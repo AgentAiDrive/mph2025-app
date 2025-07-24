@@ -9,6 +9,7 @@ These personalized parenting profiles are used in the applications prompt scheme
 
 Create personalized parenting profiles using:
 
+👪 Parent agents, 🧑‍🏫 Teacher agents, or ✨ Other agents
 📚 Books
 🧑‍ Experts
 ✨ Styles

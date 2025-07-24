@@ -67,12 +67,12 @@ def render_top_nav():
             st.rerun()
     with col2:
         if st.button("💬 Chat", key="nav_chat"):
-            st.session_state.step = 6 if st.session_state.profiles else 1
+            st.session_state.step = 7 if st.session_state.profiles else 1
             st.rerun()
     with col3:
         if st.button("📂 Saved", key="nav_saved"):
             if st.session_state.saved_responses:
-                st.session_state.step = 7
+                st.session_state.step = 8
             else:
                 st.warning("No saved responses yet.")
             st.rerun()
@@ -130,6 +130,7 @@ class PersonaProfile(BaseModel):
     parent_name: str
     child_name: str
     child_age: int
+    agent_type: str
     source_type: str
     source_name: str
     persona_description: str
@@ -162,7 +163,7 @@ if step == 0:
     with row1c1:
         if st.button("SAVED PROFILES", key="home_profiles"):
             if st.session_state.profiles:
-                st.session_state.step = 8
+                st.session_state.step = 9
                 st.rerun()
             else:
                 st.warning("No profiles yet.")
@@ -174,20 +175,20 @@ if step == 0:
     row2c1, row2c2 = st.columns(2)
     with row2c1:
         if st.button("CHAT", key="home_chat"):
-            st.session_state.step = 6 if st.session_state.profiles else 1
+            st.session_state.step = 7 if st.session_state.profiles else 1
             if not st.session_state.profiles:
                 st.warning("No profiles – create one first.")
             st.rerun()
     with row2c2:
         if st.button("SAVED CHATS", key="home_saved"):
             if st.session_state.saved_responses:
-                st.session_state.step = 7
+                st.session_state.step = 8
                 st.rerun()
             else:
                 st.warning("No saved responses yet!")
 
 elif step == 1:
-    render_top_nav() 
+    render_top_nav()
     st.markdown(
             """
             <div style="text-align:center;">
@@ -195,33 +196,61 @@ elif step == 1:
             </div>
             """,
             unsafe_allow_html=True,)
-    st.markdown('<div class="biglabel">Select A Parenting Source Type</div>', unsafe_allow_html=True)
+    st.markdown('<div class="biglabel">Select An Agent Type</div>', unsafe_allow_html=True)
     st.markdown('<div class="frame-avatar"></div>', unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
     with col1:
-        if st.button("📚  Book", key="btn_book"):
-            st.session_state.source_type = "Book"
+        if st.button("👪  Parent", key="btn_agent_parent"):
+            st.session_state.agent_type = "Parent"
             st.session_state.step = 2
             st.rerun()
     with col2:
-        if st.button("🧑‍  Expert", key="btn_expert"):
-            st.session_state.source_type = "Expert"
+        if st.button("🧑‍🏫  Teacher", key="btn_agent_teacher"):
+            st.session_state.agent_type = "Teacher"
             st.session_state.step = 2
             st.rerun()
     with col3:
-        if st.button("🌟  Style", key="btn_style"):
-            st.session_state.source_type = "Style"
+        if st.button("✨  Other", key="btn_agent_other"):
+            st.session_state.agent_type = "Other"
             st.session_state.step = 2
             st.rerun()
 
 elif step == 2:
+    render_top_nav()
     st.markdown(
                 """
                 <div style="text-align:center;">
                   <img src="https://img1.wsimg.com/isteam/ip/e13cd0a5-b867-446e-af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
                 </div>
                 """,
-                unsafe_allow_html=True,) 
+                unsafe_allow_html=True,)
+    st.markdown('<div class="biglabel">Select A Parenting Source Type</div>', unsafe_allow_html=True)
+    st.markdown('<div class="frame-avatar"></div>', unsafe_allow_html=True)
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if st.button("📚  Book", key="btn_book"):
+            st.session_state.source_type = "Book"
+            st.session_state.step = 3
+            st.rerun()
+    with col2:
+        if st.button("🧑‍  Expert", key="btn_expert"):
+            st.session_state.source_type = "Expert"
+            st.session_state.step = 3
+            st.rerun()
+    with col3:
+        if st.button("🌟  Style", key="btn_style"):
+            st.session_state.source_type = "Style"
+            st.session_state.step = 3
+            st.rerun()
+
+elif step == 3:
+    st.markdown(
+                """
+                <div style="text-align:center;">
+                  <img src="https://img1.wsimg.com/isteam/ip/e13cd0a5-b867-446e-af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
+                </div>
+                """,
+                unsafe_allow_html=True,)
     st.markdown(f'<div class="biglabel">Choose a {st.session_state.source_type}</div>', unsafe_allow_html=True)
     options = BOOKS if st.session_state.source_type == "Book" else EXPERTS if st.session_state.source_type == "Expert" else STYLES
     emoji = "📚" if st.session_state.source_type == "Book" else "🧑‍" if st.session_state.source_type == "Expert" else "🌟"
@@ -231,7 +260,7 @@ elif step == 2:
     col1, col2 = st.columns(2)
     with col1:
         if st.button("BACK", key="btn_back_step2"):
-            st.session_state.step = 1
+            st.session_state.step = 2
             st.rerun()
     with col2:
         if st.button("CREATE", key="btn_create_step2"):
@@ -240,10 +269,10 @@ elif step == 2:
                 st.warning("Please provide a name.")
             else:
                 st.session_state.source_name = src_name
-                st.session_state.step = 3
+                st.session_state.step = 4
                 st.rerun()
 
-elif step == 3:
+elif step == 4:
     st.markdown(
         """
         <div style="text-align:center;">
@@ -287,10 +316,9 @@ elif step == 3:
             st.rerun()
     with col2:
         if st.button("SAVE", key="btn_save_persona"):
-            st.session_state.step = 4
+            st.session_state.step = 5
             st.rerun()
-
-elif step == 4:
+elif step == 5:
     st.markdown(
                 """
                 <div style="text-align:center;">
@@ -317,17 +345,19 @@ elif step == 4:
                 child_age=int(c_age),
                 source_type=st.session_state.source_type,
                 source_name=st.session_state.source_name,
-                persona_description=st.session_state.persona_description
+                persona_description=st.session_state.persona_description,
+                agent_type=st.session_state.agent_type
             )
             st.session_state.profiles.append(profile.dict())
             save_json(PROFILES_FILE, st.session_state.profiles)
             st.success("Profile saved!")
-            st.session_state.step = 5
+            st.session_state.step = 6
             st.rerun()
     if st.button("BACK", key="btn_back_details"):
-        st.session_state.step = 3
+        st.session_state.step = 4
         st.rerun()
-elif step == 5:
+
+elif step == 6:
     st.markdown(
             """
             <div style="text-align:center;">
@@ -335,11 +365,11 @@ elif step == 5:
             </div>
             """,
             unsafe_allow_html=True,)
-    render_top_nav() 
+    render_top_nav()
     st.markdown('<div class="biglabel">PARENTING AGENT PROFILE CREATED! 🎉</div>', unsafe_allow_html=True)
     st.markdown('<div class="frame-avatar">📝🎉</div>', unsafe_allow_html=True)
 
-elif step == 6:
+elif step == 7:
     st.markdown(
                 """
                 <div style="text-align:center;">
@@ -347,7 +377,7 @@ elif step == 6:
                 </div>
                 """,
                 unsafe_allow_html=True,)
-    render_top_nav() 
+    render_top_nav()
     st.markdown('<div class="biglabel">1. SELECT A PARENTING AGENT</div>', unsafe_allow_html=True)
     names = [p["profile_name"] for p in st.session_state.profiles]
     col_dd, col_icon = st.columns([4,1])
@@ -356,6 +386,7 @@ elif step == 6:
     sel = st.session_state.profiles[idx]
     tooltip = (
         f"Profile: {sel['profile_name']} "
+        f"Agent: {sel.get('agent_type','Parent')} "
         f"Type: {sel['source_type']} "
         f"Source: {sel['source_name']} "
         f"Child: {sel['child_name']} "
@@ -381,6 +412,8 @@ elif step == 6:
           <div style="display:flex;justify-content:space-between;flex-wrap:wrap;">
             <div><span style="color:#27e67a;font-weight:600;">Profile:</span>
                  <span style="color:#000;font-weight:500;">{sel['profile_name']}</span></div>
+            <div><span style="color:#27e67a;font-weight:600;">Agent:</span>
+                 <span style="color:#000;font-weight:500;">{sel.get('agent_type','Parent')}</span></div>
             <div><span style="color:#27e67a;font-weight:600;">Source:</span>
                  <span style="color:#000;font-weight:500;">{sel['source_name']}</span></div>
             <div><span style="color:#27e67a;font-weight:600;">Child Age:</span>
@@ -421,7 +454,7 @@ elif step == 6:
             if record not in st.session_state.saved_responses:
                 st.session_state.saved_responses.append(record)
                 save_json(RESPONSES_FILE, st.session_state.saved_responses)
-            st.session_state.step = 7
+            st.session_state.step = 8
             st.rerun()
     with col2:
         if st.button("SEND", key="send_btn"):
@@ -448,7 +481,7 @@ elif step == 6:
                 st.error(f"OpenAI API error: {e}")
             st.rerun()
 
-elif step == 7:
+elif step == 8:
     st.markdown(
                 """
                 <div style="text-align:center;">
@@ -494,7 +527,7 @@ elif step == 7:
             st.session_state.step = 0
             st.rerun()
 
-elif step == 8:
+elif step == 9:
     st.markdown(
                 """
                 <div style="text-align:center;">
@@ -510,14 +543,15 @@ elif step == 8:
     idx = st.selectbox("Select a profile to view / edit", range(len(titles)), format_func=lambda i: titles[i], key="profile_select")
     prof = st.session_state.profiles[idx]
     with st.form("edit_profile"):
-        p_name = st.text_input("Parent first name", value=prof["parent_name"])
-        c_age  = st.number_input("Child age", 1, 21, value=prof["child_age"])
-        c_name = st.text_input("Child first name", value=prof["child_name"])
-        prof_nm= st.text_input("Profile name", value=prof["profile_name"])
-        desc   = st.text_area("Persona description", value=prof["persona_description"], height=150)
+        p_name = st.text_input("Parent first name", value=prof.get("parent_name", ""))
+        c_age  = st.number_input("Child age", 1, 21, value=prof.get("child_age", 1))
+        c_name = st.text_input("Child first name", value=prof.get("child_name", ""))
+        prof_nm= st.text_input("Profile name", value=prof.get("profile_name", ""))
+        a_type = st.selectbox("Agent type", ["Parent","Teacher","Other"], index=["Parent","Teacher","Other"].index(prof.get("agent_type","Parent")))
+        desc   = st.text_area("Persona description", value=prof.get("persona_description",""), height=150)
         saved  = st.form_submit_button("SAVE CHANGES")
     if saved:
-        prof.update(parent_name=p_name, child_age=int(c_age), child_name=c_name, profile_name=prof_nm, persona_description=desc)
+        prof.update(parent_name=p_name, child_age=int(c_age), child_name=c_name, profile_name=prof_nm, persona_description=desc, agent_type=a_type)
         st.session_state.profiles[idx] = prof
         save_json(PROFILES_FILE, st.session_state.profiles)
         st.success("Profile updated!")

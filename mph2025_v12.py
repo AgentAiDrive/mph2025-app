@@ -361,8 +361,8 @@ elif step == 4:
         with st.spinner("Thinking…"):
             try:
                 prompt = (
-                    f"Summarize the parenting philosophy, core principles, and practices of "
-                    f"the {st.session_state.source_type} '{st.session_state.source_name}' in under 200 words. "
+                    f"Summarize the philosophy, core principles, and practices of "
+                    f"the {st.session_state.source_type} '{st.session_state.source_name}' in under 200 words to describe the persona. "
                     "Respond in a JSON object with 'persona_description'."
                 )
                 out = openai.chat.completions.create(
@@ -525,7 +525,7 @@ elif step == 7:
     with col2:
         if st.button("SEND", key="send_btn"):
             base = (
-              f"You are a parenting coach with persona: {sel['persona_description']}."
+              f"Adopt the persona described here: {sel['persona_description']}. You are conversing with:"
               f" Parent: {sel['parent_name']}, Child: {sel['child_name']}, Age: {sel['child_age']}."
             )
             extra_map = {

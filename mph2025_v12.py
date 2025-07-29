@@ -36,7 +36,6 @@ st.markdown(
       padding: 6px 12px;
       border-radius: 12px;
     }
-
     .frame-avatar{font-size:1.4em;margin:6px 0 6px;display:flex;justify-content:center;color:#ffffff;}
     
     .stButton>button{
@@ -61,6 +60,10 @@ st.markdown(
     .top-nav-container > div[data-testid="stHorizontalBlock"] > div > div[data-testid="stButton"][data-key="nav_saved"] > button { background: #1d3557 !important; }
     /* --- Answer bubble --- */
     .answer-box{background:#23683c;border-radius:12px;padding:14px 18px;color:#fff;white-space:pre-wrap;margin-top:8px;}
+    /* --- Home cards --- */
+    .home-card{background:rgba(255,255,255,0.15);border-radius:16px;padding:12px;margin:6px;color:#fff;}
+    .home-card-title{font-weight:800;margin-bottom:6px;}
+    .home-small{font-size:0.8em;opacity:0.85;}
     @media (max-height:750px){.stApp{min-height:640px;}}
     </style>
     """, unsafe_allow_html=True)
@@ -86,80 +89,7 @@ def render_top_nav():
             else:
                 st.warning("No saved responses yet.")
             st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# ---------------------------------------------------------------------------
-#  HELPER FUNCTIONS & CONSTANTS
-# ---------------------------------------------------------------------------
-SOURCES_FILE = "parent_helpers_sources.json"
-DEFAULT_SOURCES = {
-    "Parent": {
-        "Book": ["The Whole-Brain Child", "Peaceful Parent, Happy Kids"],
-        "Expert": ["Dr. Laura Markham", "Dr. Daniel Siegel"],
-        "Style": ["Authoritative", "Gentle Parenting"]
-    },
-    "Teacher": {
-        "Book": ["Teach Like a Champion", "Mindset"],
-        "Expert": ["Carol Dweck", "Doug Lemov"],
-        "Style": ["Project-Based Learning", "SEL"]
-    },
-    "Other": {
-        "Book": ["Custom Book (enter manually)"],
-        "Expert": ["Custom Expert (enter manually)"],
-        "Style": ["Custom Style (enter manually)"]
-    }
-}
-
-def load_sources():
-    if not os.path.exists(SOURCES_FILE):
-        save_sources(DEFAULT_SOURCES)
-        return DEFAULT_SOURCES
-    try:
-        with open(SOURCES_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception:
-        return DEFAULT_SOURCES
-
-def save_sources(sources):
-    with open(SOURCES_FILE, "w", encoding="utf-8") as f:
-        json.dump(sources, f, indent=2)
-
-
-PROFILES_FILE = "parent_helpers_profiles.json"
-RESPONSES_FILE = "parent_helpers_responses.json"
-
-def load_json(path: str):
-    if not os.path.exists(path):
-        return []
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception as e:
-        st.error(f"Error loading {path}: {e}")
-        return []
-
-def save_json(path: str, data):
-    try:
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2)
-    except Exception as e:
-        st.error(f"Error writing {path}: {e}")
-
-for key, default in {
-    "profiles":        load_json(PROFILES_FILE),
-    "saved_responses": load_json(RESPONSES_FILE),
-    "last_answer":     "",
-    "sources":         load_sources()
-}.items():
-    st.session_state.setdefault(key, default)
-
-def get_source_options(agent_type):
-    return st.session_state["sources"].get(agent_type, {"Book":[], "Expert":[], "Style":[]})
-
-step = st.session_state.get("step", 0)
-openai.api_key = st.secrets.get("openai_key", "YOUR_OPENAI_API_KEY")
-
-AGENT_TYPES = ["Parent", "Teacher", "Other"]
+@@ -163,110 +167,156 @@ AGENT_TYPES = ["Parent", "Teacher", "Other"]
 
 class PersonaProfile(BaseModel):
     profile_name: str
@@ -185,10 +115,10 @@ TOOLTIPS = {
 #  STEP LOGIC
 # ---------------------------------------------------------------------------
 if step == 0:
-    # -- Section: Home Container --
-    with st.container():   
+    # -- Section: Home Header --
+    with st.container():
         col1, col2 = st.columns(2)
-        with col1: 
+        with col1:
             st.markdown(
                 """
                 <div style="text-align:center;">
@@ -200,51 +130,98 @@ if step == 0:
         with col2:
             st.markdown("<div class='biglabel'>MPH</div>", unsafe_allow_html=True)
 
-    # -- Section: AGENT PROFILES --
-    with st.container():
-        col1, col2, col3 = st.columns(3)
-        with col1: 
-            st.markdown("<div class='biglabel'>AGENTS:</div>", unsafe_allow_html=True)
-        with col2:
-            if st.button("SAVED AGENTS", key="home_profiles"):
-                if st.session_state.profiles:
-                    st.session_state.step = 9
-                    st.rerun()
-                else:
-                    st.warning("No profiles yet.")
-        with col3:
-            if st.button("NEW AGENT", key="home_create"):
-                st.session_state.step = 1
-                st.rerun()
+    # -- Card Layout ----------------------------------------------------
+    row1_col1, row1_col2 = st.columns(2)
+    row2_col1, row2_col2 = st.columns(2)
+    row3_col1, row3_col2 = st.columns(2)
 
-    # -- Section: AGENT CHAT --
-    with st.container():
-        col1, col2, col3 = st.columns(3)
-        with col1: 
-            st.markdown("<div class='biglabel'>CHAT:</div>", unsafe_allow_html=True)
-        with col2:
-            if st.button("SAVED CHATS", key="home_saved"):
-                if st.session_state.saved_responses:
-                    st.session_state.step = 8
-                    st.rerun()
-                else:
-                    st.warning("No saved responses yet!")
-        with col3:
-            if st.button("NEW CHAT", key="home_chat"):
-                st.session_state.step = 7 if st.session_state.profiles else 1
-                if not st.session_state.profiles:
-                    st.warning("No profiles – create one first.")
+    # --- Card: Agents ---
+    with row1_col1:
+        st.markdown('<div class="home-card">', unsafe_allow_html=True)
+        st.markdown('<div class="home-card-title">AGENTS</div>', unsafe_allow_html=True)
+        if st.button('SAVED AGENTS', key='home_profiles'):
+            if st.session_state.profiles:
+                st.session_state.step = 9
                 st.rerun()
-            
-    # -- Section: AGENT SOURCES --
-    with st.container():
-        col1, col2, col3 = st.columns(3)
-        with col1: 
-            st.markdown("<div class='biglabel'>SOURCES:</div>", unsafe_allow_html=True)
-        with col2:
-            if st.button("EDIT SOURCES", key="edit_sources"):
-                st.session_state.step = 10
+            else:
+                st.warning('No profiles yet.')
+        if st.button('NEW AGENT', key='home_create'):
+            st.session_state.step = 1
+            st.rerun()
+        with st.expander('Profiles'):
+            if st.session_state.profiles:
+                for p in st.session_state.profiles:
+                    st.markdown(f"<p class='home-small'>{p['profile_name']}</p>", unsafe_allow_html=True)
+            else:
+                st.markdown('<p class="home-small">No profiles yet.</p>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    # --- Card: Chats ---
+    with row1_col2:
+        st.markdown('<div class="home-card">', unsafe_allow_html=True)
+        st.markdown('<div class="home-card-title">CHATS</div>', unsafe_allow_html=True)
+        if st.button('SAVED CHATS', key='home_saved'):
+            if st.session_state.saved_responses:
+                st.session_state.step = 8
                 st.rerun()
+            else:
+                st.warning('No saved responses yet!')
+        if st.button('NEW CHAT', key='home_chat'):
+            st.session_state.step = 7 if st.session_state.profiles else 1
+            if not st.session_state.profiles:
+                st.warning('No profiles – create one first.')
+            st.rerun()
+        with st.expander('Saved Count'):
+            cnt = len(st.session_state.saved_responses)
+            st.markdown(f"<p class='home-small'>{cnt} saved</p>", unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    # --- Card: Sources ---
+    with row2_col1:
+        st.markdown('<div class="home-card">', unsafe_allow_html=True)
+        st.markdown('<div class="home-card-title">SOURCES</div>', unsafe_allow_html=True)
+        if st.button('EDIT SOURCES', key='edit_sources'):
+            st.session_state.step = 10
+            st.rerun()
+        with st.expander('Counts'):
+            for atype in AGENT_TYPES:
+                total = sum(len(st.session_state['sources'].get(atype, {}).get(t, [])) for t in ['Book','Expert','Style'])
+                st.markdown(f"<p class='home-small'>{atype}: {total}</p>", unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    # --- Card: About ---
+    with row2_col2:
+        st.markdown('<div class="home-card">', unsafe_allow_html=True)
+        st.markdown('<div class="home-card-title">ABOUT MPH</div>', unsafe_allow_html=True)
+        st.markdown('<p class="home-small">Personalized helpers for parents.</p>', unsafe_allow_html=True)
+        with st.expander('More'):
+            st.markdown('<p class="home-small">Powered by OpenAI</p>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    # --- Card: Data ---
+    with row3_col1:
+        st.markdown('<div class="home-card">', unsafe_allow_html=True)
+        st.markdown('<div class="home-card-title">DATA</div>', unsafe_allow_html=True)
+        if st.button('CLEAR DATA', key='clear_data'):
+            st.session_state.profiles = []
+            st.session_state.saved_responses = []
+            save_json(PROFILES_FILE, [])
+            save_json(RESPONSES_FILE, [])
+            st.success('All data cleared.')
+        with st.expander('Counts'):
+            st.markdown(f"<p class='home-small'>Profiles: {len(st.session_state.profiles)}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p class='home-small'>Chats: {len(st.session_state.saved_responses)}</p>", unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    # --- Card: Help ---
+    with row3_col2:
+        st.markdown('<div class="home-card">', unsafe_allow_html=True)
+        st.markdown('<div class="home-card-title">HELP</div>', unsafe_allow_html=True)
+        st.markdown('<p class="home-small">Create agents then chat.</p>', unsafe_allow_html=True)
+        with st.expander('More'):
+            st.markdown('<p class="home-small">Use Sources to build personas. Saved items appear in their cards.</p>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
 
 elif step == 1:
     render_top_nav()

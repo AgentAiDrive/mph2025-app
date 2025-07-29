@@ -90,7 +90,60 @@ def render_top_nav():
                 st.warning("No saved responses yet.")
             st.rerun()
 
+# ---------------------------------------------------------------------------
+#  HELPER FUNCTIONS & CONSTANTS
+# ---------------------------------------------------------------------------
+PROFILES_FILE = "parent_helpers_profiles.json"
+RESPONSES_FILE = "parent_helpers_responses.json"
+
+def load_json(path: str):
+    if not os.path.exists(path):
+        return []
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        st.error(f"Error loading {path}: {e}")
+        return []
+
+def save_json(path: str, data):
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+    except Exception as e:
+        st.error(f"Error writing {path}: {e}")
+
+for key, default in {
+    "profiles":        load_json(PROFILES_FILE),
+    "saved_responses": load_json(RESPONSES_FILE),
+    "last_answer":     "",
+}.items():
+    st.session_state.setdefault(key, default)
+
+step = st.session_state.get("step", 0)
+openai.api_key = st.secrets.get("openai_key", "YOUR_OPENAI_API_KEY")
+
 AGENT_TYPES = ["Parent", "Teacher", "Other"]
+PARENT_SOURCES = {
+    "Book": ["The Whole-Brain Child", "Peaceful Parent, Happy Kids"],
+    "Expert": ["Dr. Laura Markham", "Dr. Daniel Siegel"],
+    "Style": ["Authoritative", "Gentle Parenting"]
+}
+TEACHER_SOURCES = {
+    "Book": ["Teach Like a Champion", "Mindset"],
+    "Expert": ["Carol Dweck", "Doug Lemov"],
+    "Style": ["Project-Based Learning", "SEL"]
+}
+OTHER_SOURCES = {
+    "Book": ["Custom Book (enter manually)"],
+    "Expert": ["Custom Expert (enter manually)"],
+    "Style": ["Custom Style (enter manually)"]
+}
+
+def get_source_options(agent_type):
+    if agent_type == "Parent": return PARENT_SOURCES
+    elif agent_type == "Teacher": return TEACHER_SOURCES
+    else: return OTHER_SOURCES
 
 class PersonaProfile(BaseModel):
     profile_name: str

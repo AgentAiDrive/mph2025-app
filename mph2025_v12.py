@@ -89,7 +89,8 @@ def render_top_nav():
             else:
                 st.warning("No saved responses yet.")
             st.rerun()
-@@ -163,110 +167,156 @@ AGENT_TYPES = ["Parent", "Teacher", "Other"]
+
+AGENT_TYPES = ["Parent", "Teacher", "Other"]
 
 class PersonaProfile(BaseModel):
     profile_name: str

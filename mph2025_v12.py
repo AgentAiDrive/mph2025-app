@@ -184,7 +184,6 @@ if step == 0:
 
     # --- Card: Agents ---
     with row1_col1:
-        st.markdown('<div class="home-card">', unsafe_allow_html=True)
         st.markdown('<div class="biglabel">AGENTS</div>', unsafe_allow_html=True)
         if st.button('SAVED AGENTS', key='home_profiles'):
             if st.session_state.profiles:
@@ -205,7 +204,6 @@ if step == 0:
 
     # --- Card: Chats ---
     with row1_col2:
-        st.markdown('<div class="home-card">', unsafe_allow_html=True)
         st.markdown('<div class="biglabel">CHATS</div>', unsafe_allow_html=True)
         if st.button('SAVED CHATS', key='home_saved'):
             if st.session_state.saved_responses:
@@ -225,8 +223,7 @@ if step == 0:
 
     # --- Card: Sources ---
     with row2_col1:
-        st.markdown('<div class="home-card">', unsafe_allow_html=True)
-        st.markdown('<div class="home-card-title">SOURCES</div>', unsafe_allow_html=True)
+        st.markdown('<div class="biglabel">SOURCES</div>', unsafe_allow_html=True)
         if st.button('EDIT SOURCES', key='edit_sources'):
             st.session_state.step = 10
             st.rerun()
@@ -238,11 +235,10 @@ if step == 0:
 
     # --- Card: About ---
     with row2_col2:
-        st.markdown('<div class="home-card">', unsafe_allow_html=True)
-        st.markdown('<div class="home-card-title">ABOUT MPH</div>', unsafe_allow_html=True)
+        st.markdown('<div class="biglabel">ABOUT</div>', unsafe_allow_html=True)
         st.markdown('<p class="home-small">Personalized helpers for parents.</p>', unsafe_allow_html=True)
         with st.expander('More'):
-            st.markdown('<p class="home-small">Powered by OpenAI</p>', unsafe_allow_html=True)
+            st.markdown('<p class="home-small">powered by context engineering messages dynamically chatgpt 4.5</p>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
     # --- Card: Data ---

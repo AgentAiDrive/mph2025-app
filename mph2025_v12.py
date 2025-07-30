@@ -177,20 +177,6 @@ TOOLTIPS = {
 #  STEP LOGIC
 # ---------------------------------------------------------------------------
 if step == 0:
-    # -- Section: Home Header --
-    with st.container():
-        col1, col2 = st.columns(2)
-        with col1:
-            st.markdown(
-                """
-                <div style="text-align:center;">
-                  <img src="https://img1.wsimg.com/isteam/ip/e13cd0a5-b867-446e-af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-        with col2:
-
     # -- Card Layout ----------------------------------------------------
     row1_col1, row1_col2 = st.columns(2)
     row2_col1, row2_col2 = st.columns(2)

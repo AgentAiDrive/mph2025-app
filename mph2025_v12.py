@@ -184,7 +184,7 @@ if step == 0:
 
     # --- Card: Agents ---
     with row1_col1:
-        st.markdown('<div class="home-card">', unsafe_allow_html=True)
+        st.markdown('<div class="home-card">'AGENTS</div>, unsafe_allow_html=True)
         st.markdown('<div class="home-card-title">AGENTS</div>', unsafe_allow_html=True)
         if st.button('SAVED AGENTS', key='home_profiles'):
             if st.session_state.profiles:
@@ -205,8 +205,7 @@ if step == 0:
 
     # --- Card: Chats ---
     with row1_col2:
-        st.markdown('<div class="home-card">', unsafe_allow_html=True)
-        st.markdown('<div class="home-card-title">CHATS</div>', unsafe_allow_html=True)
+        st.markdown('<div class="home-card">'CHATS</div>, unsafe_allow_html=True)
         if st.button('SAVED CHATS', key='home_saved'):
             if st.session_state.saved_responses:
                 st.session_state.step = 8

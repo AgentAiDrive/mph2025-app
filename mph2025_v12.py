@@ -205,7 +205,8 @@ if step == 0:
 
     # --- Card: Chats ---
     with row1_col2:
-        st.markdown('<div class="home-card">'CHATS</div>, unsafe_allow_html=True)
+        st.markdown('<div class="home-card">', unsafe_allow_html=True)
+        st.markdown('<div class="biglabel">CHATS</div>', unsafe_allow_html=True)
         if st.button('SAVED CHATS', key='home_saved'):
             if st.session_state.saved_responses:
                 st.session_state.step = 8

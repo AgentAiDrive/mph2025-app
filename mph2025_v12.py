@@ -265,7 +265,7 @@ if step == 0:
 
 
 elif step == 1:
-render_top_nav()
+    render_top_nav()
     st.markdown(
             """
             <div style="text-align:center;">

@@ -265,7 +265,7 @@ if step == 0:
 
 
 elif step == 1:
-    render_top_nav()
+render_top_nav()
     st.markdown(
             """
             <div style="text-align:center;">
@@ -458,7 +458,8 @@ elif step == 6:
     st.markdown('<div class="frame-avatar"></div>', unsafe_allow_html=True)
 
 elif step == 7:
-        # -- Row: Section Title and Agent Selector in One Line --
+    render_top_nav() 
+    # -- Row: Section Title and Agent Selector in One Line --
     col1, col2 = st.columns([3, 5])
 
     # Column 1: Header

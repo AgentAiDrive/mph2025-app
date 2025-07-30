@@ -190,7 +190,6 @@ if step == 0:
                 unsafe_allow_html=True,
             )
         with col2:
-            st.markdown("<div class='biglabel'>MPH</div>", unsafe_allow_html=True)
 
     # -- Card Layout ----------------------------------------------------
     row1_col1, row1_col2 = st.columns(2)

@@ -149,7 +149,10 @@ def get_source_options(agent_type):
     if agent_type == "Parent": return PARENT_SOURCES
     elif agent_type == "Teacher": return TEACHER_SOURCES
     else: return OTHER_SOURCES
-
+        
+if 'sources' not in st.session_state:
+    st.session_state['sources'] = {atype: [] for atype in AGENT_TYPES}
+    
 class PersonaProfile(BaseModel):
     profile_name: str
     parent_name: str

@@ -661,13 +661,39 @@ elif step == 10:
     )
     render_top_nav()
     st.markdown('<div class="biglabel">EDIT SOURCE LISTS</div>', unsafe_allow_html=True)
-    agent_type = st.selectbox("Agent Type", AGENT_TYPES, key="edit_agent_type")
-    source_type = st.selectbox("Source Type", ["Book","Expert","Style"], key="edit_source_type")
+
+    # Source persistence file
+    SOURCES_FILE = "parent_helpers_sources.json"
+
+    # Define save_sources function
+    def save_sources(sources):
+        try:
+            with open(SOURCES_FILE, "w", encoding="utf-8") as f:
+                json.dump(sources, f, indent=2)
+        except Exception as e:
+            st.error(f"Error saving sources: {e}")
+
+    # Load sources from file if not already
+    def load_sources():
+        return load_json(SOURCES_FILE)
+
+    # Initialize sources if needed
+    if 'sources' not in st.session_state:
+        st.session_state['sources'] = load_sources() or {
+            "Parent": PARENT_SOURCES,
+            "Teacher": TEACHER_SOURCES,
+            "Other": OTHER_SOURCES
+        }
+
     sources = st.session_state["sources"]
+    agent_type = st.selectbox("Agent Type", AGENT_TYPES, key="edit_agent_type")
+    source_type = st.selectbox("Source Type", ["Book", "Expert", "Style"], key="edit_source_type")
+
     items = sources.get(agent_type, {}).get(source_type, [])
     st.write(f"**Current {source_type}s for {agent_type}:**")
     to_remove = st.multiselect("Select to remove", items, key="remove_sources")
     new_item = st.text_input(f"Add new {source_type}:", key="add_source")
+
     c1, c2, c3 = st.columns(3)
     with c1:
         if st.button("Remove Selected"):
@@ -676,6 +702,7 @@ elif step == 10:
             save_sources(sources)
             st.success("Removed selected!")
             st.rerun()
+
     with c2:
         if st.button("Add"):
             if new_item and new_item not in items:
@@ -686,10 +713,12 @@ elif step == 10:
                 st.rerun()
             elif new_item:
                 st.warning("Already in list.")
+
     with c3:
         if st.button("Back to Home"):
             st.session_state.step = 0
             st.rerun()
+
     st.markdown("<br>", unsafe_allow_html=True)
     st.write("**Current list:**")
     st.write(sources.get(agent_type, {}).get(source_type, []))

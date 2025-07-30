@@ -243,8 +243,7 @@ if step == 0:
 
     # --- Card: Data ---
     with row3_col1:
-        st.markdown('<div class="home-card">', unsafe_allow_html=True)
-        st.markdown('<div class="home-card-title">DATA</div>', unsafe_allow_html=True)
+        st.markdown('<div class="biglabel">DATA</div>', unsafe_allow_html=True)
         if st.button('CLEAR DATA', key='clear_data'):
             st.session_state.profiles = []
             st.session_state.saved_responses = []
@@ -258,8 +257,7 @@ if step == 0:
 
     # --- Card: Help ---
     with row3_col2:
-        st.markdown('<div class="home-card">', unsafe_allow_html=True)
-        st.markdown('<div class="home-card-title">HELP</div>', unsafe_allow_html=True)
+        st.markdown('<div class="biglabel">HELP</div>', unsafe_allow_html=True)
         st.markdown('<p class="home-small">Create agents then chat.</p>', unsafe_allow_html=True)
         with st.expander('More'):
             st.markdown('<p class="home-small">Use Sources to build personas. Saved items appear in their cards.</p>', unsafe_allow_html=True)

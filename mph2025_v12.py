@@ -139,7 +139,12 @@ OTHER_SOURCES = {
     "Expert": ["Custom Expert (enter manually)"],
     "Style": ["Custom Style (enter manually)"]
 }
-
+if 'sources' not in st.session_state:
+    st.session_state['sources'] = {
+        "Parent": PARENT_SOURCES,
+        "Teacher": TEACHER_SOURCES,
+        "Other": OTHER_SOURCES
+    }
 def get_source_options(agent_type):
     if agent_type == "Parent": return PARENT_SOURCES
     elif agent_type == "Teacher": return TEACHER_SOURCES

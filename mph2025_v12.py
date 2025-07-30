@@ -95,6 +95,7 @@ def render_top_nav():
 # ---------------------------------------------------------------------------
 PROFILES_FILE = "parent_helpers_profiles.json"
 RESPONSES_FILE = "parent_helpers_responses.json"
+SOURCES_FILE = "parent_helpers_sources.json"
 
 def load_json(path: str):
     if not os.path.exists(path):
@@ -122,7 +123,14 @@ for key, default in {
 
 step = st.session_state.get("step", 0)
 openai.api_key = st.secrets.get("openai_key", "YOUR_OPENAI_API_KEY")
-
+if 'sources' not in st.session_state:
+    def load_sources():
+        return load_json(SOURCES_FILE)
+    st.session_state['sources'] = load_sources() or {
+        "Parent": PARENT_SOURCES,
+        "Teacher": TEACHER_SOURCES,
+        "Other": OTHER_SOURCES
+    }
 AGENT_TYPES = ["Parent", "Teacher", "Other"]
 PARENT_SOURCES = {
     "Book": ["The Whole-Brain Child", "Peaceful Parent, Happy Kids"],
@@ -139,12 +147,6 @@ OTHER_SOURCES = {
     "Expert": ["Custom Expert (enter manually)"],
     "Style": ["Custom Style (enter manually)"]
 }
-if 'sources' not in st.session_state:
-    st.session_state['sources'] = {
-        "Parent": PARENT_SOURCES,
-        "Teacher": TEACHER_SOURCES,
-        "Other": OTHER_SOURCES
-    }
 def get_source_options(agent_type):
     return st.session_state.get("sources", {}).get(agent_type, {})
         

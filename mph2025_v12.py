@@ -184,7 +184,7 @@ if step == 0:
 
     # --- Card: Agents ---
     with row1_col1:
-        st.markdown('<div class="home-card">, unsafe_allow_html=True)
+        st.markdown('<div class="home-card">', unsafe_allow_html=True)
         st.markdown('<div class="biglabel">AGENTS</div>', unsafe_allow_html=True)
         if st.button('SAVED AGENTS', key='home_profiles'):
             if st.session_state.profiles:

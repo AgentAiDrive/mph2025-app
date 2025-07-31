@@ -146,10 +146,26 @@ OTHER_SOURCES = {
 
 def get_source_options(agent_type):
     return st.session_state.get("sources", {}).get(agent_type, {})
-        
-if 'sources' not in st.session_state:
-    st.session_state['sources'] = {atype: [] for atype in AGENT_TYPES}
     
+if 'sources' not in st.session_state:
+    st.session_state['sources'] = {
+        "Parent": {
+            "Book": ["The Whole-Brain Child", "Peaceful Parent, Happy Kids"],
+            "Expert": ["Dr. Laura Markham", "Dr. Daniel Siegel"],
+            "Style": ["Authoritative", "Gentle Parenting"]
+        },
+        "Teacher": {
+            "Book": ["Teach Like a Champion", "Mindset"],
+            "Expert": ["Carol Dweck", "Doug Lemov"],
+            "Style": ["Project-Based Learning", "SEL"]
+        },
+        "Other": {
+            "Book": ["Custom Book (enter manually)"],
+            "Expert": ["Custom Expert (enter manually)"],
+            "Style": ["Custom Style (enter manually)"]
+        }
+    }
+
 class PersonaProfile(BaseModel):
     profile_name: str
     parent_name: str

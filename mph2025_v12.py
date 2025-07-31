@@ -598,7 +598,7 @@ elif step == 7:
             if st.button(EMOJIS[sc], key=f"type_{sc}", help=TOOLTIPS[sc]):
                 st.session_state.shortcut = sc
 
-    st.markdown('<div class="biglabel">3. WHAT DO YOU WANT TO ASK?</div>', unsafe_allow_html=True)
+    st.markdown('<div class="home-small">3. WHAT DO YOU WANT TO ASK?</div>', unsafe_allow_html=True)
     query = st.text_area("Type here", key="chat_query")
     if st.session_state.last_answer:
         st.markdown(f"<div class='answer-box'>{st.session_state.last_answer}</div>", unsafe_allow_html=True)

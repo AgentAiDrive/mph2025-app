@@ -58,12 +58,14 @@ st.markdown(
     .top-nav-container > div[data-testid="stHorizontalBlock"] > div > div[data-testid="stButton"][data-key="nav_home"] > button { background: #e63946 !important; }
     .top-nav-container > div[data-testid="stHorizontalBlock"] > div > div[data-testid="stButton"][data-key="nav_chat"] > button { background: #27e67a !important; }
     .top-nav-container > div[data-testid="stHorizontalBlock"] > div > div[data-testid="stButton"][data-key="nav_saved"] > button { background: #1d3557 !important; }
+   
     /* --- Answer bubble --- */
     .answer-box{background:#23683c;border-radius:12px;padding:14px 18px;color:#fff;white-space:pre-wrap;margin-top:8px;}
+   
     /* --- Home cards --- */
     .home-card{background:rgba(255,255,255,0.15);border-radius:16px;padding:12px;margin:6px;color:#fff;}
     .home-card-title{font-weight:800;margin-bottom:6px;}
-    .home-small{font-size:0.8em;opacity:0.85;}
+    .home-small{font-size:0.8em;opacity:0.85;background: rgba(255, 255, 255, 0.15);}
     @media (max-height:750px){.stApp{min-height:640px;}}
     </style>
     """, unsafe_allow_html=True)

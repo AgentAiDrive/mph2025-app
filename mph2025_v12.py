@@ -407,6 +407,8 @@ elif step == 3:
                 st.warning("Please provide a name.")
             else:
                 st.session_state.source_name = src_name
+                # clear any old persona so step 4 always regenerates
+                st.session_state.pop("persona_description", None)
                 st.session_state.step = 4
                 st.rerun()
                 

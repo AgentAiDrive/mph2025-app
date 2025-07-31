@@ -291,10 +291,10 @@ if step == 0:
     total = sum(
     len(st.session_state['sources'].get(atype, {}).get(t, []))
     for t in ['Book', 'Expert', 'Style']
-)
-st.markdown(f"<p class='home-small'>{atype}: {total}</p>", unsafe_allow_html=True)
+    )
+    st.markdown(f"<p class='home-small'>{atype}: {total}</p>", unsafe_allow_html=True)
 
-        st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 elif step == 1:
     render_top_nav()

@@ -497,16 +497,38 @@ elif step == 5:
         st.rerun()
 
 elif step == 6:
-    st.markdown(
-            """
-            <div style="text-align:center;">
-              <img src="https://img1.wsimg.com/isteam/ip/e13cd0a5-b867-446e-af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
-            </div>
-            """,
-            unsafe_allow_html=True,)
+    # Top nav + header
     render_top_nav()
+    st.markdown(
+        """
+        <div style="text-align:center;">
+          <img src="https://img1.wsimg.com/isteam/ip/e13cd0a5-b867-446e-af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     st.markdown('<div class="biglabel">AGENT PROFILE CREATED!</div>', unsafe_allow_html=True)
     st.markdown('<div class="frame-avatar"></div>', unsafe_allow_html=True)
+
+    # Pull the latest profile
+    profile = st.session_state.profiles[-1]
+
+    # Render it in a colored “card”
+    st.markdown(
+        f"""
+        <div class="home-card">
+          <p><strong>Profile Name:</strong> {profile['profile_name']}</p>
+          <p><strong>Parent:</strong> {profile['parent_name']}</p>
+          <p><strong>Child:</strong> {profile['child_name']} (Age {profile['child_age']})</p>
+          <p><strong>Agent Type:</strong> {profile['agent_type']}</p>
+          <p><strong>Source ({profile['source_type']}):</strong> {profile['source_name']}</p>
+          <p><strong>Persona Description:</strong></p>
+          <div class="answer-box" style="margin-top:4px;">{profile['persona_description']}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
 
 elif step == 7:
     render_top_nav() 
@@ -618,13 +640,6 @@ elif step == 7:
             st.rerun()
 
 elif step == 8:
-    st.markdown(
-                """
-                <div style="text-align:center;">
-                  <img src="https://img1.wsimg.com/isteam/ip/e13cd0a5-b867-446e-af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
-                </div>
-                """,
-                unsafe_allow_html=True,)
     render_top_nav()
     st.markdown('<div class="biglabel">SELECT A SAVED CHAT</div>', unsafe_allow_html=True)
     if not st.session_state.saved_responses:
@@ -664,13 +679,6 @@ elif step == 8:
             st.rerun()
 
 elif step == 9:
-    st.markdown(
-                """
-                <div style="text-align:center;">
-                  <img src="https://img1.wsimg.com/isteam/ip/e13cd0a5-b867-446e-af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
-                </div>
-                """,
-                unsafe_allow_html=True,)
     render_top_nav()
     st.markdown('<div class="biglabel">AGENT PROFILES</div>', unsafe_allow_html=True)
     if not st.session_state.profiles:
@@ -703,13 +711,6 @@ elif step == 9:
             st.rerun()
 
 elif step == 10:
-    st.markdown(
-        """
-        <div style="text-align:center;">
-          <img src="https://img1.wsimg.com/isteam/ip/e13cd0a5-b867-446e-af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
-        </div>
-        """, unsafe_allow_html=True
-    )
     render_top_nav()
     st.markdown('<div class="biglabel">EDIT SOURCE LISTS</div>', unsafe_allow_html=True)
 

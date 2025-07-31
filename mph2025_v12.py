@@ -173,93 +173,124 @@ TOOLTIPS = {
 # ---------------------------------------------------------------------------
 #  STEP LOGIC
 # ---------------------------------------------------------------------------
+def render_home_card(title, buttons=None, expander_label=None, expander_body=None):
+    st.markdown(f'<div class="biglabel">{title}</div>', unsafe_allow_html=True)
+    if buttons:
+        for label, key, condition, action in buttons:
+            if st.button(label, key=key):
+                if condition is None or condition():
+                    action()
+    if expander_label and expander_body:
+        with st.expander(expander_label):
+            expander_body()
+
 if step == 0:
-    # -- Card Layout ----------------------------------------------------
     row1_col1, row1_col2 = st.columns(2)
     row2_col1, row2_col2 = st.columns(2)
     row3_col1, row3_col2 = st.columns(2)
 
-    # --- Card: Agents ---
+    # --- Card: AGENTS ---
     with row1_col1:
-        st.markdown('<div class="biglabel">AGENTS</div>', unsafe_allow_html=True)
-        if st.button('SAVED AGENTS', key='home_profiles'):
-            if st.session_state.profiles:
-                st.session_state.step = 9
-                st.rerun()
-            else:
-                st.warning('No profiles yet.')
-        if st.button('NEW AGENT', key='home_create'):
-            st.session_state.step = 1
-            st.rerun()
-        with st.expander('Profiles'):
-            if st.session_state.profiles:
-                for p in st.session_state.profiles:
-                    st.markdown(f"<p class='home-small'>{p['profile_name']}</p>", unsafe_allow_html=True)
-            else:
-                st.markdown('<p class="home-small">No profiles yet.</p>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+        render_home_card(
+            "AGENTS",
+            buttons=[
+                ("SAVED AGENTS", "home_profiles", lambda: st.session_state.profiles,
+                 lambda: (st.session_state.__setitem__('step', 9), st.rerun())),
+                ("NEW AGENT", "home_create", None,
+                 lambda: (st.session_state.__setitem__('step', 1), st.rerun()))
+            ],
+            expander_label="Profiles",
+            expander_body=lambda: [
+                st.markdown(f"<p class='home-small'>{p['profile_name']}</p>", unsafe_allow_html=True)
+                for p in st.session_state.profiles
+            ] if st.session_state.profiles else st.markdown(
+                '<p class="home-small">No profiles yet.</p>', unsafe_allow_html=True
+            )
+        )
 
-    # --- Card: Chats ---
+    # --- Card: CHATS ---
     with row1_col2:
-        st.markdown('<div class="biglabel">CHATS</div>', unsafe_allow_html=True)
-        if st.button('SAVED CHATS', key='home_saved'):
-            if st.session_state.saved_responses:
-                st.session_state.step = 8
-                st.rerun()
-            else:
-                st.warning('No saved responses yet!')
-        if st.button('NEW CHAT', key='home_chat'):
-            st.session_state.step = 7 if st.session_state.profiles else 1
-            if not st.session_state.profiles:
-                st.warning('No profiles – create one first.')
-            st.rerun()
-        with st.expander('Saved Count'):
-            cnt = len(st.session_state.saved_responses)
-            st.markdown(f"<p class='home-small'>{cnt} saved</p>", unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+        render_home_card(
+            "CHATS",
+            buttons=[
+                ("SAVED CHATS", "home_saved", lambda: st.session_state.saved_responses,
+                 lambda: (st.session_state.__setitem__('step', 8), st.rerun())),
+                ("NEW CHAT", "home_chat", None, lambda: (
+                    st.session_state.__setitem__('step', 7 if st.session_state.profiles else 1),
+                    st.warning('No profiles – create one first.') if not st.session_state.profiles else None,
+                    st.rerun()
+                ))
+            ],
+            expander_label="Saved Count",
+            expander_body=lambda: st.markdown(
+                f"<p class='home-small'>{len(st.session_state.saved_responses)} saved</p>",
+                unsafe_allow_html=True
+            )
+        )
 
-    # --- Card: Sources ---
+    # --- Card: SOURCES ---
     with row2_col1:
-        st.markdown('<div class="biglabel">SOURCES</div>', unsafe_allow_html=True)
-        if st.button('EDIT SOURCES', key='edit_sources'):
-            st.session_state.step = 10
-            st.rerun()
-        with st.expander('Counts'):
-            for atype in AGENT_TYPES:
-                total = sum(len(st.session_state['sources'].get(atype, {}).get(t, [])) for t in ['Book','Expert','Style'])
+        render_home_card(
+            "SOURCES",
+            buttons=[
+                ("EDIT SOURCES", "edit_sources", None,
+                 lambda: (st.session_state.__setitem__('step', 10), st.rerun()))
+            ],
+            expander_label="Counts",
+            expander_body=lambda: [
+                st.markdown(
+                    f"<p class='home-small'>{atype}: {sum(len(st.session_state['sources'].get(atype, {}).get(t, [])) for t in ['Book','Expert','Style'])}</p>",
+                    unsafe_allow_html=True
+                ) for atype in AGENT_TYPES
+            ]
+        )
+
+    # --- Card: ABOUT ---
+    with row2_col2:
+        render_home_card(
+            "ABOUT",
+            expander_label="More",
+            expander_body=lambda: st.markdown(
+                '<p class="home-small">powered by context engineering messages dynamically chatgpt 4.5</p>',
+                unsafe_allow_html=True
+            )
+        )
+        st.markdown('<p class="home-small">Personalized helpers for parents.</p>', unsafe_allow_html=True)
+
+    # --- Card: DATA ---
+    with row3_col1:
+        render_home_card(
+            "DATA",
+            buttons=[
+                ("CLEAR DATA", "clear_data", None, lambda: (
+                    st.session_state.__setitem__('profiles', []),
+                    st.session_state.__setitem__('saved_responses', []),
+                    save_json(PROFILES_FILE, []),
+                    save_json(RESPONSES_FILE, []),
+                    st.success("All data cleared.")
+                ))
+            ],
+            expander_label="Counts",
+            expander_body=lambda: (
+                st.markdown(f"<p class='home-small'>Profiles: {len(st.session_state.profiles)}</p>", unsafe_allow_html=True),
+                st.markdown(f"<p class='home-small'>Chats: {len(st.session_state.saved_responses)}</p>", unsafe_allow_html=True)
+            )
+        )
+
+    # --- Card: HELP ---
+    with row3_col2:
+        render_home_card(
+            "HELP",
+            expander_label="More",
+            expander_body=lambda: st.markdown(
+                '<p class="home-small">Use Sources to build personas. Saved items appear in their cards.</p>',
+                unsafe_allow_html=True
+            )
+        )
+        st.markdown('<p class="home-small">Create agents then chat.</p>', unsafe_allow_html=True)
+        st.session_state['sources'].get(atype, {}).get(t, [])) for t in ['Book','Expert','Style'])
                 st.markdown(f"<p class='home-small'>{atype}: {total}</p>", unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
-
-    # --- Card: About ---
-    with row2_col2:
-        st.markdown('<div class="biglabel">ABOUT</div>', unsafe_allow_html=True)
-        st.markdown('<p class="home-small">Personalized helpers for parents.</p>', unsafe_allow_html=True)
-        with st.expander('More'):
-            st.markdown('<p class="home-small">powered by context engineering messages dynamically chatgpt 4.5</p>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    # --- Card: Data ---
-    with row3_col1:
-        st.markdown('<div class="biglabel">DATA</div>', unsafe_allow_html=True)
-        if st.button('CLEAR DATA', key='clear_data'):
-            st.session_state.profiles = []
-            st.session_state.saved_responses = []
-            save_json(PROFILES_FILE, [])
-            save_json(RESPONSES_FILE, [])
-            st.success('All data cleared.')
-        with st.expander('Counts'):
-            st.markdown(f"<p class='home-small'>Profiles: {len(st.session_state.profiles)}</p>", unsafe_allow_html=True)
-            st.markdown(f"<p class='home-small'>Chats: {len(st.session_state.saved_responses)}</p>", unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    # --- Card: Help ---
-    with row3_col2:
-        st.markdown('<div class="biglabel">HELP</div>', unsafe_allow_html=True)
-        st.markdown('<p class="home-small">Create agents then chat.</p>', unsafe_allow_html=True)
-        with st.expander('More'):
-            st.markdown('<p class="home-small">Use Sources to build personas. Saved items appear in their cards.</p>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-
 
 elif step == 1:
     render_top_nav()

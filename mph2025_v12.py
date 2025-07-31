@@ -189,15 +189,22 @@ TOOLTIPS = {
 # ---------------------------------------------------------------------------
 #  STEP LOGIC
 # ---------------------------------------------------------------------------
-def render_home_card(title, buttons=None, expander_label=None, expander_body=None):
+def render_home_card(title, subtitle=None, buttons=None, expander_label=None, expander_body=None):
+    # Title
     st.markdown(f'<div class="biglabel">{title}</div>', unsafe_allow_html=True)
+
+    # Optional subtitle
     if subtitle:
         st.markdown(subtitle, unsafe_allow_html=True)
+
+    # Buttons
     if buttons:
         for label, key, condition, action in buttons:
             if st.button(label, key=key):
                 if condition is None or condition():
                     action()
+
+    # Expander
     if expander_label and expander_body:
         with st.expander(expander_label):
             expander_body()
@@ -225,7 +232,6 @@ if step == 0:
             ] if st.session_state.profiles else st.markdown(
                 '<p class="home-small">No profiles yet.</p>', unsafe_allow_html=True
             )
-        )
 
     # --- Card: CHATS ---
     with row1_col2:

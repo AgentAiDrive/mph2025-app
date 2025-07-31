@@ -232,7 +232,7 @@ if step == 0:
             ] if st.session_state.profiles else st.markdown(
                 '<p class="home-small">No profiles yet.</p>', unsafe_allow_html=True
             )
-
+        )
     # --- Card: CHATS ---
     with row1_col2:
         render_home_card(

@@ -32,12 +32,12 @@ st.markdown(
       margin: 4px 0 10px;
       text-align: center;
       letter-spacing: 0.5px;
-      background: rgba(255, 255, 255, 0.15);  /* Light translucent white */
+      background: rgba(255, 255, 255, 0.15);
       padding: 6px 12px;
       border-radius: 12px;
     }
     .frame-avatar{font-size:1.4em;margin:6px 0 6px;display:flex;justify-content:center;color:#ffffff;}
-    
+
     .stButton>button{
       border-radius:26px!important;
       font-weight:700!important;
@@ -54,13 +54,10 @@ st.markdown(
       margin: -10px -10px 24px -10px !important;
       width: calc(100% + 20px) !important;
     }
-    /* --- Top nav button colors: HIGH SPECIFICITY! --- */
     .top-nav-container > div[data-testid="stHorizontalBlock"] > div > div[data-testid="stButton"][data-key="nav_home"] > button { background: #e63946 !important; }
     .top-nav-container > div[data-testid="stHorizontalBlock"] > div > div[data-testid="stButton"][data-key="nav_chat"] > button { background: #27e67a !important; }
     .top-nav-container > div[data-testid="stHorizontalBlock"] > div > div[data-testid="stButton"][data-key="nav_saved"] > button { background: #1d3557 !important; }
-    /* --- Answer bubble --- */
     .answer-box{background:#23683c;border-radius:12px;padding:14px 18px;color:#fff;white-space:pre-wrap;margin-top:8px;}
-    /* --- Home cards --- */
     .home-card{background:rgba(255,255,255,0.15);border-radius:16px;padding:12px;margin:6px;color:#fff;}
     .home-card-title{font-weight:800;margin-bottom:6px;}
     .home-small{font-size:0.8em;opacity:0.85;}
@@ -80,18 +77,18 @@ def render_top_nav():
             st.rerun()
     with col2:
         if st.button("💬 Chat", key="nav_chat"):
-            st.session_state.step = 7 if st.session_state.profiles else 1
+            st.session_state.step = 7 if st.session_state.get("profiles") else 1
             st.rerun()
     with col3:
         if st.button("📂 Saved", key="nav_saved"):
-            if st.session_state.saved_responses:
+            if st.session_state.get("saved_responses"):
                 st.session_state.step = 8
             else:
                 st.warning("No saved responses yet.")
             st.rerun()
 
 # ---------------------------------------------------------------------------
-#  HELPER FUNCTIONS & CONSTANTS
+#  HELPER FUNCTIONS & STATE INIT
 # ---------------------------------------------------------------------------
 PROFILES_FILE = "parent_helpers_profiles.json"
 RESPONSES_FILE = "parent_helpers_responses.json"
@@ -123,46 +120,59 @@ for key, default in {
 
 step = st.session_state.get("step", 0)
 openai.api_key = st.secrets.get("openai_key", "YOUR_OPENAI_API_KEY")
-if 'sources' not in st.session_state:
-    def load_sources():
-        return load_json(SOURCES_FILE)
-    st.session_state['sources'] = load_sources() or {
-        "Parent": PARENT_SOURCES,
-        "Teacher": TEACHER_SOURCES,
-        "Other": OTHER_SOURCES
-    }
-AGENT_TYPES = ["Parent", "Teacher", "Other"]
+# ---------------------------------------------------------------------------
+#  DEFAULT SOURCE OPTIONS (Books, Experts, Styles)
+# ---------------------------------------------------------------------------
 PARENT_SOURCES = {
     "Book": ["The Whole-Brain Child", "Peaceful Parent, Happy Kids"],
     "Expert": ["Dr. Laura Markham", "Dr. Daniel Siegel"],
     "Style": ["Authoritative", "Gentle Parenting"]
 }
+
 TEACHER_SOURCES = {
     "Book": ["Teach Like a Champion", "Mindset"],
     "Expert": ["Carol Dweck", "Doug Lemov"],
     "Style": ["Project-Based Learning", "SEL"]
 }
+
 OTHER_SOURCES = {
     "Book": ["Custom Book (enter manually)"],
     "Expert": ["Custom Expert (enter manually)"],
     "Style": ["Custom Style (enter manually)"]
 }
+
+AGENT_TYPES = ["Parent", "Teacher", "Other"]
+
+def load_sources():
+    if os.path.exists(SOURCES_FILE):
+        try:
+            with open(SOURCES_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            st.error(f"Error reading {SOURCES_FILE}: {e}")
+            return {}
+    return {}
+
+def save_sources(sources):
+    try:
+        with open(SOURCES_FILE, "w", encoding="utf-8") as f:
+            json.dump(sources, f, indent=2)
+    except Exception as e:
+        st.error(f"Error saving {SOURCES_FILE}: {e}")
+
+if 'sources' not in st.session_state:
+    st.session_state['sources'] = load_sources() or {
+        "Parent": PARENT_SOURCES,
+        "Teacher": TEACHER_SOURCES,
+        "Other": OTHER_SOURCES
+    }
+
 def get_source_options(agent_type):
     return st.session_state.get("sources", {}).get(agent_type, {})
-        
-if 'sources' not in st.session_state:
-    st.session_state['sources'] = {atype: [] for atype in AGENT_TYPES}
-    
-class PersonaProfile(BaseModel):
-    profile_name: str
-    parent_name: str
-    child_name: str
-    child_age: int
-    agent_type: str
-    source_type: str
-    source_name: str
-    persona_description: str
 
+# ---------------------------------------------------------------------------
+#  SHORTCUTS & TOOLTIPS
+# ---------------------------------------------------------------------------
 SHORTCUTS = ["💬 DEFAULT","🤝 CONNECT","🌱 GROW","🔍 EXPLORE","🛠 RESOLVE","❤ SUPPORT"]
 EMOJIS = {"💬 DEFAULT":"💬","🤝 CONNECT":"🤝","🌱 GROW":"🌱","🔍 EXPLORE":"🔍","🛠 RESOLVE":"🛠","❤ SUPPORT":"❤"}
 TOOLTIPS = {

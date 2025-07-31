@@ -123,7 +123,7 @@ for key, default in {
 
 step = st.session_state.get("step", 0)
 openai.api_key = st.secrets.get("openai_key", "YOUR_OPENAI_API_KEY")
-if 'sources' not in st.session_state:
+
 def get_source_options(agent_type):
     return st.session_state.get("sources", {}).get(agent_type, {})
         

@@ -123,6 +123,26 @@ for key, default in {
 
 step = st.session_state.get("step", 0)
 openai.api_key = st.secrets.get("openai_key", "YOUR_OPENAI_API_KEY")
+# Agent types and default sources
+AGENT_TYPES = ["Parent", "Teacher", "Other"]
+
+PARENT_SOURCES = {
+    "Book": ["The Whole-Brain Child", "Peaceful Parent, Happy Kids"],
+    "Expert": ["Dr. Laura Markham", "Dr. Daniel Siegel"],
+    "Style": ["Authoritative", "Gentle Parenting"]
+}
+
+TEACHER_SOURCES = {
+    "Book": ["Teach Like a Champion", "Mindset"],
+    "Expert": ["Carol Dweck", "Doug Lemov"],
+    "Style": ["Project-Based Learning", "SEL"]
+}
+
+OTHER_SOURCES = {
+    "Book": ["Custom Book (enter manually)"],
+    "Expert": ["Custom Expert (enter manually)"],
+    "Style": ["Custom Style (enter manually)"]
+}
 
 def get_source_options(agent_type):
     return st.session_state.get("sources", {}).get(agent_type, {})

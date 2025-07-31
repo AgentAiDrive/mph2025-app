@@ -209,6 +209,7 @@ if step == 0:
     with row1_col1:
         render_home_card(
             "AGENTS",
+            st.markdown('<p class="home-small">View, Edit, Delete Agents</p>', unsafe_allow_html=True)
             buttons=[
                 ("SAVED AGENTS", "home_profiles", lambda: st.session_state.profiles,
                  lambda: (st.session_state.__setitem__('step', 9), st.rerun())),
@@ -228,6 +229,7 @@ if step == 0:
     with row1_col2:
         render_home_card(
             "CHATS",
+            st.markdown('<p class="home-small">View, Start New, Delete</p>', unsafe_allow_html=True)
             buttons=[
                 ("SAVED CHATS", "home_saved", lambda: st.session_state.saved_responses,
                  lambda: (st.session_state.__setitem__('step', 8), st.rerun())),
@@ -299,12 +301,10 @@ if step == 0:
             "HELP",
             expander_label="More",
             expander_body=lambda: st.markdown(
-                '<p class="home-small">Use Sources to build personas. Saved items appear in their cards.</p>',
+                '<p class="home-small">Edit Agent Source types and names Use Sources to build agent personas. Create custom agents then chat.</p>',
                 unsafe_allow_html=True
             )
         )
-        st.markdown('<p class="home-small">Create agents then chat.</p>', unsafe_allow_html=True)
-  
     st.markdown('</div>', unsafe_allow_html=True)
 
 elif step == 1:

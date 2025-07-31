@@ -304,12 +304,7 @@ if step == 0:
             )
         )
         st.markdown('<p class="home-small">Create agents then chat.</p>', unsafe_allow_html=True)
-    total = sum(
-    len(st.session_state['sources'].get(atype, {}).get(t, []))
-    for t in ['Book', 'Expert', 'Style']
-    )
-    st.markdown(f"<p class='home-small'>{atype}: {total}</p>", unsafe_allow_html=True)
-
+  
     st.markdown('</div>', unsafe_allow_html=True)
 
 elif step == 1:

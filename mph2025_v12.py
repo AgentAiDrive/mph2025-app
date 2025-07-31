@@ -191,6 +191,8 @@ TOOLTIPS = {
 # ---------------------------------------------------------------------------
 def render_home_card(title, buttons=None, expander_label=None, expander_body=None):
     st.markdown(f'<div class="biglabel">{title}</div>', unsafe_allow_html=True)
+    if subtitle:
+        st.markdown(subtitle, unsafe_allow_html=True)
     if buttons:
         for label, key, condition, action in buttons:
             if st.button(label, key=key):
@@ -209,7 +211,7 @@ if step == 0:
     with row1_col1:
         render_home_card(
             "AGENTS",
-            st.markdown('<p class="home-small">View, Edit, Delete Agents</p>', unsafe_allow_html=True)
+            subtitle='<p class="home-small">View, Edit, Delete Agents</p>',
             buttons=[
                 ("SAVED AGENTS", "home_profiles", lambda: st.session_state.profiles,
                  lambda: (st.session_state.__setitem__('step', 9), st.rerun())),
@@ -229,7 +231,7 @@ if step == 0:
     with row1_col2:
         render_home_card(
             "CHATS",
-            st.markdown('<p class="home-small">View, Start New, Delete</p>', unsafe_allow_html=True)
+            subtitle='<p class="home-small">View and Delete Chats</p>',
             buttons=[
                 ("SAVED CHATS", "home_saved", lambda: st.session_state.saved_responses,
                  lambda: (st.session_state.__setitem__('step', 8), st.rerun())),

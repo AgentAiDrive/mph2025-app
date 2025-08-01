@@ -701,6 +701,9 @@ def render_step7():
                 # Persist whether persistent memory was used for this answer
                 "persistent_memory": st.session_state.get("persistent_memory", False)
             }
+            # If persistent memory is enabled, snapshot the current conversation for this profile.
+            if record["persistent_memory"]:
+                record["conversation"] = st.session_state.conversation.get(sel['profile_name'], []).copy()
             if record not in st.session_state.saved_responses:
                 st.session_state.saved_responses.append(record)
                 save_json(RESPONSES_FILE, st.session_state.saved_responses)

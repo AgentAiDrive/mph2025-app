@@ -5,17 +5,6 @@ import os
 import time
 from pydantic import BaseModel
 
-"""
-This module reorganizes the original mph2025 streamlit application into
-discrete functions per UI step.  Each `render_stepX()` encapsulates the
-logic and markup required for a given screen, which makes the overall
-flow easier to follow and maintain.  The behavior is otherwise
-unchanged from the original app hosted at:
-https://github.com/agentaidrive/mph2025-app/blob/main/mph2025_v12.py
-
-To start the app run `streamlit run mph2025_modular.py`.
-"""
-
 # ---------------------------------------------------------------------------
 #  GLOBAL STYLE SHEET
 # ---------------------------------------------------------------------------

@@ -241,26 +241,31 @@ TOOLTIPS = {
 #  HOME PAGE CARD RENDERING
 # ---------------------------------------------------------------------------
 
-def render_home_card(title, subtitle=None, expander_label=None, expander_body=None, buttons=None,) -> None:
-    """Render a card on the home page with a title, optional subtitle,
-    a list of buttons and an optional expander."""
+def render_home_card(title, subtitle=None, expander_label=None, expander_body=None, buttons=None) -> None:
+    """Render a card on the home page with:
+       1. Title
+       2. Optional subtitle
+       3. Optional expander
+       4. Action buttons
+    """
     # Title
-    st.markdown(f'<div class="biglabel">{title}</div>', 
-                unsafe_allow_html=True)
+    st.markdown(f'<div class="biglabel">{title}</div>', unsafe_allow_html=True)
+
     # Optional subtitle
     if subtitle:
         st.markdown(subtitle, unsafe_allow_html=True)
-    # Expander
+
+    # Expander (now rendered before buttons)
     if expander_label and expander_body:
         with st.expander(expander_label):
             expander_body()
-    # Buttons
+
+    # Buttons (rendered after expander)
     if buttons:
         for label, key, condition, action in buttons:
             if st.button(label, key=key):
                 if condition is None or condition():
-                    action()
-    
+                    action()   
 # ---------------------------------------------------------------------------
 #  STEP FUNCTIONS
 # ---------------------------------------------------------------------------
@@ -269,50 +274,51 @@ def render_step0():
     """Render the home page with cards for agents, chats, sources, and data."""
     row1_col1, row1_col2 = st.columns(2)
     row2_col1, row2_col2 = st.columns(2)
-    # Card: AGENTS
+
+    # AGENTS card (expander before buttons)
     with row1_col1:
         render_home_card(
             "AGENTS",
+            subtitle='<p class="home-small">View, Edit, Delete Agents</p>',
             expander_label="Profiles",
             expander_body=lambda: [
-                st.markdown(f"<p class='home-small'>{p['profile_name']}</p>", 
-                            unsafe_allow_html=True)
+                st.markdown(f"<p class='home-small'>{p['profile_name']}</p>", unsafe_allow_html=True)
                 for p in st.session_state.profiles
-            ] if st.session_state.profiles else st.markdown(
-                '<p class="home-small">No profiles yet.</p>', 
-                unsafe_allow_html=True
-            ),
+            ] if st.session_state.profiles else lambda: st.markdown(
+                '<p class="home-small">No profiles yet.</p>', unsafe_allow_html=True),
             buttons=[
-                ("SAVED AGENTS", "home_profiles", lambda: 
-                 st.session_state.profiles,
-                 lambda: (st.session_state.__setitem__('step', 9), 
-                          st.rerun())),
-                ("NEW AGENT", "home_create", None,
-                 lambda: (st.session_state.__setitem__('step', 1), 
-                          st.rerun()))
+                ("SAVED AGENTS", "home_profiles", lambda: st.session_state.profiles,
+                 lambda: (st.session_state.__setitem__('step', 9), st.rerun())),
+                ("NEW AGENT",    "home_create",   None,
+                 lambda: (st.session_state.__setitem__('step', 1),  st.rerun())),
             ]
         )
-    # Card: CHATS
+
+    # CHATS card (expander lists saved chat titles)
     with row1_col2:
+        saved_titles = [
+            f"{i+1}. {r['profile']} – {r['shortcut']}"
+            for i, r in enumerate(st.session_state.saved_responses)
+        ]
         render_home_card(
             "CHATS",
-            expander_label="Saved Count",
-            expander_body=lambda: st.markdown(
-                f"<p class='home-small'>{len(st.session_state.saved_responses)} saved</p>",
-                unsafe_allow_html=True
+            subtitle='<p class="home-small">View and Delete Chats</p>',
+            expander_label="Saved Chats",
+            expander_body=lambda: (
+                [st.markdown(f"<p class='home-small'>{t}</p>", unsafe_allow_html=True)
+                 for t in saved_titles]
+                if saved_titles
+                else st.markdown('<p class="home-small">No saved chats.</p>', unsafe_allow_html=True)
             ),
             buttons=[
-                ("SAVED CHATS", "home_saved", lambda: 
-                 st.session_state.saved_responses,
-                 lambda: (st.session_state.__setitem__('step', 8), 
-                          st.rerun())),
-                ("NEW CHAT", "home_chat", None, lambda: (
-                    st.session_state.__setitem__(
-                        'step', 7 if st.session_state.profiles else 1),
-                    st.warning('No profiles – create one first.') if not 
-                    st.session_state.profiles else None,
-                    st.rerun()
-                ))
+                ("SAVED CHATS", "home_saved", lambda: st.session_state.saved_responses,
+                 lambda: (st.session_state.__setitem__('step', 8), st.rerun())),
+                ("NEW CHAT",    "home_chat",   None,
+                 lambda: (
+                     st.session_state.__setitem__('step', 7 if st.session_state.profiles else 1),
+                     st.warning('No profiles – create one first.') if not st.session_state.profiles else None,
+                     st.rerun()
+                 )),
             ]
         )
     # Card: SOURCES

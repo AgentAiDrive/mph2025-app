@@ -81,7 +81,7 @@ st.markdown(
     radius:16px;padding:12px;margin:6px;color:#fff;}
     .home-card-title{font-weight:800;margin-bottom:6px;}
     .home-small{font-size:0.8em;opacity:0.85;background:white;border:3px 
-    solid #000000;margin:4px;}
+    solid #000000;margin:4px 4px;padding:4px;}
     .home-button{font-size:0.8em;opacity:0.85;background:white;border:3px 
     solid #000000;}
     @media (max-height:750px){.stApp{min-height:640px;}}
@@ -267,10 +267,9 @@ def render_home_card(title, subtitle=None, buttons=None,
 # ---------------------------------------------------------------------------
 
 def render_step0():
-    """Render the home page with cards for agents, chats, sources, about, data and help."""
+    """Render the home page with cards for agents, chats, sources, and data."""
     row1_col1, row1_col2 = st.columns(2)
     row2_col1, row2_col2 = st.columns(2)
-    row3_col1, row3_col2 = st.columns(2)
     # Card: AGENTS
     with row1_col1:
         render_home_card(
@@ -337,21 +336,9 @@ def render_step0():
                 ) for atype in AGENT_TYPES
             ]
         )
-    # Card: ABOUT
-    with row2_col2:
-        render_home_card(
-            "ABOUT",
-            expander_label="More",
-            expander_body=lambda: st.markdown(
-                '<p class="home-small">powered by context engineering '
-                'messages dynamically chatgpt 4.5</p>',
-                unsafe_allow_html=True
-            )
-        )
-        st.markdown('<p class="home-small">Personalized helpers for parents.</p>', 
-                    unsafe_allow_html=True)
+ 
     # Card: DATA
-    with row3_col1:
+    with row2_col2:
         render_home_card(
             "DATA",
             buttons=[
@@ -373,19 +360,6 @@ def render_step0():
                             unsafe_allow_html=True)
             )
         )
-    # Card: HELP
-    with row3_col2:
-        render_home_card(
-            "HELP",
-            expander_label="More",
-            expander_body=lambda: st.markdown(
-                '<p class="home-small">Edit Agent Source types and names '
-                'Use Sources to build agent personas. Create custom agents then chat.</p>',
-                unsafe_allow_html=True
-            )
-        )
-    st.markdown('</div>', unsafe_allow_html=True)
-
 def render_step1():
     """Render the page to select the agent type (Parent, Teacher, Other)."""
     render_top_nav()

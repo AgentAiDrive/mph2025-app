@@ -274,16 +274,6 @@ def render_step0():
     with row1_col1:
         render_home_card(
             "AGENTS",
-            subtitle='<p class="home-small">Add, Edit or Delete</p>',
-            buttons=[
-                ("SAVED AGENTS", "home_profiles", lambda: 
-                 st.session_state.profiles,
-                 lambda: (st.session_state.__setitem__('step', 9), 
-                          st.rerun())),
-                ("NEW AGENT", "home_create", None,
-                 lambda: (st.session_state.__setitem__('step', 1), 
-                          st.rerun()))
-            ],
             expander_label="Profiles",
             expander_body=lambda: [
                 st.markdown(f"<p class='home-small'>{p['profile_name']}</p>", 
@@ -292,13 +282,26 @@ def render_step0():
             ] if st.session_state.profiles else st.markdown(
                 '<p class="home-small">No profiles yet.</p>', 
                 unsafe_allow_html=True
-            )
+            ),
+            buttons=[
+                ("SAVED AGENTS", "home_profiles", lambda: 
+                 st.session_state.profiles,
+                 lambda: (st.session_state.__setitem__('step', 9), 
+                          st.rerun())),
+                ("NEW AGENT", "home_create", None,
+                 lambda: (st.session_state.__setitem__('step', 1), 
+                          st.rerun()))
+            ]
         )
     # Card: CHATS
     with row1_col2:
         render_home_card(
             "CHATS",
-            subtitle='<p class="home-small">Add, Edit or Delete</p>',
+            expander_label="Saved Count",
+            expander_body=lambda: st.markdown(
+                f"<p class='home-small'>{len(st.session_state.saved_responses)} saved</p>",
+                unsafe_allow_html=True
+            ),
             buttons=[
                 ("SAVED CHATS", "home_saved", lambda: 
                  st.session_state.saved_responses,
@@ -311,12 +314,7 @@ def render_step0():
                     st.session_state.profiles else None,
                     st.rerun()
                 ))
-            ],
-            expander_label="Saved Count",
-            expander_body=lambda: st.markdown(
-                f"<p class='home-small'>{len(st.session_state.saved_responses)} saved</p>",
-                unsafe_allow_html=True
-            )
+            ]
         )
     # Card: SOURCES
     with row2_col1:

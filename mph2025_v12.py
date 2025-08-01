@@ -1,14 +1,30 @@
 import streamlit as st
-import openai, json, os
+import openai
+import json
+import os
+import time
 from pydantic import BaseModel
 
+"""
+This module reorganizes the original mph2025 streamlit application into
+discrete functions per UI step.  Each `render_stepX()` encapsulates the
+logic and markup required for a given screen, which makes the overall
+flow easier to follow and maintain.  The behavior is otherwise
+unchanged from the original app hosted at:
+https://github.com/agentaidrive/mph2025-app/blob/main/mph2025_v12.py
+
+To start the app run `streamlit run mph2025_modular.py`.
+"""
+
 # ---------------------------------------------------------------------------
-#  📐  GLOBAL STYLE SHEET
+#  GLOBAL STYLE SHEET
 # ---------------------------------------------------------------------------
+
 st.markdown(
     """
     <style>
-    body{background:linear-gradient(135deg,#2fe273 0%,#09742a 100%)!important;min-height:100vh;}
+    body{background:linear-gradient(135deg,#2fe273 0%,#09742a 
+    100%)!important;min-height:100vh;}
     .stApp {
       background: linear-gradient(335deg,#2fe273 0%,#09742a 100%)!important;
       border-radius: 32px;
@@ -17,7 +33,8 @@ st.markdown(
       height: 100vh;
       overflow-y: auto;
       margin: 32px auto;
-      box-shadow: 0 8px 32px rgba(60,60,60,.25), 0 1.5px 8px rgba(30,90,40,.06);
+      box-shadow: 0 8px 32px rgba(60,60,60,.25), 0 1.5px 8px 
+      rgba(30,90,40,.06);
       border: 3px solid #ffffff;
       display: flex;
       flex-direction: column;
@@ -36,8 +53,9 @@ st.markdown(
       padding: 6px 12px;
       border-radius: 12px;
     }
-    .frame-avatar{font-size:1.4em;margin:6px 0 6px;display:flex;justify-content:center;color:#ffffff;}
-    
+    .frame-avatar{font-size:1.4em;margin:6px 0 6px;display:flex;justify-
+    content:center;color:#ffffff;}
+
     .stButton>button{
       border-radius:26px!important;
       font-weight:700!important;
@@ -55,38 +73,52 @@ st.markdown(
       width: calc(100% + 20px) !important;
     }
     /* --- Top nav button colors: HIGH SPECIFICITY! --- */
-    .top-nav-container > div[data-testid="stHorizontalBlock"] > div > div[data-testid="stButton"][data-key="nav_home"] > button { background: #e63946 !important; }
-    .top-nav-container > div[data-testid="stHorizontalBlock"] > div > div[data-testid="stButton"][data-key="nav_chat"] > button { background: #27e67a !important; }
-    .top-nav-container > div[data-testid="stHorizontalBlock"] > div > div[data-testid="stButton"][data-key="nav_saved"] > button { background: #1d3557 !important; }
-   
+    .top-nav-container > div[data-testid="stHorizontalBlock"] > div > 
+    div[data-testid="stButton"][data-key="nav_home"] > button { background: #e63946 
+    !important; }
+    .top-nav-container > div[data-testid="stHorizontalBlock"] > div > 
+    div[data-testid="stButton"][data-key="nav_chat"] > button { background: #27e67a 
+    !important; }
+    .top-nav-container > div[data-testid="stHorizontalBlock"] > div > 
+    div[data-testid="stButton"][data-key="nav_saved"] > button { background: #1d3557
+    !important; }
+
     /* --- Answer bubble --- */
-    .answer-box{background:#23683c;border-radius:12px;padding:14px 18px;color:#fff;white-space:pre-wrap;margin-top:8px;}
-   
+    .answer-box{background:#23683c;border-radius:12px;padding:14px 
+    18px;color:#fff;white-space:pre-wrap;margin-top:8px;}
+
     /* --- Home cards --- */
-    .home-card{background:rgba(255,255,255,0.15);border-radius:16px;padding:12px;margin:6px;color:#fff;}
+    .home-card{background:rgba(255,255,255,0.15);border-
+    radius:16px;padding:12px;margin:6px;color:#fff;}
     .home-card-title{font-weight:800;margin-bottom:6px;}
-    .home-small{font-size:0.8em;opacity:0.85;background:white;border:3px solid #000000;}
-    .home-button{font-size:0.8em;opacity:0.85;background:white;border:3px solid #000000;}
+    .home-small{font-size:0.8em;opacity:0.85;background:white;border:3px 
+    solid #000000;}
+    .home-button{font-size:0.8em;opacity:0.85;background:white;border:3px 
+    solid #000000;}
     @media (max-height:750px){.stApp{min-height:640px;}}
     </style>
-    """, unsafe_allow_html=True)
+    """,
+    unsafe_allow_html=True)
 
 # ---------------------------------------------------------------------------
 #  TOP NAVIGATION
 # ---------------------------------------------------------------------------
-def render_top_nav():
+
+def render_top_nav() -> None:
+    """Render the sticky top navigation bar with Home, Chat and Saved buttons."""
     st.markdown('<div class="top-nav-container">', unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
     with col1:
-        if st.button("🏠 Home", key="nav_home"):
+        if st.button(" Home", key="nav_home"):
             st.session_state.step = 0
             st.rerun()
     with col2:
-        if st.button("💬 Chat", key="nav_chat"):
+        if st.button(" Chat", key="nav_chat"):
+            # If profiles exist go straight to chat selection step otherwise to agent creation.
             st.session_state.step = 7 if st.session_state.profiles else 1
             st.rerun()
     with col3:
-        if st.button("📂 Saved", key="nav_saved"):
+        if st.button(" Saved", key="nav_saved"):
             if st.session_state.saved_responses:
                 st.session_state.step = 8
             else:
@@ -96,11 +128,15 @@ def render_top_nav():
 # ---------------------------------------------------------------------------
 #  HELPER FUNCTIONS & CONSTANTS
 # ---------------------------------------------------------------------------
+
 PROFILES_FILE = "parent_helpers_profiles.json"
 RESPONSES_FILE = "parent_helpers_responses.json"
 SOURCES_FILE = "parent_helpers_sources.json"
+# Path used to persist conversation history for the optional memory feature.
+MEMORY_FILE = "parent_helpers_memory.json"
 
 def load_json(path: str):
+    """Load JSON data from a file or return an empty list if file does not exist."""
     if not os.path.exists(path):
         return []
     try:
@@ -111,12 +147,14 @@ def load_json(path: str):
         return []
 
 def save_json(path: str, data):
+    """Save data to a JSON file, catching and displaying any errors."""
     try:
         with open(path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
     except Exception as e:
         st.error(f"Error writing {path}: {e}")
 
+# Initialize persistent session state keys
 for key, default in {
     "profiles":        load_json(PROFILES_FILE),
     "saved_responses": load_json(RESPONSES_FILE),
@@ -124,8 +162,14 @@ for key, default in {
 }.items():
     st.session_state.setdefault(key, default)
 
-step = st.session_state.get("step", 0)
+# Initialize conversation history and memory toggle.  The conversation
+# dict maps profile names to a list of message dicts ({"role", "content"}).
+st.session_state.setdefault("conversation", (load_json(MEMORY_FILE) or {}))
+st.session_state.setdefault("persistent_memory", False)
+
+# Configure OpenAI key
 openai.api_key = st.secrets.get("openai_key", "YOUR_OPENAI_API_KEY")
+
 # Agent types and default sources
 AGENT_TYPES = ["Parent", "Teacher", "Other"]
 
@@ -147,9 +191,11 @@ OTHER_SOURCES = {
     "Style": ["Custom Style (enter manually)"]
 }
 
-def get_source_options(agent_type):
+def get_source_options(agent_type: str):
+    """Return the source dictionary for a given agent type from session state."""
     return st.session_state.get("sources", {}).get(agent_type, {})
-    
+
+# Initialize sources in session state if not already present
 if 'sources' not in st.session_state:
     st.session_state['sources'] = {
         "Parent": {
@@ -170,6 +216,7 @@ if 'sources' not in st.session_state:
     }
 
 class PersonaProfile(BaseModel):
+    """Data model for saving persona profiles."""
     profile_name: str
     parent_name: str
     child_name: str
@@ -179,74 +226,90 @@ class PersonaProfile(BaseModel):
     source_name: str
     persona_description: str
 
-SHORTCUTS = ["💬 DEFAULT","🤝 CONNECT","🌱 GROW","🔍 EXPLORE","🛠 RESOLVE","❤ SUPPORT"]
-EMOJIS = {"💬 DEFAULT":"💬","🤝 CONNECT":"🤝","🌱 GROW":"🌱","🔍 EXPLORE":"🔍","🛠 RESOLVE":"🛠","❤ SUPPORT":"❤"}
+SHORTCUTS = [" DEFAULT"," CONNECT"," GROW"," EXPLORE"," RESOLVE","❤ SUPPORT"]
+EMOJIS = {" DEFAULT":""," CONNECT":""," GROW":""," EXPLORE":""," RESOLVE":"","❤ SUPPORT":"❤"}
 TOOLTIPS = {
-    "💬 DEFAULT":"No formatting",
-    "🤝 CONNECT":"Help explain complex ideas with examples",
-    "🌱 GROW":"Strategies to improve parenting",
-    "🔍 EXPLORE":"Age-appropriate Q&A",
-    "🛠 RESOLVE":"Step-by-step advice",
+    " DEFAULT":"No formatting",
+    " CONNECT":"Help explain complex ideas with examples",
+    " GROW":"Strategies to improve parenting",
+    " EXPLORE":"Age-appropriate Q&A",
+    " RESOLVE":"Step-by-step advice",
     "❤ SUPPORT":"Empathetic guidance"
 }
-# ---------------------------------------------------------------------------
-#  STEP LOGIC
-# ---------------------------------------------------------------------------
-def render_home_card(title, subtitle=None, buttons=None, expander_label=None, expander_body=None):
-    # Title
-    st.markdown(f'<div class="biglabel">{title}</div>', unsafe_allow_html=True)
 
+# ---------------------------------------------------------------------------
+#  HOME PAGE CARD RENDERING
+# ---------------------------------------------------------------------------
+
+def render_home_card(title, subtitle=None, buttons=None, 
+                     expander_label=None, expander_body=None) -> None:
+    """Render a card on the home page with a title, optional subtitle,
+    a list of buttons and an optional expander."""
+    # Title
+    st.markdown(f'<div class="biglabel">{title}</div>', 
+                unsafe_allow_html=True)
     # Optional subtitle
     if subtitle:
         st.markdown(subtitle, unsafe_allow_html=True)
-
     # Buttons
     if buttons:
         for label, key, condition, action in buttons:
             if st.button(label, key=key):
                 if condition is None or condition():
                     action()
-
     # Expander
     if expander_label and expander_body:
         with st.expander(expander_label):
             expander_body()
 
-if step == 0:
+# ---------------------------------------------------------------------------
+#  STEP FUNCTIONS
+# ---------------------------------------------------------------------------
+
+def render_step0():
+    """Render the home page with cards for agents, chats, sources, about, data and help."""
     row1_col1, row1_col2 = st.columns(2)
     row2_col1, row2_col2 = st.columns(2)
     row3_col1, row3_col2 = st.columns(2)
-
-    # --- Card: AGENTS ---
+    # Card: AGENTS
     with row1_col1:
         render_home_card(
             "AGENTS",
             subtitle='<p class="home-small">View, Edit, Delete Agents</p>',
             buttons=[
-                ("SAVED AGENTS", "home_profiles", lambda: st.session_state.profiles,
-                 lambda: (st.session_state.__setitem__('step', 9), st.rerun())),
+                ("SAVED AGENTS", "home_profiles", lambda: 
+                 st.session_state.profiles,
+                 lambda: (st.session_state.__setitem__('step', 9), 
+                          st.rerun())),
                 ("NEW AGENT", "home_create", None,
-                 lambda: (st.session_state.__setitem__('step', 1), st.rerun()))
+                 lambda: (st.session_state.__setitem__('step', 1), 
+                          st.rerun()))
             ],
             expander_label="Profiles",
             expander_body=lambda: [
-                st.markdown(f"<p class='home-small'>{p['profile_name']}</p>", unsafe_allow_html=True)
+                st.markdown(f"<p class='home-small'>{p['profile_name']}</p>", 
+                            unsafe_allow_html=True)
                 for p in st.session_state.profiles
             ] if st.session_state.profiles else st.markdown(
-                '<p class="home-small">No profiles yet.</p>', unsafe_allow_html=True
+                '<p class="home-small">No profiles yet.</p>', 
+                unsafe_allow_html=True
             )
         )
-    # --- Card: CHATS ---
+    # Card: CHATS
     with row1_col2:
         render_home_card(
             "CHATS",
             subtitle='<p class="home-small">View and Delete Chats</p>',
             buttons=[
-                ("SAVED CHATS", "home_saved", lambda: st.session_state.saved_responses,
-                 lambda: (st.session_state.__setitem__('step', 8), st.rerun())),
+                ("SAVED CHATS", "home_saved", lambda: 
+                 st.session_state.saved_responses,
+                 lambda: (st.session_state.__setitem__('step', 8), 
+                          st.rerun())),
                 ("NEW CHAT", "home_chat", None, lambda: (
-                    st.session_state.__setitem__('step', 7 if st.session_state.profiles else 1),
-                    st.warning('No profiles – create one first.') if not st.session_state.profiles else None,
+                    st.session_state.__setitem__(
+                        'step', 7 if st.session_state.profiles else 1),
+                    st.warning('No profiles – create one first.') if not 
+                    st.session_state.profiles else None,
                     st.rerun()
                 ))
             ],
@@ -256,37 +319,38 @@ if step == 0:
                 unsafe_allow_html=True
             )
         )
-
-    # --- Card: SOURCES ---
+    # Card: SOURCES
     with row2_col1:
         render_home_card(
             "SOURCES",
             buttons=[
                 ("EDIT SOURCES", "edit_sources", None,
-                 lambda: (st.session_state.__setitem__('step', 10), st.rerun()))
+                 lambda: (st.session_state.__setitem__('step', 10), 
+                          st.rerun()))
             ],
             expander_label="Counts",
             expander_body=lambda: [
                 st.markdown(
-                    f"<p class='home-small'>{atype}: {sum(len(st.session_state['sources'].get(atype, {}).get(t, [])) for t in ['Book','Expert','Style'])}</p>",
+                    f"<p class='home-small'>{atype}: "
+                    f"{sum(len(st.session_state['sources'].get(atype, {}).get(t, [])) for t in ['Book','Expert','Style'])}</p>",
                     unsafe_allow_html=True
                 ) for atype in AGENT_TYPES
             ]
         )
-
-    # --- Card: ABOUT ---
+    # Card: ABOUT
     with row2_col2:
         render_home_card(
             "ABOUT",
             expander_label="More",
             expander_body=lambda: st.markdown(
-                '<p class="home-small">powered by context engineering messages dynamically chatgpt 4.5</p>',
+                '<p class="home-small">powered by context engineering '
+                'messages dynamically chatgpt 4.5</p>',
                 unsafe_allow_html=True
             )
         )
-        st.markdown('<p class="home-small">Personalized helpers for parents.</p>', unsafe_allow_html=True)
-
-    # --- Card: DATA ---
+        st.markdown('<p class="home-small">Personalized helpers for parents.</p>', 
+                    unsafe_allow_html=True)
+    # Card: DATA
     with row3_col1:
         render_home_card(
             "DATA",
@@ -301,42 +365,49 @@ if step == 0:
             ],
             expander_label="Counts",
             expander_body=lambda: (
-                st.markdown(f"<p class='home-small'>Profiles: {len(st.session_state.profiles)}</p>", unsafe_allow_html=True),
-                st.markdown(f"<p class='home-small'>Chats: {len(st.session_state.saved_responses)}</p>", unsafe_allow_html=True)
+                st.markdown(f"<p class='home-small'>Profiles: "
+                            f"{len(st.session_state.profiles)}</p>", 
+                            unsafe_allow_html=True),
+                st.markdown(f"<p class='home-small'>Chats: "
+                            f"{len(st.session_state.saved_responses)}</p>", 
+                            unsafe_allow_html=True)
             )
         )
-
-    # --- Card: HELP ---
+    # Card: HELP
     with row3_col2:
         render_home_card(
             "HELP",
             expander_label="More",
             expander_body=lambda: st.markdown(
-                '<p class="home-small">Edit Agent Source types and names Use Sources to build agent personas. Create custom agents then chat.</p>',
+                '<p class="home-small">Edit Agent Source types and names '
+                'Use Sources to build agent personas. Create custom agents then chat.</p>',
                 unsafe_allow_html=True
             )
         )
     st.markdown('</div>', unsafe_allow_html=True)
 
-elif step == 1:
+def render_step1():
+    """Render the page to select the agent type (Parent, Teacher, Other)."""
     render_top_nav()
     st.markdown(
-            """
-            <div style="text-align:center;">
-              <img src="https://img1.wsimg.com/isteam/ip/e13cd0a5-b867-446e-af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
-            </div>
-            """,
-            unsafe_allow_html=True,)
-    st.markdown('<div class="biglabel">Select An Agent Type</div>', unsafe_allow_html=True)
+        """
+        <div style="text-align:center;">
+          <img src="https://img1.wsimg.com/isteam/ip/e13cd0a5-b867-446e-
+af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
+        </div>
+        """,
+        unsafe_allow_html=True,)
+    st.markdown('<div class="biglabel">Select An Agent Type</div>', 
+                unsafe_allow_html=True)
     st.markdown('<div class="frame-avatar"></div>', unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
     with col1:
-        if st.button("👪  Parent", key="btn_agent_parent"):
+        if st.button("  Parent", key="btn_agent_parent"):
             st.session_state.agent_type = "Parent"
             st.session_state.step = 2
             st.rerun()
     with col2:
-        if st.button("🧑‍🏫  Teacher", key="btn_agent_teacher"):
+        if st.button("‍  Teacher", key="btn_agent_teacher"):
             st.session_state.agent_type = "Teacher"
             st.session_state.step = 2
             st.rerun()
@@ -346,56 +417,62 @@ elif step == 1:
             st.session_state.step = 2
             st.rerun()
 
-elif step == 2:
+def render_step2():
+    """Render the page to select the source type (Book, Expert, Style)."""
     render_top_nav()
     st.markdown(
-                """
-                <div style="text-align:center;">
-                  <img src="https://img1.wsimg.com/isteam/ip/e13cd0a5-b867-446e-af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
-                </div>
-                """,
-                unsafe_allow_html=True,)
-    st.markdown('<div class="biglabel">Select Agent Source Type</div>', unsafe_allow_html=True)
+        """
+        <div style="text-align:center;">
+          <img src="https://img1.wsimg.com/isteam/ip/e13cd0a5-b867-446e-
+af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
+        </div>
+        """,
+        unsafe_allow_html=True,)
+    st.markdown('<div class="biglabel">Select Agent Source Type</div>', 
+                unsafe_allow_html=True)
     st.markdown('<div class="frame-avatar"></div>', unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
     with col1:
-        if st.button("📚  Book", key="btn_book"):
+        if st.button("  Book", key="btn_book"):
             st.session_state.source_type = "Book"
             st.session_state.step = 3
             st.rerun()
     with col2:
-        if st.button("🧑‍  Expert", key="btn_expert"):
+        if st.button("‍  Expert", key="btn_expert"):
             st.session_state.source_type = "Expert"
             st.session_state.step = 3
             st.rerun()
     with col3:
-        if st.button("🌟  Style", key="btn_style"):
+        if st.button("  Style", key="btn_style"):
             st.session_state.source_type = "Style"
             st.session_state.step = 3
             st.rerun()
 
-elif step == 3:
+def render_step3():
+    """Render the page to choose a specific book/expert/style or enter a custom one."""
     st.markdown(
         """
         <div style="text-align:center;">
-          <img src="https://img1.wsimg.com/isteam/ip/e13cd0a5-b867-446e-af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
+          <img src="https://img1.wsimg.com/isteam/ip/e13cd0a5-b867-446e-
+af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
         </div>
         """,
         unsafe_allow_html=True,
     )
-    # Get current agent type
+    # Determine current agent type and source options
     agent_type = st.session_state.get("agent_type", "Parent")
-    # Get source options for agent type
     sources = get_source_options(agent_type)
     source_type = st.session_state.get("source_type", "Book")
-    # Available options for the selected source_type
     options = sources.get(source_type, ["Other..."])
     # Always append "Other..." for custom entry
     if "Other..." not in options:
         options = options + ["Other..."]
-    emoji = "📚" if source_type == "Book" else "🧑‍" if source_type == "Expert" else "🌟"
-    st.markdown(f'<div class="biglabel">Choose a {source_type}</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="frame-avatar">{emoji}</div>', unsafe_allow_html=True)
+    # Select display emoji for Expert vs Style vs Book
+    emoji = "" if source_type == "Book" else "‍" if source_type == "Expert" else ""
+    st.markdown(f'<div class="biglabel">Choose a {source_type}</div>', 
+                unsafe_allow_html=True)
+    st.markdown(f'<div class="frame-avatar">{emoji}</div>', 
+                unsafe_allow_html=True)
     choice = st.selectbox("Select or enter your own:", options)
     custom = st.text_input("Enter custom name") if choice == "Other..." else ""
     col1, col2 = st.columns(2)
@@ -414,38 +491,45 @@ elif step == 3:
                 st.session_state.pop("persona_description", None)
                 st.session_state.step = 4
                 st.rerun()
-                
-elif step == 4:
+
+def render_step4():
+    """Generate the agent persona description using the OpenAI API."""
     st.markdown(
         """
         <div style="text-align:center;">
-            <img src="https://img1.wsimg.com/isteam/ip/e13cd0a5-b867-446e-af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
+            <img src="https://img1.wsimg.com/isteam/ip/e13cd0a5-b867-446e-
+af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
         </div>
         """,
         unsafe_allow_html=True,
     )
-    import time
-    st.markdown('<div class="biglabel">GENERATING YOUR AGENT PERSONA</div>', unsafe_allow_html=True)
-    st.markdown('<div class="frame-avatar">🧠✨</div>', unsafe_allow_html=True)
+    st.markdown('<div class="biglabel">GENERATING YOUR AGENT PERSONA</div>',
+                unsafe_allow_html=True)
+    st.markdown('<div class="frame-avatar">✨</div>', unsafe_allow_html=True)
     placeholder = st.empty()
-    for msg in ["Assimilating Knowledge…", "Synthesizing Information…", "Assessing Results…", "Generating Persona…"]:
+    # Show animated progress messages
+    for msg in ["Assimilating Knowledge…", "Synthesizing Information…", 
+                "Assessing Results…", "Generating Persona…"]:
         placeholder.info(msg)
         time.sleep(0.5)
+    # Only call the API if persona description is not cached
     if "persona_description" not in st.session_state:
         with st.spinner("Thinking…"):
             try:
                 prompt = (
-                    f"Summarize the philosophy, core principles, and practices of "
-                    f"the {st.session_state.source_type} '{st.session_state.source_name}' in under 200 words to describe the persona. "
+                    f"Summarize the philosophy, core principles, and "
+                    f"practices of the {st.session_state.source_type} "
+                    f"'{st.session_state.source_name}' in under 200 words to describe the persona. "
                     "Respond in a JSON object with 'persona_description'."
                 )
                 out = openai.chat.completions.create(
-                model="gpt-4o",
-                messages=[{"role": "user", "content": prompt}],
-                response_format={"type":"json_object"}
+                    model="gpt-4o",
+                    messages=[{"role": "user", "content": prompt}],
+                    response_format={"type":"json_object"}
                 )
                 raw = out.choices[0].message.content
-                st.session_state.persona_description = json.loads(raw)["persona_description"]
+                st.session_state.persona_description = \
+                    json.loads(raw)["persona_description"]
             except Exception as e:
                 st.error(f"OpenAI API error: {e}")
     placeholder.empty()
@@ -462,16 +546,19 @@ elif step == 4:
             st.session_state.step = 5
             st.rerun()
 
-elif step == 5:
+def render_step5():
+    """Render the page to personalize the agent and save the profile."""
     st.markdown(
-                """
-                <div style="text-align:center;">
-                  <img src="https://img1.wsimg.com/isteam/ip/e13cd0a5-b867-446e-af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
-                </div>
-                """,
-                unsafe_allow_html=True,)
-    st.markdown('<div class="biglabel">PERSONALIZE AGENT</div>', unsafe_allow_html=True)
-    st.markdown('<div class="frame-avatar">📷</div>', unsafe_allow_html=True)
+        """
+        <div style="text-align:center;">
+          <img src="https://img1.wsimg.com/isteam/ip/e13cd0a5-b867-446e-
+af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
+        </div>
+        """,
+        unsafe_allow_html=True,)
+    st.markdown('<div class="biglabel">PERSONALIZE AGENT</div>', 
+                unsafe_allow_html=True)
+    st.markdown('<div class="frame-avatar"></div>', unsafe_allow_html=True)
     with st.form("profile"):
         p_name = st.text_input("Parent first name")
         c_age  = st.number_input("Child age", 1, 21)
@@ -501,32 +588,34 @@ elif step == 5:
         st.session_state.step = 4
         st.rerun()
 
-elif step == 6:
-    # Top nav + header
+def render_step6():
+    """Display the newly created agent profile confirmation card."""
     render_top_nav()
     st.markdown(
         """
         <div style="text-align:center;">
-          <img src="https://img1.wsimg.com/isteam/ip/e13cd0a5-b867-446e-af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
+          <img src="https://img1.wsimg.com/isteam/ip/e13cd0a5-b867-446e-
+af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
         </div>
         """,
         unsafe_allow_html=True,
     )
-    st.markdown('<div class="biglabel">AGENT PROFILE CREATED!</div>', unsafe_allow_html=True)
+    st.markdown('<div class="biglabel">AGENT PROFILE CREATED!</div>', 
+                unsafe_allow_html=True)
     st.markdown('<div class="frame-avatar"></div>', unsafe_allow_html=True)
-
     # Pull the latest profile
     profile = st.session_state.profiles[-1]
-
     # Render it in a colored “card”
     st.markdown(
         f"""
         <div class="home-card">
           <p><strong>Profile Name:</strong> {profile['profile_name']}</p>
           <p><strong>Parent:</strong> {profile['parent_name']}</p>
-          <p><strong>Child:</strong> {profile['child_name']} (Age {profile['child_age']})</p>
+          <p><strong>Child:</strong> {profile['child_name']} (Age 
+{profile['child_age']})</p>
           <p><strong>Agent Type:</strong> {profile['agent_type']}</p>
-          <p><strong>Source ({profile['source_type']}):</strong> {profile['source_name']}</p>
+          <p><strong>Source ({profile['source_type']}):</strong> 
+{profile['source_name']}</p>
           <p><strong>Persona Description:</strong></p>
           <div class="answer-box" style="margin-top:4px;">{profile['persona_description']}</div>
         </div>
@@ -534,29 +623,24 @@ elif step == 6:
         unsafe_allow_html=True,
     )
 
-
-elif step == 7:
-    render_top_nav() 
-    # -- Row: Section Title and Agent Selector in One Line --
+def render_step7():
+    """Chat interface: choose profile, select response type, ask question and view/save answer."""
+    render_top_nav()
+    # Row: Section Title and Agent Selector in one line
     col1, col2 = st.columns([3, 5])
-
     # Column 1: Header
     with col1:
-        st.markdown('<div class="biglabel">1. SELECT AN AGENT</div>', unsafe_allow_html=True)
-
+        st.markdown('<div class="biglabel">1. SELECT AN AGENT</div>', 
+                    unsafe_allow_html=True)
     # Column 2: Selectbox and Info Icon
     names = [p["profile_name"] for p in st.session_state.profiles]
     col_dd, col_icon = col2.columns([4, 1])
-
-    # Selectbox
     idx = col_dd.selectbox(
         "Agent Profiles:",
         range(len(names)),
         format_func=lambda i: names[i],
         key="chat_profile"
     )
-
-    # Info Tooltip
     sel = st.session_state.profiles[idx]
     tooltip = (
         f"Profile: {sel['profile_name']} | "
@@ -568,22 +652,17 @@ elif step == 7:
         f"Parent: {sel['parent_name']} | "
         f"Persona: {sel['persona_description']}"
     )
-
     col_icon.markdown(
         f'<span title="{tooltip}" style="font-size:1.5em; cursor:help;">ℹ️</span>',
         unsafe_allow_html=True,
     )
-
-
-    # -- Ensure session state key exists first --
-    st.session_state.setdefault("shortcut", "💬 DEFAULT")
-
-    # -- Row 1: Section Label and Selection Box --
+    # Ensure session state key exists first
+    st.session_state.setdefault("shortcut", " DEFAULT")
+    # Row 1: Section Label and selection box
     col1, col2 = st.columns([3, 5])
-
     with col1:
-        st.markdown('<div class="biglabel">2. SELECT A RESPONSE TYPE</div>', unsafe_allow_html=True)
-
+        st.markdown('<div class="biglabel">2. SELECT A RESPONSE TYPE</div>',
+                    unsafe_allow_html=True)
     with col2:
         st.markdown(
             f"""
@@ -593,18 +672,26 @@ elif step == 7:
             """,
             unsafe_allow_html=True,
         )
-
-    # -- Row 2: Emoji Buttons (Full Width) --
+    # Row 2: Emoji Buttons (Full Width)
     button_cols = st.columns(len(SHORTCUTS))
     for i, sc in enumerate(SHORTCUTS):
         with button_cols[i]:
             if st.button(EMOJIS[sc], key=f"type_{sc}", help=TOOLTIPS[sc]):
                 st.session_state.shortcut = sc
-
-    st.markdown('<div class="home-small">3. WHAT DO YOU WANT TO ASK?</div>', unsafe_allow_html=True)
+    # Allow users to toggle persistent memory for the conversation.  When enabled
+    # the chat history with this profile will be appended to each new query,
+    # enabling the agent to remember prior exchanges.
+    st.checkbox(
+        "Use persistent memory",
+        key="persistent_memory",
+        help="Keep conversation context for this profile between turns."
+    )
+    st.markdown('<div class="home-small">3. WHAT DO YOU WANT TO ASK?</div>',
+                unsafe_allow_html=True)
     query = st.text_area("Type here", key="chat_query")
     if st.session_state.last_answer:
-        st.markdown(f"<div class='answer-box'>{st.session_state.last_answer}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='answer-box'>{st.session_state.last_answer}</div>", 
+                    unsafe_allow_html=True)
     col1, col2 = st.columns(2)
     with col1:
         if st.button("SAVE RESPONSE", key="save_response"):
@@ -622,35 +709,69 @@ elif step == 7:
     with col2:
         if st.button("SEND", key="send_btn"):
             base = (
-              f"Adopt the persona described here: {sel['persona_description']}. You are conversing with:"
-              f" Parent: {sel['parent_name']}, Child: {sel['child_name']}, Age: {sel['child_age']}."
+              f"Adopt the persona described here: {sel['persona_description']}. "
+              f"You are conversing with:"
+              f" Parent: {sel['parent_name']}, Child: {sel['child_name']}, "
+              f"Age: {sel['child_age']}."
             )
             extra_map = {
-              "🤝 CONNECT":" Help explain with examples.",
-              "🌱 GROW":" Offer advanced strategies.",
-              "🔍 EXPLORE":" Facilitate age-appropriate Q&A.",
-              "🛠 RESOLVE":" Provide step-by-step resolution.",
+              " CONNECT":" Help explain with examples.",
+              " GROW":" Offer advanced strategies.",
+              " EXPLORE":" Facilitate age-appropriate Q&A.",
+              " RESOLVE":" Provide step-by-step resolution.",
               "❤ SUPPORT":" Offer empathetic support."
             }
-            prompt = base + extra_map.get(st.session_state.shortcut, "") + "\n" + query + "\nRespond as JSON with 'answer'."
-            try:
-                out = openai.chat.completions.create(
-                  model="gpt-4o",
-                  messages=[{"role":"system","content":prompt}],
-                  response_format={"type":"json_object"}
-                )
-                st.session_state.last_answer = json.loads(out.choices[0].message.content)["answer"]
-            except Exception as e:
-                st.error(f"OpenAI API error: {e}")
+            if st.session_state.get("persistent_memory"):
+                # Build a messages list incorporating prior conversation history.
+                conversation = st.session_state.conversation.get(sel['profile_name'], [])
+                system_content = base + extra_map.get(st.session_state.shortcut, "")
+                messages = [{"role": "system", "content": system_content}]
+                messages.extend(conversation)
+                messages.append({"role": "user", "content": query})
+                try:
+                    out = openai.chat.completions.create(
+                      model="gpt-4o",
+                      messages=messages,
+                      response_format={"type":"json_object"}
+                    )
+                    answer = json.loads(out.choices[0].message.content)["answer"]
+                    # Update conversation history
+                    new_conv = conversation + [
+                        {"role": "user", "content": query},
+                        {"role": "assistant", "content": answer}
+                    ]
+                    st.session_state.conversation[sel['profile_name']] = new_conv
+                    save_json(MEMORY_FILE, st.session_state.conversation)
+                    st.session_state.last_answer = answer
+                except Exception as e:
+                    st.error(f"OpenAI API error: {e}")
+            else:
+                # Stateless chat: single-turn prompt and response
+                prompt = base + extra_map.get(st.session_state.shortcut, "") + \
+                         "\n" + query + "\nRespond as JSON with 'answer'."
+                try:
+                    out = openai.chat.completions.create(
+                      model="gpt-4o",
+                      messages=[{"role":"system","content":prompt}],
+                      response_format={"type":"json_object"}
+                    )
+                    st.session_state.last_answer = \
+                        json.loads(out.choices[0].message.content)["answer"]
+                except Exception as e:
+                    st.error(f"OpenAI API error: {e}")
             st.rerun()
 
-elif step == 8:
+def render_step8():
+    """List saved chats and allow deletion or closing."""
     render_top_nav()
-    st.markdown('<div class="biglabel">SELECT A SAVED CHAT</div>', unsafe_allow_html=True)
+    st.markdown('<div class="biglabel">SELECT A SAVED CHAT</div>', 
+                unsafe_allow_html=True)
     if not st.session_state.saved_responses:
         st.info("No saved responses."); st.session_state.step = 0; st.rerun()
-    titles = [f"{i+1}. {r['profile']} – {r['shortcut']}" for i, r in enumerate(st.session_state.saved_responses)]
-    sel_idx = st.selectbox("Saved Chats:", range(len(titles)), format_func=lambda i: titles[i], key="saved_select")
+    titles = [f"{i+1}. {r['profile']} – {r['shortcut']}" for i, r in 
+              enumerate(st.session_state.saved_responses)]
+    sel_idx = st.selectbox("Saved Chats:", range(len(titles)), 
+                           format_func=lambda i: titles[i], key="saved_select")
     item = st.session_state.saved_responses[sel_idx]
     for field in ("profile","shortcut"):
         st.markdown(f'''
@@ -683,24 +804,37 @@ elif step == 8:
             st.session_state.step = 0
             st.rerun()
 
-elif step == 9:
+def render_step9():
+    """List agent profiles and allow editing or deletion."""
     render_top_nav()
-    st.markdown('<div class="biglabel">AGENT PROFILES</div>', unsafe_allow_html=True)
+    st.markdown('<div class="biglabel">AGENT PROFILES</div>', 
+                unsafe_allow_html=True)
     if not st.session_state.profiles:
         st.info("No profiles stored."); st.session_state.step = 0; st.rerun()
-    titles = [f"{i+1}. {p['profile_name']}" for i,p in enumerate(st.session_state.profiles)]
-    idx = st.selectbox("Select a profile to view / edit", range(len(titles)), format_func=lambda i: titles[i], key="profile_select")
+    titles = [f"{i+1}. {p['profile_name']}" for i,p in 
+              enumerate(st.session_state.profiles)]
+    idx = st.selectbox("Select a profile to view / edit", 
+                       range(len(titles)), format_func=lambda i: titles[i], 
+                       key="profile_select")
     prof = st.session_state.profiles[idx]
     with st.form("edit_profile"):
-        p_name = st.text_input("Parent first name", value=prof.get("parent_name", ""))
-        c_age  = st.number_input("Child age", 1, 21, value=prof.get("child_age", 1))
-        c_name = st.text_input("Child first name", value=prof.get("child_name", ""))
-        prof_nm= st.text_input("Profile name", value=prof.get("profile_name", ""))
-        a_type = st.selectbox("Agent type", ["Parent","Teacher","Other"], index=["Parent","Teacher","Other"].index(prof.get("agent_type","Parent")))
-        desc   = st.text_area("Persona description", value=prof.get("persona_description",""), height=150)
+        p_name = st.text_input("Parent first name", 
+        value=prof.get("parent_name", ""))
+        c_age  = st.number_input("Child age", 1, 21, 
+        value=prof.get("child_age", 1))
+        c_name = st.text_input("Child first name", 
+        value=prof.get("child_name", ""))
+        prof_nm= st.text_input("Profile name", 
+        value=prof.get("profile_name", ""))
+        a_type = st.selectbox("Agent type", ["Parent","Teacher","Other"], 
+        index=["Parent","Teacher","Other"].index(prof.get("agent_type","Parent")))
+        desc   = st.text_area("Persona description", 
+        value=prof.get("persona_description",""), height=150)
         saved  = st.form_submit_button("SAVE CHANGES")
     if saved:
-        prof.update(parent_name=p_name, child_age=int(c_age), child_name=c_name, profile_name=prof_nm, persona_description=desc, agent_type=a_type)
+        prof.update(parent_name=p_name, child_age=int(c_age), 
+        child_name=c_name, profile_name=prof_nm, persona_description=desc, 
+        agent_type=a_type)
         st.session_state.profiles[idx] = prof
         save_json(PROFILES_FILE, st.session_state.profiles)
         st.success("Profile updated!")
@@ -715,25 +849,22 @@ elif step == 9:
             st.session_state.step = 0
             st.rerun()
 
-elif step == 10:
+def render_step10():
+    """Render the page for editing the available source lists."""
     render_top_nav()
-    st.markdown('<div class="biglabel">EDIT SOURCE LISTS</div>', unsafe_allow_html=True)
-
-    # Source persistence file
-    SOURCES_FILE = "parent_helpers_sources.json"
-
-    # Define save_sources function
+    st.markdown('<div class="biglabel">EDIT SOURCE LISTS</div>', 
+                unsafe_allow_html=True)
+    # persistence file for sources
     def save_sources(sources):
+        """Persist updated sources to JSON file."""
         try:
             with open(SOURCES_FILE, "w", encoding="utf-8") as f:
                 json.dump(sources, f, indent=2)
         except Exception as e:
             st.error(f"Error saving sources: {e}")
-
-    # Load sources from file if not already
     def load_sources():
+        """Load sources from file via the existing helper."""
         return load_json(SOURCES_FILE)
-
     # Initialize sources if needed
     if 'sources' not in st.session_state:
         st.session_state['sources'] = load_sources() or {
@@ -741,16 +872,16 @@ elif step == 10:
             "Teacher": TEACHER_SOURCES,
             "Other": OTHER_SOURCES
         }
-
     sources = st.session_state["sources"]
-    agent_type = st.selectbox("Agent Type", AGENT_TYPES, key="edit_agent_type")
-    source_type = st.selectbox("Source Type", ["Book", "Expert", "Style"], key="edit_source_type")
-
+    agent_type = st.selectbox("Agent Type", AGENT_TYPES, 
+                              key="edit_agent_type")
+    source_type = st.selectbox("Source Type", ["Book", "Expert", "Style"], 
+                               key="edit_source_type")
     items = sources.get(agent_type, {}).get(source_type, [])
     st.write(f"**Current {source_type}s for {agent_type}:**")
-    to_remove = st.multiselect("Select to remove", items, key="remove_sources")
+    to_remove = st.multiselect("Select to remove", items, 
+                               key="remove_sources")
     new_item = st.text_input(f"Add new {source_type}:", key="add_source")
-
     c1, c2, c3 = st.columns(3)
     with c1:
         if st.button("Remove Selected"):
@@ -759,7 +890,6 @@ elif step == 10:
             save_sources(sources)
             st.success("Removed selected!")
             st.rerun()
-
     with c2:
         if st.button("Add"):
             if new_item and new_item not in items:
@@ -770,12 +900,47 @@ elif step == 10:
                 st.rerun()
             elif new_item:
                 st.warning("Already in list.")
-
     with c3:
         if st.button("Back to Home"):
             st.session_state.step = 0
             st.rerun()
-
     st.markdown("<br>", unsafe_allow_html=True)
     st.write("**Current list:**")
     st.write(sources.get(agent_type, {}).get(source_type, []))
+
+# ---------------------------------------------------------------------------
+#  ENTRY POINT
+# ---------------------------------------------------------------------------
+
+def main():
+    """Entry point that dispatches to the appropriate step renderer."""
+    step = st.session_state.get("step", 0)
+    if step == 0:
+        render_step0()
+    elif step == 1:
+        render_step1()
+    elif step == 2:
+        render_step2()
+    elif step == 3:
+        render_step3()
+    elif step == 4:
+        render_step4()
+    elif step == 5:
+        render_step5()
+    elif step == 6:
+        render_step6()
+    elif step == 7:
+        render_step7()
+    elif step == 8:
+        render_step8()
+    elif step == 9:
+        render_step9()
+    elif step == 10:
+        render_step10()
+    else:
+        # Fallback to home on unexpected step value
+        st.session_state.step = 0
+        render_step0()
+
+if __name__ == "__main__":
+    main()

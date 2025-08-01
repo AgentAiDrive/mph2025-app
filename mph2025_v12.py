@@ -5,6 +5,7 @@ import os
 import time
 from pydantic import BaseModel
 
+# ---------------------------------------------------------------------------
 #  GLOBAL STYLE SHEET
 # ---------------------------------------------------------------------------
 
@@ -721,7 +722,9 @@ def render_step7():
             if st.session_state.get("persistent_memory"):
                 # Build a messages list incorporating prior conversation history.
                 conversation = st.session_state.conversation.get(sel['profile_name'], [])
-                system_content = base + extra_map.get(st.session_state.shortcut, "")
+                # Instruct the assistant to respond in JSON so the response_format feature works.
+                system_content = base + extra_map.get(st.session_state.shortcut, "") + \
+                    "\nRespond as JSON with 'answer'."
                 messages = [{"role": "system", "content": system_content}]
                 messages.extend(conversation)
                 messages.append({"role": "user", "content": query})

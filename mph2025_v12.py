@@ -298,7 +298,7 @@ def render_step0():
     with row1_col2:
         render_home_card(
             "CHATS",
-            subtitle='<p class="home-small">View and Delete Chats</p>',
+            subtitle='<p class="home-small">Add, Edit or Delete</p>',
             buttons=[
                 ("SAVED CHATS", "home_saved", lambda: 
                  st.session_state.saved_responses,
@@ -491,9 +491,9 @@ af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
         with st.spinner("Thinking…"):
             try:
                 prompt = (
-                    f"Summarize the philosophy, core principles, and "
+                    f"You are creating a persona description based on the summarization of the domain, philosophy, core principles, and "
                     f"practices of the {st.session_state.source_type} "
-                    f"'{st.session_state.source_name}' in under 200 words to describe the persona. "
+                    f"'{st.session_state.source_name}'. This persona will be used to instruct the model to adopt the persona in future conversations.  In under 200 words to describe the persona. "
                     "Respond in a JSON object with 'persona_description'."
                 )
                 out = openai.chat.completions.create(

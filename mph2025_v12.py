@@ -155,6 +155,8 @@ for key, default in {
 # dict maps profile names to a list of message dicts ({"role", "content"}).
 st.session_state.setdefault("conversation", (load_json(MEMORY_FILE) or {}))
 st.session_state.setdefault("persistent_memory", False)
+# Temporary conversation history used for stateless sessions.
+st.session_state.setdefault("temp_conversation", {})
 
 # Configure OpenAI key
 openai.api_key = st.secrets.get("openai_key", "YOUR_OPENAI_API_KEY")
@@ -684,12 +686,45 @@ def render_step7():
         key="persistent_memory",
         help="Keep conversation context for this profile between turns."
     )
+    # Display conversation history feed for this profile. When persistent memory
+    # is enabled the feed comes from the persistent conversation; otherwise
+    # it comes from a temporary conversation list for the current session.
+    current_conv = []
+    if st.session_state.get("persistent_memory"):
+        current_conv = st.session_state.conversation.get(sel['profile_name'], [])
+    else:
+        current_conv = st.session_state.temp_conversation.get(sel['profile_name'], [])
+    if current_conv:
+        for msg in current_conv:
+            if msg.get("role") == "user":
+                # Build tooltip with profile details for hover
+                tooltip_html = (
+                    f"Profile: {sel['profile_name']} | "
+                    f"Agent: {sel.get('agent_type','Parent')} | "
+                    f"Type: {sel['source_type']} | "
+                    f"Source: {sel['source_name']} | "
+                    f"Child: {sel['child_name']} | "
+                    f"Age: {sel['child_age']} | "
+                    f"Parent: {sel['parent_name']} | "
+                    f"Persona: {sel['persona_description']}"
+                )
+                st.markdown(
+                    f"<div class='answer-box' style='background:#144d2f;'>"
+                    f"<strong>You:</strong> {msg.get('content','')} "
+                    f"<span title='{tooltip_html}' style='cursor:help;font-size:1.1em;'>ℹ️</span>"
+                    f"</div>",
+                    unsafe_allow_html=True
+                )
+            else:
+                st.markdown(
+                    f"<div class='answer-box'>"
+                    f"{msg.get('content','')}"
+                    f"</div>",
+                    unsafe_allow_html=True
+                )
     st.markdown('<div class="home-small">3. WHAT DO YOU WANT TO ASK?</div>',
                 unsafe_allow_html=True)
     query = st.text_area("Type here", key="chat_query")
-    if st.session_state.last_answer:
-        st.markdown(f"<div class='answer-box'>{st.session_state.last_answer}</div>", 
-                    unsafe_allow_html=True)
     col1, col2 = st.columns(2)
     with col1:
         if st.button("SAVE RESPONSE", key="save_response"):
@@ -707,8 +742,8 @@ def render_step7():
             if record not in st.session_state.saved_responses:
                 st.session_state.saved_responses.append(record)
                 save_json(RESPONSES_FILE, st.session_state.saved_responses)
-            st.session_state.step = 8
-            st.rerun()
+            # Provide feedback without leaving the chat
+            st.success("Response saved!")
     with col2:
         if st.button("SEND", key="send_btn"):
             base = (
@@ -740,13 +775,15 @@ def render_step7():
                       response_format={"type":"json_object"}
                     )
                     answer = json.loads(out.choices[0].message.content)["answer"]
-                    # Update conversation history
+                    # Update conversation history (persistent)
                     new_conv = conversation + [
                         {"role": "user", "content": query},
                         {"role": "assistant", "content": answer}
                     ]
                     st.session_state.conversation[sel['profile_name']] = new_conv
                     save_json(MEMORY_FILE, st.session_state.conversation)
+                    # Mirror persistent conversation into temp conversation for UI feed
+                    st.session_state.temp_conversation[sel['profile_name']] = new_conv.copy()
                     st.session_state.last_answer = answer
                     # Only rerun on success to display the answer
                     st.rerun()
@@ -762,8 +799,15 @@ def render_step7():
                       messages=[{"role":"system","content":prompt}],
                       response_format={"type":"json_object"}
                     )
-                    st.session_state.last_answer = \
-                        json.loads(out.choices[0].message.content)["answer"]
+                    answer_val = json.loads(out.choices[0].message.content)["answer"]
+                    st.session_state.last_answer = answer_val
+                    # Update temporary conversation history for this profile
+                    tmp = st.session_state.temp_conversation.get(sel['profile_name'], [])
+                    tmp = tmp + [
+                        {"role": "user", "content": query},
+                        {"role": "assistant", "content": answer_val}
+                    ]
+                    st.session_state.temp_conversation[sel['profile_name']] = tmp
                     # Only rerun on success
                     st.rerun()
                 except Exception as e:
@@ -807,6 +851,18 @@ def render_step8():
       <div class="answer-box" style="color:#fff;">
         {item["answer"]}
       </div>''', unsafe_allow_html=True)
+
+    # If the item contains a conversation history, display it in an expander so
+    # users can revisit previous turns when persistent memory was enabled.
+    if item.get("conversation"):
+        st.markdown('<p style="color:#fff;margin:4px 0;"><strong>Chat History:</strong></p>', unsafe_allow_html=True)
+        with st.expander("Show conversation history"):
+            for msg in item["conversation"]:
+                role_label = "You" if msg.get("role") == "user" else "Agent"
+                st.markdown(
+                    f"<p style='color:#fff;margin:4px 0;'><strong>{role_label}:</strong> {msg.get('content','')}</p>",
+                    unsafe_allow_html=True
+                )
     c1, c2 = st.columns(2)
     with c1:
         if st.button("DELETE", key="btn_delete_saved"):

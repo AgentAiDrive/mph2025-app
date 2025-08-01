@@ -697,7 +697,9 @@ def render_step7():
                 "profile": sel["profile_name"],
                 "shortcut": st.session_state.shortcut,
                 "question": query,
-                "answer":   st.session_state.last_answer
+                "answer":   st.session_state.last_answer,
+                # Persist whether persistent memory was used for this answer
+                "persistent_memory": st.session_state.get("persistent_memory", False)
             }
             if record not in st.session_state.saved_responses:
                 st.session_state.saved_responses.append(record)
@@ -781,6 +783,12 @@ def render_step8():
           <p style="color:#fff;margin:4px 0;">
             <strong>{field.title()}:</strong> {item[field]}
           </p>''', unsafe_allow_html=True)
+    # Show whether persistent memory was used for this chat
+    mem_flag = item.get("persistent_memory", False)
+    st.markdown(f'''
+      <p style="color:#fff;margin:4px 0;">
+        <strong>Persistent memory:</strong> {'Yes' if mem_flag else 'No'}
+      </p>''', unsafe_allow_html=True)
     st.markdown('''
       <p style="color:#fff;margin:4px 0;"><strong>Question:</strong></p>''',
       unsafe_allow_html=True)

@@ -38,7 +38,7 @@ st.markdown(
       margin: 4px 0 10px;
       text-align: center;
       letter-spacing: 0.5px;
-      background: rgba(255, 255, 255, 0.15);  /* Light translucent white */
+      background: rgba(255, 255, 255, 0.55);  /* Light translucent white */
       padding: 6px 12px;
       border-radius: 12px;
     }
@@ -50,7 +50,7 @@ st.markdown(
       font-weight:700!important;
       font-size:.7em!important;
       padding:.4em 0!important;
-      background:#ffffff!important;
+      background:#blue!important;
       color:#000000!important;
       margin:6px 0!important;
       width:100%!important;
@@ -81,7 +81,7 @@ st.markdown(
     radius:16px;padding:12px;margin:6px;color:#fff;}
     .home-card-title{font-weight:800;margin-bottom:6px;}
     .home-small{font-size:0.8em;opacity:0.85;background:white;border:3px 
-    solid #000000;}
+    solid #000000;margin:4px;}
     .home-button{font-size:0.8em;opacity:0.85;background:white;border:3px 
     solid #000000;}
     @media (max-height:750px){.stApp{min-height:640px;}}
@@ -275,7 +275,7 @@ def render_step0():
     with row1_col1:
         render_home_card(
             "AGENTS",
-            subtitle='<p class="home-small">View, Edit, Delete Agents</p>',
+            subtitle='<p class="home-small">Add, Edit or Delete</p>',
             buttons=[
                 ("SAVED AGENTS", "home_profiles", lambda: 
                  st.session_state.profiles,

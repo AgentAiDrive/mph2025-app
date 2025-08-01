@@ -521,47 +521,72 @@ af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
             st.rerun()
 
 def render_step5():
-    """Render the page to personalize the agent and save the profile."""
+    """Render the page to personalize the agent and save the profile, with fields varying by agent type."""
+    render_top_nav()
     st.markdown(
         """
         <div style="text-align:center;">
-          <img src="https://img1.wsimg.com/isteam/ip/e13cd0a5-b867-446e-
-af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
+          <img src="https://img1.wsimg.com/isteam/ip/e13cd0a5-b867-446e-af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
         </div>
         """,
-        unsafe_allow_html=True,)
-    st.markdown('<div class="biglabel">PERSONALIZE AGENT</div>', 
-                unsafe_allow_html=True)
+        unsafe_allow_html=True,
+    )
+    st.markdown('<div class="biglabel">PERSONALIZE AGENT</div>', unsafe_allow_html=True)
     st.markdown('<div class="frame-avatar"></div>', unsafe_allow_html=True)
+
+    agent_type = st.session_state.get("agent_type", "Parent")
+
+    # Build the form fields dynamically based on agent_type
     with st.form("profile"):
-        p_name = st.text_input("Parent first name")
-        c_age  = st.number_input("Child age", 1, 21)
-        c_name = st.text_input("Child first name")
-        prof_nm= st.text_input("Profile name")
-        saved  = st.form_submit_button("SAVE")
+        if agent_type == "Parent":
+            p_name = st.text_input("Parent first name")
+            c_age  = st.number_input("Child age", 1, 21)
+            c_name = st.text_input("Child first name")
+        elif agent_type == "Teacher":
+            p_name = st.text_input("Teacher name")
+            c_age  = st.number_input("Class grade", 1, 12)
+            c_name = ""  # not used for teachers
+        else:  # Other
+            p_name = st.text_input("First name")
+            c_age  = 0
+            c_name = ""
+
+        prof_nm = st.text_input("Profile name")
+        saved   = st.form_submit_button("SAVE")
+
     if saved:
-        if not all([p_name, c_age, c_name, prof_nm]):
-            st.warning("Please fill every field.")
+        # Validate required fields
+        missing = []
+        if not p_name:
+            missing.append("name")
+        if agent_type == "Parent" and not c_name:
+            missing.append("child name")
+        if not prof_nm:
+            missing.append("profile name")
+
+        if missing:
+            st.warning(f"Please fill the following: {', '.join(missing)}.")
         else:
+            # Create and store the profile
             profile = PersonaProfile(
-                profile_name=prof_nm,
-                parent_name=p_name,
-                child_name=c_name,
-                child_age=int(c_age),
-                source_type=st.session_state.source_type,
-                source_name=st.session_state.source_name,
-                persona_description=st.session_state.persona_description,
-                agent_type=st.session_state.agent_type
+                profile_name        = prof_nm,
+                parent_name         = p_name,
+                child_name          = c_name,
+                child_age           = int(c_age),
+                source_type         = st.session_state.source_type,
+                source_name         = st.session_state.source_name,
+                persona_description = st.session_state.persona_description,
+                agent_type          = agent_type
             )
             st.session_state.profiles.append(profile.dict())
             save_json(PROFILES_FILE, st.session_state.profiles)
             st.success("Profile saved!")
             st.session_state.step = 6
             st.rerun()
+
     if st.button("BACK", key="btn_back_details"):
         st.session_state.step = 4
         st.rerun()
-
 def render_step6():
     """Display the newly created agent profile confirmation card."""
     render_top_nav()

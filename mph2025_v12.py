@@ -241,8 +241,7 @@ TOOLTIPS = {
 #  HOME PAGE CARD RENDERING
 # ---------------------------------------------------------------------------
 
-def render_home_card(title, subtitle=None, buttons=None, 
-                     expander_label=None, expander_body=None) -> None:
+def render_home_card(title, subtitle=None, expander_label=None, expander_body=None, buttons=None,) -> None:
     """Render a card on the home page with a title, optional subtitle,
     a list of buttons and an optional expander."""
     # Title
@@ -251,17 +250,17 @@ def render_home_card(title, subtitle=None, buttons=None,
     # Optional subtitle
     if subtitle:
         st.markdown(subtitle, unsafe_allow_html=True)
+    # Expander
+    if expander_label and expander_body:
+        with st.expander(expander_label):
+            expander_body()
     # Buttons
     if buttons:
         for label, key, condition, action in buttons:
             if st.button(label, key=key):
                 if condition is None or condition():
                     action()
-    # Expander
-    if expander_label and expander_body:
-        with st.expander(expander_label):
-            expander_body()
-
+    
 # ---------------------------------------------------------------------------
 #  STEP FUNCTIONS
 # ---------------------------------------------------------------------------

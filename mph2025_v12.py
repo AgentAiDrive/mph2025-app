@@ -279,7 +279,6 @@ def render_step0():
     with row1_col1:
         render_home_card(
             "AGENTS",
-            subtitle='<p class="home-small">View, Edit, Delete Agents</p>',
             expander_label="Profiles",
             expander_body=lambda: [
                 st.markdown(f"<p class='home-small'>{p['profile_name']}</p>", unsafe_allow_html=True)
@@ -302,7 +301,6 @@ def render_step0():
         ]
         render_home_card(
             "CHATS",
-            subtitle='<p class="home-small">View and Delete Chats</p>',
             expander_label="Saved Chats",
             expander_body=lambda: (
                 [st.markdown(f"<p class='home-small'>{t}</p>", unsafe_allow_html=True)
@@ -325,11 +323,6 @@ def render_step0():
     with row2_col1:
         render_home_card(
             "SOURCES",
-            buttons=[
-                ("EDIT SOURCES", "edit_sources", None,
-                 lambda: (st.session_state.__setitem__('step', 10), 
-                          st.rerun()))
-            ],
             expander_label="Counts",
             expander_body=lambda: [
                 st.markdown(
@@ -337,22 +330,17 @@ def render_step0():
                     f"{sum(len(st.session_state['sources'].get(atype, {}).get(t, [])) for t in ['Book','Expert','Style'])}</p>",
                     unsafe_allow_html=True
                 ) for atype in AGENT_TYPES
+            ],
+            buttons=[
+                ("EDIT SOURCES", "edit_sources", None,
+                 lambda: (st.session_state.__setitem__('step', 10), 
+                          st.rerun()))
             ]
         )
- 
     # Card: DATA
     with row2_col2:
         render_home_card(
             "DATA",
-            buttons=[
-                ("CLEAR DATA", "clear_data", None, lambda: (
-                    st.session_state.__setitem__('profiles', []),
-                    st.session_state.__setitem__('saved_responses', []),
-                    save_json(PROFILES_FILE, []),
-                    save_json(RESPONSES_FILE, []),
-                    st.success("All data cleared.")
-                ))
-            ],
             expander_label="Counts",
             expander_body=lambda: (
                 st.markdown(f"<p class='home-small'>Profiles: "
@@ -361,7 +349,16 @@ def render_step0():
                 st.markdown(f"<p class='home-small'>Chats: "
                             f"{len(st.session_state.saved_responses)}</p>", 
                             unsafe_allow_html=True)
-            )
+            ),
+            buttons=[
+                ("CLEAR DATA", "clear_data", None, lambda: (
+                    st.session_state.__setitem__('profiles', []),
+                    st.session_state.__setitem__('saved_responses', []),
+                    save_json(PROFILES_FILE, []),
+                    save_json(RESPONSES_FILE, []),
+                    st.success("All data cleared.")
+                ))
+            ]
         )
 def render_step1():
     """Render the page to select the agent type (Parent, Teacher, Other)."""

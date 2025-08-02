@@ -408,8 +408,8 @@ def render_step0():
                      st.session_state.__setitem__('step', 7 if st.session_state.profiles else 1),
                      st.warning('No profiles – create one first.') if not st.session_state.profiles else None,
                      st.rerun()
-                 )),
-            ]
+                 ))
+            ],
             expander_label="SAVED CHATS",
             expander_body=lambda: (
                 [st.markdown(f"<p class='home-small'>{t}</p>", unsafe_allow_html=True)
@@ -440,7 +440,6 @@ def render_step0():
     with row2_col2:
         render_home_card(
             "DATA",
-
             buttons=[
                 ("CLEAR DATA", "clear_data", None, lambda: (
                     st.session_state.__setitem__('profiles', []),

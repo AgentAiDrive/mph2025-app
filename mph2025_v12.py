@@ -93,17 +93,7 @@ st.markdown(
       margin: -10px -10px 24px -10px !important;
       width: calc(100% + 20px) !important;
     }
-    /* --- Top nav button colors: HIGH SPECIFICITY! --- */
-    .top-nav-container > div[data-testid="stHorizontalBlock"] > div > 
-    div[data-testid="stButton"][data-key="nav_home"] > button { background: #e63946 
-    !important; }
-    .top-nav-container > div[data-testid="stHorizontalBlock"] > div > 
-    div[data-testid="stButton"][data-key="nav_chat"] > button { background: #27e67a 
-    !important; }
-    .top-nav-container > div[data-testid="stHorizontalBlock"] > div > 
-    div[data-testid="stButton"][data-key="nav_saved"] > button { background: #1d3557
-    !important; }
-
+   
     /* --- Answer bubble --- */
     .answer-box{background:#23683c;border-radius:12px;padding:14px 
     18px;color:#fff;white-space:pre-wrap;margin-top:8px;}
@@ -394,7 +384,7 @@ def render_step0():
         )
 def render_step1():
     """Render the page to select the agent type (Parent, Teacher, Other)."""
-    render_top_nav()
+   
     st.markdown(
         """
         <div style="text-align:center;">
@@ -422,10 +412,9 @@ af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
             st.session_state.agent_type = "Other"
             st.session_state.step = 2
             st.rerun()
-
+    render_top_nav()
 def render_step2():
     """Render the page to select the source type (Book, Expert, Style)."""
-    render_top_nav()
     st.markdown(
         """
         <div style="text-align:center;">
@@ -453,7 +442,7 @@ af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
             st.session_state.source_type = "Style"
             st.session_state.step = 3
             st.rerun()
-
+    render_top_nav()
 def render_step3():
     """Render the page to choose a specific book/expert/style or enter a custom one."""
     st.markdown(
@@ -475,7 +464,7 @@ af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
         options = options + ["Other..."]
     # Select display emoji for Expert vs Style vs Book
     emoji = "" if source_type == "Book" else "‍" if source_type == "Expert" else ""
-    st.markdown(f'<div class="biglabel">Choose a {source_type}</div>', 
+    st.markdown(f'<div class="biglabel-G">Choose a {source_type}</div>', 
                 unsafe_allow_html=True)
     st.markdown(f'<div class="frame-avatar">{emoji}</div>', 
                 unsafe_allow_html=True)
@@ -497,7 +486,7 @@ af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
                 st.session_state.pop("persona_description", None)
                 st.session_state.step = 4
                 st.rerun()
-
+    render_top_nav()
 def render_step4():
     """Generate the agent persona description using the OpenAI API."""
     st.markdown(
@@ -551,10 +540,9 @@ af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
         if st.button("SAVE", key="btn_save_persona"):
             st.session_state.step = 5
             st.rerun()
-
+    render_top_nav()
 def render_step5():
     """Render the page to personalize the agent and save the profile, with fields varying by agent type."""
-    render_top_nav()
     st.markdown(
         """
         <div style="text-align:center;">
@@ -619,9 +607,9 @@ def render_step5():
     if st.button("BACK", key="btn_back_details"):
         st.session_state.step = 4
         st.rerun()
+    render_top_nav()
 def render_step6():
     """Display the newly created agent profile confirmation card."""
-    render_top_nav()
     st.markdown(
         """
         <div style="text-align:center;">
@@ -653,7 +641,7 @@ af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
         """,
         unsafe_allow_html=True,
     )
-
+    render_top_nav()
 def render_step7():
     """Chat interface: choose profile, select response type, ask question and view/save answer."""
     render_top_nav()
@@ -661,7 +649,7 @@ def render_step7():
     col1, col2 = st.columns([3, 5])
     # Column 1: Header
     with col1:
-        st.markdown('<div class="biglabel">1. SELECT AN AGENT</div>', 
+        st.markdown('<div class="biglabel-G">1. SELECT AN AGENT</div>', 
                     unsafe_allow_html=True)
     # Column 2: Selectbox and Info Icon
     names = [p["profile_name"] for p in st.session_state.profiles]
@@ -692,7 +680,7 @@ def render_step7():
     # Row 1: Section Label and selection box
     col1, col2 = st.columns([3, 5])
     with col1:
-        st.markdown('<div class="biglabel">2. SELECT A RESPONSE TYPE</div>',
+        st.markdown('<div class="biglabel-G">2. SELECT A RESPONSE TYPE</div>',
                     unsafe_allow_html=True)
     with col2:
         st.markdown(
@@ -847,7 +835,7 @@ def render_step7():
 def render_step8():
     """List saved chats and allow deletion or closing."""
     render_top_nav()
-    st.markdown('<div class="biglabel">SELECT A SAVED CHAT</div>', 
+    st.markdown('<div class="biglabel-B">SELECT A SAVED CHAT</div>', 
                 unsafe_allow_html=True)
     if not st.session_state.saved_responses:
         st.info("No saved responses."); st.session_state.step = 0; st.rerun()
@@ -908,7 +896,7 @@ def render_step8():
 def render_step9():
     """List agent profiles and allow editing or deletion."""
     render_top_nav()
-    st.markdown('<div class="biglabel">AGENT PROFILES</div>', 
+    st.markdown('<div class="biglabel-B">AGENT PROFILES</div>', 
                 unsafe_allow_html=True)
     if not st.session_state.profiles:
         st.info("No profiles stored."); st.session_state.step = 0; st.rerun()
@@ -953,7 +941,7 @@ def render_step9():
 def render_step10():
     """Render the page for editing the available source lists."""
     render_top_nav()
-    st.markdown('<div class="biglabel">EDIT SOURCE LISTS</div>', 
+    st.markdown('<div class="biglabel-R">EDIT SOURCE LISTS</div>', 
                 unsafe_allow_html=True)
     # persistence file for sources
     def save_sources(sources):

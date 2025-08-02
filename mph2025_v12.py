@@ -369,25 +369,30 @@ def render_step0():
     row1_col1, row1_col2 = st.columns(2)
     row2_col1, row2_col2 = st.columns(2)
 
-    # AGENTS card
     with row1_col1:
         render_home_card(
-            "AGENTS",
-            buttons=[
-                ("SAVED AGENTS", "home_profiles", lambda: st.session_state.profiles,
-                 lambda: (st.session_state.__setitem__('step', 9), st.rerun())),
-                ("NEW AGENT", "home_create", None,
-                 lambda: (st.session_state.__setitem__('step', 1), st.rerun())),
-            ],
-            expander_label="SAVED PROFILES",
-            expander_body=lambda: (
-                [st.markdown(f"<p class='home-small'>{p['profile_name']}</p>", unsafe_allow_html=True)
-                 for p in st.session_state.profiles]
-                if st.session_state.profiles 
-                else st.markdown('<p class="home-small">No profiles yet.</p>', unsafe_allow_html=True)
-            )
+        "AGENTS",
+        buttons=[
+            ("SAVED AGENTS", "home_profiles", lambda: st.session_state.profiles,
+             lambda: (st.session_state.__setitem__('step', 9), st.rerun())),
+            ("NEW AGENT", "home_create", None,
+             lambda: (st.session_state.__setitem__('step', 1), st.rerun())),
+        ],
+        expander_label="SAVED PROFILES",
+        expander_body=lambda: (
+            [st.button(
+                f"{p['profile_name']}",
+                key=f"profile_link_{i}",
+                on_click=lambda idx=i: (
+                    st.session_state.__setitem__('profile_select', idx),
+                    st.session_state.__setitem__('step', 9),
+                    st.rerun()
+                )
+            ) for i, p in enumerate(st.session_state.profiles)]
+            if st.session_state.profiles
+            else st.markdown('<p class="home-small">No profiles yet.</p>', unsafe_allow_html=True)
         )
-
+    )
     # CHATS card
     with row1_col2:
         saved_titles = [

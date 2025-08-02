@@ -373,18 +373,18 @@ def render_step0():
     with row1_col1:
         render_home_card(
             "AGENTS",
+            buttons=[
+                ("SAVED AGENTS", "home_profiles", lambda: st.session_state.profiles,
+                 lambda: (st.session_state.__setitem__('step', 9), st.rerun())),
+                ("NEW AGENT",    "home_create",   None,
+                 lambda: (st.session_state.__setitem__('step', 1),  st.rerun())),
+            ],   
             expander_label="SAVED PROFILES",
             expander_body=lambda: [
                 st.markdown(f"<p class='home-small'>{p['profile_name']}</p>", unsafe_allow_html=True)
                 for p in st.session_state.profiles
             ] if st.session_state.profiles else lambda: st.markdown(
                 '<p class="home-small">No profiles yet.</p>', unsafe_allow_html=True),
-            buttons=[
-                ("SAVED AGENTS", "home_profiles", lambda: st.session_state.profiles,
-                 lambda: (st.session_state.__setitem__('step', 9), st.rerun())),
-                ("NEW AGENT",    "home_create",   None,
-                 lambda: (st.session_state.__setitem__('step', 1),  st.rerun())),
-            ]
         )
 
     # CHATS card (expander lists saved chat titles)
@@ -395,13 +395,6 @@ def render_step0():
         ]
         render_home_card(
             "CHATS",
-            expander_label="SAVED CHATS",
-            expander_body=lambda: (
-                [st.markdown(f"<p class='home-small'>{t}</p>", unsafe_allow_html=True)
-                 for t in saved_titles]
-                if saved_titles
-                else st.markdown('<p class="home-small">No saved chats.</p>', unsafe_allow_html=True)
-            ),
             buttons=[
                 ("SAVED CHATS", "home_saved", lambda: st.session_state.saved_responses,
                  lambda: (st.session_state.__setitem__('step', 8), st.rerun())),
@@ -412,11 +405,23 @@ def render_step0():
                      st.rerun()
                  )),
             ]
+            expander_label="SAVED CHATS",
+            expander_body=lambda: (
+                [st.markdown(f"<p class='home-small'>{t}</p>", unsafe_allow_html=True)
+                 for t in saved_titles]
+                if saved_titles
+                else st.markdown('<p class="home-small">No saved chats.</p>', unsafe_allow_html=True)
+            )
         )
     # Card: SOURCES
     with row2_col1:
         render_home_card(
             "SOURCES",
+            buttons=[
+                ("EDIT SOURCES", "edit_sources", None,
+                 lambda: (st.session_state.__setitem__('step', 10), 
+                          st.rerun()))
+            ], 
             expander_label="Counts",
             expander_body=lambda: [
                 st.markdown(
@@ -424,26 +429,13 @@ def render_step0():
                     f"{sum(len(st.session_state['sources'].get(atype, {}).get(t, [])) for t in ['Book','Expert','Style'])}</p>",
                     unsafe_allow_html=True
                 ) for atype in AGENT_TYPES
-            ],
-            buttons=[
-                ("EDIT SOURCES", "edit_sources", None,
-                 lambda: (st.session_state.__setitem__('step', 10), 
-                          st.rerun()))
             ]
         )
     # Card: DATA
     with row2_col2:
         render_home_card(
             "DATA",
-            expander_label="Counts",
-            expander_body=lambda: (
-                st.markdown(f"<p class='home-small'>Profiles: "
-                            f"{len(st.session_state.profiles)}</p>", 
-                            unsafe_allow_html=True),
-                st.markdown(f"<p class='home-small'>Chats: "
-                            f"{len(st.session_state.saved_responses)}</p>", 
-                            unsafe_allow_html=True)
-            ),
+
             buttons=[
                 ("CLEAR DATA", "clear_data", None, lambda: (
                     st.session_state.__setitem__('profiles', []),
@@ -452,8 +444,18 @@ def render_step0():
                     save_json(RESPONSES_FILE, []),
                     st.success("All data cleared.")
                 ))
-            ]
+            ],
+            expander_label="Counts",
+            expander_body=lambda: (
+                st.markdown(f"<p class='home-small'>Profiles: "
+                            f"{len(st.session_state.profiles)}</p>", 
+                            unsafe_allow_html=True),
+                st.markdown(f"<p class='home-small'>Chats: "
+                            f"{len(st.session_state.saved_responses)}</p>", 
+                            unsafe_allow_html=True)
+            )
         )
+        
 def render_step1():
     """Render the page to select the agent type (Parent, Teacher, Other)."""
    

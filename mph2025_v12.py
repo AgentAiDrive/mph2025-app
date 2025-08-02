@@ -192,19 +192,19 @@ def render_top_nav() -> None:
     st.markdown('<div class="top-nav-container">', unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.markdown('<div class="st-btn-green">', unsafe_allow_html=True)
+        st.markdown('<div class="biglabel-G">', unsafe_allow_html=True)
         if st.button(" Home", key="nav_home"):
             st.session_state.step = 0
             st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
     with col2:
-        st.markdown('<div class="st-btn-blue">', unsafe_allow_html=True)
+        st.markdown('<div class="biglabel-B">', unsafe_allow_html=True)
         if st.button(" Chat", key="nav_chat"):
             st.session_state.step = 7 if st.session_state.profiles else 1
             st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
     with col3:
-        st.markdown('<div class="st-btn-red">', unsafe_allow_html=True)
+        st.markdown('<div class="biglabel-R">', unsafe_allow_html=True)
         if st.button(" Saved", key="nav_saved"):
             if st.session_state.saved_responses:
                 st.session_state.step = 8

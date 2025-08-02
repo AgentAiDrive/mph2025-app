@@ -979,14 +979,14 @@ def render_step9():
                        key="profile_select")
     prof = st.session_state.profiles[idx]
    with st.form("edit_profile"):
-    p_name = st.text_input("Parent first name", value=prof.get("parent_name", ""))
-    c_age  = st.number_input("Child age", 1, 21, value=prof.get("child_age", 1))
-    c_name = st.text_input("Child first name", value=prof.get("child_name", ""))
-    prof_nm= st.text_input("Profile name", value=prof.get("profile_name", ""))
-    a_type = st.selectbox("Agent type", ["Parent","Teacher","Other"], 
-        index=["Parent","Teacher","Other"].index(prof.get("agent_type","Parent")))
-    desc   = st.text_area("Persona description", value=prof.get("persona_description",""), height=150)
-    saved  = st.form_submit_button("SAVE CHANGES")
+        p_name = st.text_input("Parent first name", value=prof.get("parent_name", ""))
+        c_age  = st.number_input("Child age", 1, 21, value=prof.get("child_age", 1))
+        c_name = st.text_input("Child first name", value=prof.get("child_name", ""))
+        prof_nm= st.text_input("Profile name", value=prof.get("profile_name", ""))
+        a_type = st.selectbox("Agent type", ["Parent","Teacher","Other"], 
+            index=["Parent","Teacher","Other"].index(prof.get("agent_type","Parent")))
+        desc   = st.text_area("Persona description", value=prof.get("persona_description",""), height=150)
+        saved  = st.form_submit_button("SAVE CHANGES")
     if saved:
         prof.update(parent_name=p_name, child_age=int(c_age), 
         child_name=c_name, profile_name=prof_nm, persona_description=desc, 

@@ -343,19 +343,19 @@ def render_home_card(title, subtitle=None, buttons=None, expander_label=None, ex
     st.markdown(f'<div class="biglabel-G">{title}</div>', unsafe_allow_html=True)
     if subtitle:
         st.markdown(subtitle, unsafe_allow_html=True)
-    # Expander always rendered (before buttons)
+    # Buttons FIRST
+    if buttons:
+        for label, key, condition, action in buttons:
+            if st.button(label, key=key):
+                if condition is None or condition():
+                    action()
+    # Expander after buttons
     if expander_label and expander_body:
         with st.expander(expander_label):
             if callable(expander_body):
                 expander_body()
             else:
                 st.write(expander_body)
-    # Buttons after expander
-    if buttons:
-        for label, key, condition, action in buttons:
-            if st.button(label, key=key):
-                if condition is None or condition():
-                    action()
 
 # ---------------------------------------------------------------------------
 #  STEP FUNCTIONS

@@ -373,7 +373,7 @@ def render_step0():
     with row1_col1:
         render_home_card(
             "AGENTS",
-            expander_label="Profiles",
+            expander_label="SAVED PROFILES",
             expander_body=lambda: [
                 st.markdown(f"<p class='home-small'>{p['profile_name']}</p>", unsafe_allow_html=True)
                 for p in st.session_state.profiles
@@ -395,7 +395,7 @@ def render_step0():
         ]
         render_home_card(
             "CHATS",
-            expander_label="Saved Chats",
+            expander_label="SAVED CHATS",
             expander_body=lambda: (
                 [st.markdown(f"<p class='home-small'>{t}</p>", unsafe_allow_html=True)
                  for t in saved_titles]

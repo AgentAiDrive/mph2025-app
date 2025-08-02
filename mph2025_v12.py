@@ -368,22 +368,23 @@ def render_step0():
     row1_col1, row1_col2 = st.columns(2)
     row2_col1, row2_col2 = st.columns(2)
 
-    # AGENTS card (expander before buttons)
-    with row1_col1:
-        render_home_card(
-            "AGENTS",
-            buttons=[
-                ("SAVED AGENTS", "home_profiles", lambda: st.session_state.profiles,
-                 lambda: (st.session_state.__setitem__('step', 9), st.rerun())),
-                ("NEW AGENT",    "home_create",   None,
-                 lambda: (st.session_state.__setitem__('step', 1),  st.rerun())),
-            ],   
+with row1_col1:
+    render_home_card(
+        "AGENTS",
+        buttons=[
+            ("SAVED AGENTS", "home_profiles", lambda: st.session_state.profiles,
+             lambda: (st.session_state.__setitem__('step', 9), st.rerun())),
+            ("NEW AGENT", "home_create", None,
+             lambda: (st.session_state.__setitem__('step', 1), st.rerun())),
+        ],
+        expander_label="SAVED PROFILES",  # <-- THIS WAS MISSING
         expander_body=lambda: (
             [st.markdown(f"<p class='home-small'>{p['profile_name']}</p>", unsafe_allow_html=True)
              for p in st.session_state.profiles]
             if st.session_state.profiles 
             else st.markdown('<p class="home-small">No profiles yet.</p>', unsafe_allow_html=True)
         )
+    )
 
     # CHATS card (expander lists saved chat titles)
     with row1_col2:

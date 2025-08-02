@@ -340,12 +340,12 @@ TOOLTIPS = {
 #  HOME PAGE CARD RENDERING
 # ---------------------------------------------------------------------------
 
-def render_home_card(title, subtitle=None, expander_label=None, expander_body=None, buttons=None) -> None:
+def render_home_card(title, subtitle=None, buttons=None, expander_label=None, expander_body=None) -> None:
     """Render a card on the home page with:
        1. Title
        2. Optional subtitle
-       3. Optional expander
-       4. Action buttons
+       3. Action buttons
+       4. Optional expander
     """
     # Title
     st.markdown(f'<div class="biglabel-G">{title}</div>', unsafe_allow_html=True)
@@ -354,17 +354,18 @@ def render_home_card(title, subtitle=None, expander_label=None, expander_body=No
     if subtitle:
         st.markdown(subtitle, unsafe_allow_html=True)
 
-    # Expander (now rendered before buttons)
-    if expander_label and expander_body:
-        with st.expander(expander_label):
-            expander_body()
-
-    # Buttons (rendered after expander)
+  # Buttons (rendered after expander)
     if buttons:
         for label, key, condition, action in buttons:
             if st.button(label, key=key):
                 if condition is None or condition():
                     action()   
+    
+    # Expander (now rendered before buttons)
+    if expander_label and expander_body:
+        with st.expander(expander_label):
+            expander_body()
+
 # ---------------------------------------------------------------------------
 #  STEP FUNCTIONS
 # ---------------------------------------------------------------------------

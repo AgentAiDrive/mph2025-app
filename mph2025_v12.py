@@ -343,7 +343,7 @@ def render_home_card(title, subtitle=None, expander_label=None, expander_body=No
        4. Action buttons
     """
     # Title
-    st.markdown(f'<div class="biglabel-B">{title}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="biglabel-G">{title}</div>', unsafe_allow_html=True)
 
     # Optional subtitle
     if subtitle:

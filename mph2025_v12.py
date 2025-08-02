@@ -89,7 +89,7 @@ body {
   font-weight: 700!important;
   font-size: .7em!important;
   padding: .4em 0!important;
-  background: #2966d8!important;
+  background: #1ec97b!important;
   color: #fff!important;
   margin: 6px 0!important;
   width: 100%!important;
@@ -340,7 +340,7 @@ TOOLTIPS = {
 #  HOME PAGE CARD RENDERING
 # ---------------------------------------------------------------------------
 def render_home_card(title, subtitle=None, buttons=None, expander_label=None, expander_body=None) -> None:
-    st.markdown(f'<div class="biglabel-G">{title}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="biglabel-B">{title}</div>', unsafe_allow_html=True)
     if subtitle:
         st.markdown(subtitle, unsafe_allow_html=True)
     # Buttons FIRST

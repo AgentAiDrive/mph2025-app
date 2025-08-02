@@ -188,30 +188,33 @@ body {
 # ---------------------------------------------------------------------------
 
 def render_top_nav() -> None:
-    """Render the sticky top navigation bar with Home, Chat and Saved buttons."""
+    """Render a sticky top navigation bar with just Home."""
     st.markdown('<div class="top-nav-container">', unsafe_allow_html=True)
-    col1, col2, col3 = st.columns(3)
+    col1 = st.columns(1)[0]
     with col1:
         st.markdown('<div class="biglabel-G">', unsafe_allow_html=True)
         if st.button(" Home", key="nav_home"):
             st.session_state.step = 0
             st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
-    with col2:
-        st.markdown('<div class="biglabel-B">', unsafe_allow_html=True)
-        if st.button(" Chat", key="nav_chat"):
+    st.markdown('</div>', unsafe_allow_html=True)
+# ---------------------------------------------------------------------------
+#  BOTTOM NAVIGATION
+# ---------------------------------------------------------------------------
+
+def render_bottom_nav():
+    c1, c2 = st.columns(2)
+    with c1:
+        if st.button(" Chat", key="nav_chat_bottom"):
             st.session_state.step = 7 if st.session_state.profiles else 1
             st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
-    with col3:
-        st.markdown('<div class="biglabel-R">', unsafe_allow_html=True)
-        if st.button(" Saved", key="nav_saved"):
+    with c2:
+        if st.button(" Saved", key="nav_saved_bottom"):
             if st.session_state.saved_responses:
                 st.session_state.step = 8
             else:
                 st.warning("No saved responses yet.")
             st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
 
 # ---------------------------------------------------------------------------
 #  HELPER FUNCTIONS & CONSTANTS
@@ -555,6 +558,7 @@ af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
             st.session_state.step = 3
             st.rerun()
     render_top_nav()
+    render_bottom_nav()
 def render_step3():
     """Render the page to choose a specific book/expert/style or enter a custom one."""
     st.markdown(
@@ -599,6 +603,7 @@ af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
                 st.session_state.step = 4
                 st.rerun()
     render_top_nav()
+    render_bottom_nav()
 def render_step4():
     """Generate the agent persona description using the OpenAI API."""
     st.markdown(
@@ -653,6 +658,7 @@ af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
             st.session_state.step = 5
             st.rerun()
     render_top_nav()
+    render_bottom_nav()
 def render_step5():
     """Render the page to personalize the agent and save the profile, with fields varying by agent type."""
     st.markdown(
@@ -943,7 +949,7 @@ def render_step7():
                     st.rerun()
                 except Exception as e:
                     st.error(f"OpenAI API error: {e}")
-
+    render_bottom_nav()
 def render_step8():
     """List saved chats and allow deletion or closing."""
     render_top_nav()
@@ -1004,7 +1010,7 @@ def render_step8():
         if st.button("CLOSE", key="btn_close_saved"):
             st.session_state.step = 0
             st.rerun()
-
+    render_bottom_nav()
 def render_step9():
     """List agent profiles and allow editing or deletion."""
     render_top_nav()
@@ -1054,7 +1060,7 @@ def render_step9():
         if st.button("CLOSE", key="btn_close_profile"):
             st.session_state.step = 0
             st.rerun()
-
+    render_bottom_nav()
 def render_step10():
     """Render the page for editing the available source lists."""
     render_top_nav()
@@ -1113,7 +1119,7 @@ def render_step10():
     st.markdown("<br>", unsafe_allow_html=True)
     st.write("**Current list:**")
     st.write(sources.get(agent_type, {}).get(source_type, []))
-
+    render_bottom_nav()
 # ---------------------------------------------------------------------------
 #  ENTRY POINT
 # ---------------------------------------------------------------------------

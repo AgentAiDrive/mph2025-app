@@ -339,32 +339,25 @@ TOOLTIPS = {
 # ---------------------------------------------------------------------------
 #  HOME PAGE CARD RENDERING
 # ---------------------------------------------------------------------------
-
 def render_home_card(title, subtitle=None, buttons=None, expander_label=None, expander_body=None) -> None:
-    """Render a card on the home page with:
-       1. Title
-       2. Optional subtitle
-       3. Action buttons
-       4. Optional expander
-    """
-    # Title
     st.markdown(f'<div class="biglabel-G">{title}</div>', unsafe_allow_html=True)
-
-    # Optional subtitle
     if subtitle:
         st.markdown(subtitle, unsafe_allow_html=True)
 
-  # Buttons (rendered after expander)
+    # Expander always rendered (before buttons)
+    if expander_label and expander_body:
+        with st.expander(expander_label):
+            if callable(expander_body):
+                expander_body()
+            else:
+                st.write(expander_body)
+
+    # Buttons after expander
     if buttons:
         for label, key, condition, action in buttons:
             if st.button(label, key=key):
                 if condition is None or condition():
-                    action()   
-    
-    # Expander (now rendered before buttons)
-    if expander_label and expander_body:
-        with st.expander(expander_label):
-            expander_body()
+                    action()
 
 # ---------------------------------------------------------------------------
 #  STEP FUNCTIONS
@@ -385,12 +378,11 @@ def render_step0():
                 ("NEW AGENT",    "home_create",   None,
                  lambda: (st.session_state.__setitem__('step', 1),  st.rerun())),
             ],   
-            expander_label="SAVED PROFILES",
-            expander_body=lambda: [
-                st.markdown(f"<p class='home-small'>{p['profile_name']}</p>", unsafe_allow_html=True)
-                for p in st.session_state.profiles
-            ] if st.session_state.profiles else lambda: st.markdown(
-                '<p class="home-small">No profiles yet.</p>', unsafe_allow_html=True),
+        expander_body=lambda: (
+            [st.markdown(f"<p class='home-small'>{p['profile_name']}</p>", unsafe_allow_html=True)
+             for p in st.session_state.profiles]
+            if st.session_state.profiles 
+            else st.markdown('<p class="home-small">No profiles yet.</p>', unsafe_allow_html=True)
         )
 
     # CHATS card (expander lists saved chat titles)
@@ -986,19 +978,19 @@ def render_step9():
                        key="profile_select")
     prof = st.session_state.profiles[idx]
     with st.form("edit_profile"):
-        p_name = st.text_input("Parent first name", 
-        value=prof.get("parent_name", ""))
-        c_age  = st.number_input("Child age", 1, 21, 
-        value=prof.get("child_age", 1))
-        c_name = st.text_input("Child first name", 
-        value=prof.get("child_name", ""))
-        prof_nm= st.text_input("Profile name", 
-        value=prof.get("profile_name", ""))
-        a_type = st.selectbox("Agent type", ["Parent","Teacher","Other"], 
+    p_name = st.text_input("Parent first name", value=prof.get("parent_name", ""))
+    # Always force default_age into allowed range!
+    min_age, max_age = 1, 21
+    default_age = prof.get("child_age", min_age)
+    if default_age < min_age or default_age > max_age:
+        default_age = min_age
+    c_age  = st.number_input("Child age", min_age, max_age, value=default_age)
+    c_name = st.text_input("Child first name", value=prof.get("child_name", ""))
+    prof_nm= st.text_input("Profile name", value=prof.get("profile_name", ""))
+    a_type = st.selectbox("Agent type", ["Parent","Teacher","Other"], 
         index=["Parent","Teacher","Other"].index(prof.get("agent_type","Parent")))
-        desc   = st.text_area("Persona description", 
-        value=prof.get("persona_description",""), height=150)
-        saved  = st.form_submit_button("SAVE CHANGES")
+    desc   = st.text_area("Persona description", value=prof.get("persona_description",""), height=150)
+    saved  = st.form_submit_button("SAVE CHANGES")
     if saved:
         prof.update(parent_name=p_name, child_age=int(c_age), 
         child_name=c_name, profile_name=prof_nm, persona_description=desc, 

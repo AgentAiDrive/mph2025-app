@@ -192,7 +192,7 @@ def render_top_nav() -> None:
     st.markdown('<div class="top-nav-container">', unsafe_allow_html=True)
     col1 = st.columns(1)[0]
     with col1:
-        st.markdown('<div class="biglabel-G">', unsafe_allow_html=True)
+        st.markdown('<div class="biglabel-B">', unsafe_allow_html=True)
         if st.button(" Home", key="nav_home"):
             st.session_state.step = 0
             st.rerun()

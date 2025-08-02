@@ -395,6 +395,7 @@ def render_step0():
         ]
         render_home_card(
             "CHATS",
+           
             buttons=[
                 ("SAVED CHATS", "home_saved", lambda: st.session_state.saved_responses,
                  lambda: (st.session_state.__setitem__('step', 8), st.rerun())),

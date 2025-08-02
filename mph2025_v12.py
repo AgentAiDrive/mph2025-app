@@ -192,21 +192,26 @@ def render_top_nav() -> None:
     st.markdown('<div class="top-nav-container">', unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
     with col1:
-        if st-btn-green(" Home", key="nav_home"):
+        st.markdown('<div class="st-btn-green">', unsafe_allow_html=True)
+        if st.button(" Home", key="nav_home"):
             st.session_state.step = 0
             st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
     with col2:
-        if st-btn-blue(" Chat", key="nav_chat"):
-            # If profiles exist go straight to chat selection step otherwise to agent creation.
+        st.markdown('<div class="st-btn-blue">', unsafe_allow_html=True)
+        if st.button(" Chat", key="nav_chat"):
             st.session_state.step = 7 if st.session_state.profiles else 1
             st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
     with col3:
-        if st-btn-red(" Saved", key="nav_saved"):
+        st.markdown('<div class="st-btn-red">', unsafe_allow_html=True)
+        if st.button(" Saved", key="nav_saved"):
             if st.session_state.saved_responses:
                 st.session_state.step = 8
             else:
                 st.warning("No saved responses yet.")
             st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # ---------------------------------------------------------------------------
 #  HELPER FUNCTIONS & CONSTANTS
@@ -395,7 +400,6 @@ def render_step0():
         ]
         render_home_card(
             "CHATS",
-           
             buttons=[
                 ("SAVED CHATS", "home_saved", lambda: st.session_state.saved_responses,
                  lambda: (st.session_state.__setitem__('step', 8), st.rerun())),
@@ -473,17 +477,17 @@ af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
     st.markdown('<div class="frame-avatar"></div>', unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
     with col1:
-        if st-btn-green("  Parent", key="btn_agent_parent"):
+        if st.button("  Parent", key="btn_agent_parent"):
             st.session_state.agent_type = "Parent"
             st.session_state.step = 2
             st.rerun()
     with col2:
-        if st-btn-blue("‍  Teacher", key="btn_agent_teacher"):
+        if st.button("‍  Teacher", key="btn_agent_teacher"):
             st.session_state.agent_type = "Teacher"
             st.session_state.step = 2
             st.rerun()
     with col3:
-        if st-btn-red("✨  Other", key="btn_agent_other"):
+        if st.button("✨  Other", key="btn_agent_other"):
             st.session_state.agent_type = "Other"
             st.session_state.step = 2
             st.rerun()
@@ -503,17 +507,17 @@ af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
     st.markdown('<div class="frame-avatar"></div>', unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
     with col1:
-        if st-btn-green("  Book", key="btn_book"):
+        if st.button("  Book", key="btn_book"):
             st.session_state.source_type = "Book"
             st.session_state.step = 3
             st.rerun()
     with col2:
-        if st-btn-blue("‍  Expert", key="btn_expert"):
+        if st.button("‍  Expert", key="btn_expert"):
             st.session_state.source_type = "Expert"
             st.session_state.step = 3
             st.rerun()
     with col3:
-        if st-btn-red("  Style", key="btn_style"):
+        if st.button("  Style", key="btn_style"):
             st.session_state.source_type = "Style"
             st.session_state.step = 3
             st.rerun()
@@ -547,11 +551,11 @@ af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
     custom = st.text_input("Enter custom name") if choice == "Other..." else ""
     col1, col2 = st.columns(2)
     with col1:
-        if st-btn-red("BACK", key="btn_back_step2"):
+        if st.button("BACK", key="btn_back_step2"):
             st.session_state.step = 2
             st.rerun()
     with col2:
-        if st-btn-green("CREATE", key="btn_create_step2"):
+        if st.button("CREATE", key="btn_create_step2"):
             src_name = custom if choice == "Other..." else choice
             if not src_name:
                 st.warning("Please provide a name.")
@@ -608,11 +612,11 @@ af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
         st.info(desc)
     col1, col2 = st.columns(2)
     with col1:
-        if st-btn-blue("RETRY", key="btn_retry"):
+        if st.button("RETRY", key="btn_retry"):
             st.session_state.pop("persona_description", None)
             st.rerun()
     with col2:
-        if st-btn-red("SAVE", key="btn_save_persona"):
+        if st.button("SAVE", key="btn_save_persona"):
             st.session_state.step = 5
             st.rerun()
     render_top_nav()
@@ -679,7 +683,7 @@ def render_step5():
             st.session_state.step = 6
             st.rerun()
 
-    if st-btn-red("BACK", key="btn_back_details"):
+    if st.button("BACK", key="btn_back_details"):
         st.session_state.step = 4
         st.rerun()
     render_top_nav()
@@ -821,7 +825,7 @@ def render_step7():
     query = st.text_area("Type here", key="chat_query")
     col1, col2 = st.columns(2)
     with col1:
-        if st-btn-blue("SAVE RESPONSE", key="save_response"):
+        if st.button("SAVE RESPONSE", key="save_response"):
             record = {
                 "profile": sel["profile_name"],
                 "shortcut": st.session_state.shortcut,
@@ -839,7 +843,7 @@ def render_step7():
             # Provide feedback without leaving the chat
             st.success("Response saved!")
     with col2:
-        if st-btn-green("SEND", key="send_btn"):
+        if st.button("SEND", key="send_btn"):
             base = (
               f"Adopt the persona described here: {sel['persona_description']}. "
               f"You are conversing with:"
@@ -959,12 +963,12 @@ def render_step8():
                 )
     c1, c2 = st.columns(2)
     with c1:
-        if st-btn-red("DELETE", key="btn_delete_saved"):
+        if st.button("DELETE", key="btn_delete_saved"):
             st.session_state.saved_responses.pop(sel_idx)
             save_json(RESPONSES_FILE, st.session_state.saved_responses)
             st.rerun()
     with c2:
-        if st-btn-red("CLOSE", key="btn_close_saved"):
+        if st.button("CLOSE", key="btn_close_saved"):
             st.session_state.step = 0
             st.rerun()
 
@@ -1004,12 +1008,12 @@ def render_step9():
         st.success("Profile updated!")
     c1, c2 = st.columns(2)
     with c1:
-        if st-btn-red("DELETE PROFILE", key="btn_delete_profile"):
+        if st.button("DELETE PROFILE", key="btn_delete_profile"):
             st.session_state.profiles.pop(idx)
             save_json(PROFILES_FILE, st.session_state.profiles)
             st.rerun()
     with c2:
-        if st-btn-red("CLOSE", key="btn_close_profile"):
+        if st.button("CLOSE", key="btn_close_profile"):
             st.session_state.step = 0
             st.rerun()
 
@@ -1048,14 +1052,14 @@ def render_step10():
     new_item = st.text_input(f"Add new {source_type}:", key="add_source")
     c1, c2, c3 = st.columns(3)
     with c1:
-        if st-btn-red("Remove Selected"):
+        if st.button("Remove Selected"):
             sources[agent_type][source_type] = [x for x in items if x not in to_remove]
             st.session_state["sources"] = sources
             save_sources(sources)
             st.success("Removed selected!")
             st.rerun()
     with c2:
-        if st-btn-green("Add"):
+        if st.button("Add"):
             if new_item and new_item not in items:
                 sources[agent_type][source_type].append(new_item)
                 st.session_state["sources"] = sources
@@ -1065,7 +1069,7 @@ def render_step10():
             elif new_item:
                 st.warning("Already in list.")
     with c3:
-        if st-btn-red("Back to Home"):
+        if st.button("Back to Home"):
             st.session_state.step = 0
             st.rerun()
     st.markdown("<br>", unsafe_allow_html=True)

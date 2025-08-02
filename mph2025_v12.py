@@ -30,7 +30,39 @@ st.markdown(
       align-items: center;
       padding: 10px 10px 10px;
     }
-
+     .biglabel-B {
+      font-size: 1.1em;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 4px 0 10px;
+      text-align: center;
+      letter-spacing: 0.5px;
+      background: rgba(0, 0, 255, 0.55);  /* Light translucent blue */
+      padding: 6px 12px;
+      border-radius: 12px;
+    }
+      .biglabel-R {
+      font-size: 1.1em;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 4px 0 10px;
+      text-align: center;
+      letter-spacing: 0.5px;
+      background: rgba(255, 0, 0, 0.55);  /* Light translucent red */
+      padding: 6px 12px;
+      border-radius: 12px;
+    }
+     .biglabel-G {
+      font-size: 1.1em;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 4px 0 10px;
+      text-align: center;
+      letter-spacing: 0.5px;
+      background: rgba(0, 255, 0, 0.55);  /* Light translucent green */
+      padding: 6px 12px;
+      border-radius: 12px;
+    }
     .biglabel {
       font-size: 1.1em;
       font-weight: 800;
@@ -371,7 +403,7 @@ af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
         </div>
         """,
         unsafe_allow_html=True,)
-    st.markdown('<div class="biglabel">Select An Agent Type</div>', 
+    st.markdown('<div class="biglabel-G">Select An Agent Type</div>', 
                 unsafe_allow_html=True)
     st.markdown('<div class="frame-avatar"></div>', unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
@@ -402,7 +434,7 @@ af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
         </div>
         """,
         unsafe_allow_html=True,)
-    st.markdown('<div class="biglabel">Select Agent Source Type</div>', 
+    st.markdown('<div class="biglabel-G">Select Agent Source Type</div>', 
                 unsafe_allow_html=True)
     st.markdown('<div class="frame-avatar"></div>', unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
@@ -477,7 +509,7 @@ af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
         """,
         unsafe_allow_html=True,
     )
-    st.markdown('<div class="biglabel">GENERATING YOUR AGENT PERSONA</div>',
+    st.markdown('<div class="biglabel-B">GENERATING YOUR AGENT PERSONA</div>',
                 unsafe_allow_html=True)
     st.markdown('<div class="frame-avatar">✨</div>', unsafe_allow_html=True)
     placeholder = st.empty()
@@ -531,7 +563,7 @@ def render_step5():
         """,
         unsafe_allow_html=True,
     )
-    st.markdown('<div class="biglabel">PERSONALIZE AGENT</div>', unsafe_allow_html=True)
+    st.markdown('<div class="biglabel-G">PERSONALIZE AGENT</div>', unsafe_allow_html=True)
     st.markdown('<div class="frame-avatar"></div>', unsafe_allow_html=True)
 
     agent_type = st.session_state.get("agent_type", "Parent")

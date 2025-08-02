@@ -1008,29 +1008,39 @@ def render_step8():
 def render_step9():
     """List agent profiles and allow editing or deletion."""
     render_top_nav()
-    st.markdown('<div class="biglabel-B">AGENT PROFILES</div>', 
-                unsafe_allow_html=True)
+    st.markdown('<div class="biglabel-B">AGENT PROFILES</div>', unsafe_allow_html=True)
     if not st.session_state.profiles:
-        st.info("No profiles stored."); st.session_state.step = 0; st.rerun()
-    titles = [f"{i+1}. {p['profile_name']}" for i,p in 
-              enumerate(st.session_state.profiles)]
-    idx = st.selectbox("Select a profile to view / edit", 
-                       range(len(titles)), format_func=lambda i: titles[i], 
+        st.info("No profiles stored.")
+        st.session_state.step = 0
+        st.rerun()
+    titles = [f"{i+1}. {p['profile_name']}" for i, p in enumerate(st.session_state.profiles)]
+    idx = st.selectbox("Select a profile to view / edit",
+                       range(len(titles)), format_func=lambda i: titles[i],
                        key="profile_select")
     prof = st.session_state.profiles[idx]
-with st.form("edit_profile"):
+
+    with st.form("edit_profile"):
         p_name = st.text_input("Parent first name", value=prof.get("parent_name", ""))
-        c_age  = st.number_input("Child age", 1, 21, value=prof.get("child_age", 1))
+        # Safeguard age value
+        age_val = prof.get("child_age", 1)
+        if not isinstance(age_val, int):
+            try:
+                age_val = int(age_val)
+            except Exception:
+                age_val = 1
+        age_val = max(1, min(age_val, 21))
+        c_age  = st.number_input("Child age", 1, 21, value=age_val)
         c_name = st.text_input("Child first name", value=prof.get("child_name", ""))
         prof_nm= st.text_input("Profile name", value=prof.get("profile_name", ""))
-        a_type = st.selectbox("Agent type", ["Parent","Teacher","Other"], 
+        a_type = st.selectbox("Agent type", ["Parent","Teacher","Other"],
             index=["Parent","Teacher","Other"].index(prof.get("agent_type","Parent")))
         desc   = st.text_area("Persona description", value=prof.get("persona_description",""), height=150)
         saved  = st.form_submit_button("SAVE CHANGES")
+
     if saved:
-        prof.update(parent_name=p_name, child_age=int(c_age), 
-        child_name=c_name, profile_name=prof_nm, persona_description=desc, 
-        agent_type=a_type)
+        prof.update(parent_name=p_name, child_age=int(c_age),
+                    child_name=c_name, profile_name=prof_nm, persona_description=desc,
+                    agent_type=a_type)
         st.session_state.profiles[idx] = prof
         save_json(PROFILES_FILE, st.session_state.profiles)
         st.success("Profile updated!")

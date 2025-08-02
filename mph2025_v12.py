@@ -11,105 +11,177 @@ from pydantic import BaseModel
 
 st.markdown(
     """
-    <style>
-    body{background:linear-gradient(135deg,#2fe273 0%,#09742a 
-    100%)!important;min-height:100vh;}
-    .stApp {
-      background: linear-gradient(335deg,#2fe273 0%,#09742a 100%)!important;
-      border-radius: 32px;
-      max-width: 400px;
-      min-height: 100vh;
-      height: 100vh;
-      overflow-y: auto;
-      margin: 32px auto;
-      box-shadow: 0 8px 32px rgba(60,60,60,.25), 0 1.5px 8px 
-      rgba(30,90,40,.06);
-      border: 3px solid #ffffff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 10px 10px 10px;
-    }
-     .biglabel-B {
-      font-size: 1.1em;
-      font-weight: 800;
-      color: #ffffff;
-      margin: 4px 0 10px;
-      text-align: center;
-      letter-spacing: 0.5px;
-      background: rgba(0, 0, 255, 0.55);  /* Light translucent blue */
-      padding: 6px 12px;
-      border-radius: 12px;
-    }
-      .biglabel-R {
-      font-size: 1.1em;
-      font-weight: 800;
-      color: #ffffff;
-      margin: 4px 0 10px;
-      text-align: center;
-      letter-spacing: 0.5px;
-      background: rgba(255, 0, 0, 0.55);  /* Light translucent red */
-      padding: 6px 12px;
-      border-radius: 12px;
-    }
-     .biglabel-G {
-      font-size: 1.1em;
-      font-weight: 800;
-      color: #ffffff;
-      margin: 4px 0 10px;
-      text-align: center;
-      letter-spacing: 0.5px;
-      background: rgba(0, 255, 0, 0.55);  /* Light translucent green */
-      padding: 6px 12px;
-      border-radius: 12px;
-    }
-    .biglabel {
-      font-size: 1.1em;
-      font-weight: 800;
-      color: #ffffff;
-      margin: 4px 0 10px;
-      text-align: center;
-      letter-spacing: 0.5px;
-      background: rgba(255, 255, 255, 0.55);  /* Light translucent white */
-      padding: 6px 12px;
-      border-radius: 12px;
-    }
-    .frame-avatar{font-size:1.4em;margin:6px 0 6px;display:flex;justify-
-    content:center;color:#ffffff;}
-
-    .stButton>button{
-      border-radius:26px!important;
-      font-weight:700!important;
-      font-size:.7em!important;
-      padding:.4em 0!important;
-      background:#blue!important;
-      color:#000000!important;
-      margin:6px 0!important;
-      width:100%!important;
-    }
-    .top-nav-container {
-      padding: 12px 12px 12px 12px !important;
-      border-radius: 32px !important;
-      margin: -10px -10px 24px -10px !important;
-      width: calc(100% + 20px) !important;
-    }
-   
-    /* --- Answer bubble --- */
-    .answer-box{background:#23683c;border-radius:12px;padding:14px 
-    18px;color:#fff;white-space:pre-wrap;margin-top:8px;}
-
-    /* --- Home cards --- */
-    .home-card{background:rgba(255,255,255,0.15);border-
-    radius:16px;padding:12px;margin:6px;color:#fff;}
-    .home-card-title{font-weight:800;margin-bottom:6px;}
-    .home-small{font-size:0.8em;opacity:0.85;background:white;border:3px 
-    solid #000000;margin:4px 4px;padding:4px;}
-    .home-button{font-size:0.8em;opacity:0.85;background:white;border:3px 
-    solid #000000;}
-    @media (max-height:750px){.stApp{min-height:640px;}}
-    </style>
+<style>
+body {
+  background: linear-gradient(135deg,#2fe273 0%,#09742a 100%)!important;
+  min-height: 100vh;
+}
+.stApp {
+  background: linear-gradient(335deg,#2fe273 0%,#09742a 100%)!important;
+  border-radius: 32px;
+  max-width: 400px;
+  min-height: 100vh;
+  height: 100vh;
+  overflow-y: auto;
+  margin: 32px auto;
+  box-shadow: 0 8px 32px rgba(60,60,60,.25), 0 1.5px 8px rgba(30,90,40,.06);
+  border: 3px solid #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 10px 10px;
+}
+/* --- COLOR LABELS --- */
+.biglabel-B {
+  font-size: 1.1em;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 4px 0 10px;
+  text-align: center;
+  letter-spacing: 0.5px;
+  background: rgba(0, 0, 255, 0.55);
+  padding: 6px 12px;
+  border-radius: 12px;
+}
+.biglabel-R {
+  font-size: 1.1em;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 4px 0 10px;
+  text-align: center;
+  letter-spacing: 0.5px;
+  background: rgba(255, 0, 0, 0.55);
+  padding: 6px 12px;
+  border-radius: 12px;
+}
+.biglabel-G {
+  font-size: 1.1em;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 4px 0 10px;
+  text-align: center;
+  letter-spacing: 0.5px;
+  background: rgba(0, 255, 0, 0.55);
+  padding: 6px 12px;
+  border-radius: 12px;
+}
+.biglabel {
+  font-size: 1.1em;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 4px 0 10px;
+  text-align: center;
+  letter-spacing: 0.5px;
+  background: rgba(255, 255, 255, 0.55);
+  padding: 6px 12px;
+  border-radius: 12px;
+}
+.frame-avatar {
+  font-size: 1.4em;
+  margin: 6px 0 6px;
+  display: flex;
+  justify-content: center;
+  color: #ffffff;
+}
+/* --- COLOR BUTTONS --- */
+.stButton>button {
+  border-radius: 26px!important;
+  font-weight: 700!important;
+  font-size: .7em!important;
+  padding: .4em 0!important;
+  background: #2966d8!important;
+  color: #fff!important;
+  margin: 6px 0!important;
+  width: 100%!important;
+}
+.st-btn-blue > button {
+  border-radius: 26px !important;
+  font-weight: 700 !important;
+  font-size: .9em !important;
+  padding: .4em 0 !important;
+  background: #2966d8 !important;
+  color: #fff !important;
+  margin: 6px 0 !important;
+  width: 100% !important;
+  border: none !important;
+  box-shadow: 0 2px 12px rgba(44,99,180,0.12);
+  transition: background 0.2s;
+}
+.st-btn-green > button {
+  border-radius: 26px !important;
+  font-weight: 700 !important;
+  font-size: .9em !important;
+  padding: .4em 0 !important;
+  background: #1ec97b !important;
+  color: #fff !important;
+  margin: 6px 0 !important;
+  width: 100% !important;
+  border: none !important;
+  box-shadow: 0 2px 12px rgba(44,180,99,0.12);
+  transition: background 0.2s;
+}
+.st-btn-red > button {
+  border-radius: 26px !important;
+  font-weight: 700 !important;
+  font-size: .9em !important;
+  padding: .4em 0 !important;
+  background: #d8293c !important;
+  color: #fff !important;
+  margin: 6px 0 !important;
+  width: 100% !important;
+  border: none !important;
+  box-shadow: 0 2px 12px rgba(180,44,99,0.12);
+  transition: background 0.2s;
+}
+/* --- TOP NAV BAR--- */
+.top-nav-container {
+  padding: 12px 12px 12px 12px !important;
+  border-radius: 32px !important;
+  margin: -10px -10px 24px -10px !important;
+  width: calc(100% + 20px) !important;
+}
+/* --- Answer bubble --- */
+.answer-box {
+  background: #23683c;
+  border-radius: 12px;
+  padding: 14px 18px;
+  color: #fff;
+  white-space: pre-wrap;
+  margin-top: 8px;
+}
+/* --- Home cards --- */
+.home-card {
+  background: rgba(255,255,255,0.15);
+  border-radius: 16px;
+  padding: 12px;
+  margin: 6px;
+  color: #fff;
+}
+.home-card-title {
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+.home-small {
+  font-size: 0.8em;
+  opacity: 0.85;
+  background: white;
+  border: 3px solid #000000;
+  margin: 4px 4px;
+  padding: 4px;
+}
+.home-button {
+  font-size: 0.8em;
+  opacity: 0.85;
+  background: white;
+  border: 3px solid #000000;
+}
+@media (max-height:750px){
+  .stApp{min-height:640px;}
+}
+</style>
     """,
-    unsafe_allow_html=True)
+    unsafe_allow_html=True
+)
 
 # ---------------------------------------------------------------------------
 #  TOP NAVIGATION
@@ -120,16 +192,16 @@ def render_top_nav() -> None:
     st.markdown('<div class="top-nav-container">', unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
     with col1:
-        if st.button(" Home", key="nav_home"):
+        if st-btn-green(" Home", key="nav_home"):
             st.session_state.step = 0
             st.rerun()
     with col2:
-        if st.button(" Chat", key="nav_chat"):
+        if st-btn-blue(" Chat", key="nav_chat"):
             # If profiles exist go straight to chat selection step otherwise to agent creation.
             st.session_state.step = 7 if st.session_state.profiles else 1
             st.rerun()
     with col3:
-        if st.button(" Saved", key="nav_saved"):
+        if st-btn-red(" Saved", key="nav_saved"):
             if st.session_state.saved_responses:
                 st.session_state.step = 8
             else:
@@ -398,17 +470,17 @@ af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
     st.markdown('<div class="frame-avatar"></div>', unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
     with col1:
-        if st.button("  Parent", key="btn_agent_parent"):
+        if st-btn-green("  Parent", key="btn_agent_parent"):
             st.session_state.agent_type = "Parent"
             st.session_state.step = 2
             st.rerun()
     with col2:
-        if st.button("‍  Teacher", key="btn_agent_teacher"):
+        if st-btn-blue("‍  Teacher", key="btn_agent_teacher"):
             st.session_state.agent_type = "Teacher"
             st.session_state.step = 2
             st.rerun()
     with col3:
-        if st.button("✨  Other", key="btn_agent_other"):
+        if st-btn-red("✨  Other", key="btn_agent_other"):
             st.session_state.agent_type = "Other"
             st.session_state.step = 2
             st.rerun()
@@ -428,17 +500,17 @@ af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
     st.markdown('<div class="frame-avatar"></div>', unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
     with col1:
-        if st.button("  Book", key="btn_book"):
+        if st-btn-green("  Book", key="btn_book"):
             st.session_state.source_type = "Book"
             st.session_state.step = 3
             st.rerun()
     with col2:
-        if st.button("‍  Expert", key="btn_expert"):
+        if st-btn-blue("‍  Expert", key="btn_expert"):
             st.session_state.source_type = "Expert"
             st.session_state.step = 3
             st.rerun()
     with col3:
-        if st.button("  Style", key="btn_style"):
+        if st-btn-red("  Style", key="btn_style"):
             st.session_state.source_type = "Style"
             st.session_state.step = 3
             st.rerun()
@@ -472,11 +544,11 @@ af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
     custom = st.text_input("Enter custom name") if choice == "Other..." else ""
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("BACK", key="btn_back_step2"):
+        if st-btn-red("BACK", key="btn_back_step2"):
             st.session_state.step = 2
             st.rerun()
     with col2:
-        if st.button("CREATE", key="btn_create_step2"):
+        if st-btn-green("CREATE", key="btn_create_step2"):
             src_name = custom if choice == "Other..." else choice
             if not src_name:
                 st.warning("Please provide a name.")
@@ -533,11 +605,11 @@ af2a-268488bd6f38/myparenthelpers%20logo%20round.png" width="80" />
         st.info(desc)
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("RETRY", key="btn_retry"):
+        if st-btn-blue("RETRY", key="btn_retry"):
             st.session_state.pop("persona_description", None)
             st.rerun()
     with col2:
-        if st.button("SAVE", key="btn_save_persona"):
+        if st-btn-red("SAVE", key="btn_save_persona"):
             st.session_state.step = 5
             st.rerun()
     render_top_nav()
@@ -604,7 +676,7 @@ def render_step5():
             st.session_state.step = 6
             st.rerun()
 
-    if st.button("BACK", key="btn_back_details"):
+    if st-btn-red("BACK", key="btn_back_details"):
         st.session_state.step = 4
         st.rerun()
     render_top_nav()
@@ -746,7 +818,7 @@ def render_step7():
     query = st.text_area("Type here", key="chat_query")
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("SAVE RESPONSE", key="save_response"):
+        if st-btn-blue("SAVE RESPONSE", key="save_response"):
             record = {
                 "profile": sel["profile_name"],
                 "shortcut": st.session_state.shortcut,
@@ -764,7 +836,7 @@ def render_step7():
             # Provide feedback without leaving the chat
             st.success("Response saved!")
     with col2:
-        if st.button("SEND", key="send_btn"):
+        if st-btn-green("SEND", key="send_btn"):
             base = (
               f"Adopt the persona described here: {sel['persona_description']}. "
               f"You are conversing with:"
@@ -884,12 +956,12 @@ def render_step8():
                 )
     c1, c2 = st.columns(2)
     with c1:
-        if st.button("DELETE", key="btn_delete_saved"):
+        if st-btn-red("DELETE", key="btn_delete_saved"):
             st.session_state.saved_responses.pop(sel_idx)
             save_json(RESPONSES_FILE, st.session_state.saved_responses)
             st.rerun()
     with c2:
-        if st.button("CLOSE", key="btn_close_saved"):
+        if st-btn-red("CLOSE", key="btn_close_saved"):
             st.session_state.step = 0
             st.rerun()
 
@@ -929,12 +1001,12 @@ def render_step9():
         st.success("Profile updated!")
     c1, c2 = st.columns(2)
     with c1:
-        if st.button("DELETE PROFILE", key="btn_delete_profile"):
+        if st-btn-red("DELETE PROFILE", key="btn_delete_profile"):
             st.session_state.profiles.pop(idx)
             save_json(PROFILES_FILE, st.session_state.profiles)
             st.rerun()
     with c2:
-        if st.button("CLOSE", key="btn_close_profile"):
+        if st-btn-red("CLOSE", key="btn_close_profile"):
             st.session_state.step = 0
             st.rerun()
 
@@ -973,14 +1045,14 @@ def render_step10():
     new_item = st.text_input(f"Add new {source_type}:", key="add_source")
     c1, c2, c3 = st.columns(3)
     with c1:
-        if st.button("Remove Selected"):
+        if st-btn-red("Remove Selected"):
             sources[agent_type][source_type] = [x for x in items if x not in to_remove]
             st.session_state["sources"] = sources
             save_sources(sources)
             st.success("Removed selected!")
             st.rerun()
     with c2:
-        if st.button("Add"):
+        if st-btn-green("Add"):
             if new_item and new_item not in items:
                 sources[agent_type][source_type].append(new_item)
                 st.session_state["sources"] = sources
@@ -990,7 +1062,7 @@ def render_step10():
             elif new_item:
                 st.warning("Already in list.")
     with c3:
-        if st.button("Back to Home"):
+        if st-btn-red("Back to Home"):
             st.session_state.step = 0
             st.rerun()
     st.markdown("<br>", unsafe_allow_html=True)

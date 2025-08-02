@@ -131,7 +131,24 @@ chats to ask questions and save meaningful conversations. Keep sources updated a
 wisely for the best experience.
 
 mph-2025.streamlit.app
-https://share.streamlit.io/user/agentaidrive
+
+## UI Workflow & Steps
+
+| Step | UI Screen            | Function             | Notes                                       |
+|:----:|----------------------|----------------------|---------------------------------------------|
+|  0   | **Home**             | `render_step0()`     | Cards: Agents, Chats, Sources, Data         |
+|  1   | Select Agent Type    | `render_step1()`     | Parent / Teacher / Other                    |
+|  2   | Select Source Type   | `render_step2()`     | Book / Expert / Style                       |
+|  3   | Choose Source        | `render_step3()`     | Dropdown or custom entry                    |
+|  4   | Generate Persona     | `render_step4()`     | OpenAI call + loading animation             |
+|  5   | Personalize Agent    | `render_step5()`     | Form fields adapt by `agent_type`           |
+|  6   | Confirmation         | `render_step6()`     | Show saved profile card                     |
+|  7   | Chat Interface       | `render_step7()`     | Profile selector, shortcuts, live feed      |
+|  8   | Saved Chats          | `render_step8()`     | View/delete; expander for full history      |
+|  9   | Edit Profiles        | `render_step9()`     | Update or delete Agent profiles             |
+| 10   | Edit Sources         | `render_step10()`    | Add/remove Books/Experts/Styles             |
+
+
 
 Streamlit
 https://mph-2025.streamlit.app/

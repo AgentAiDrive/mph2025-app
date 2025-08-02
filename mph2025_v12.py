@@ -978,14 +978,9 @@ def render_step9():
                        range(len(titles)), format_func=lambda i: titles[i], 
                        key="profile_select")
     prof = st.session_state.profiles[idx]
-    with st.form("edit_profile"):
+   with st.form("edit_profile"):
     p_name = st.text_input("Parent first name", value=prof.get("parent_name", ""))
-    # Always force default_age into allowed range!
-    min_age, max_age = 1, 21
-    default_age = prof.get("child_age", min_age)
-    if default_age < min_age or default_age > max_age:
-        default_age = min_age
-    c_age  = st.number_input("Child age", min_age, max_age, value=default_age)
+    c_age  = st.number_input("Child age", 1, 21, value=prof.get("child_age", 1))
     c_name = st.text_input("Child first name", value=prof.get("child_name", ""))
     prof_nm= st.text_input("Profile name", value=prof.get("profile_name", ""))
     a_type = st.selectbox("Agent type", ["Parent","Teacher","Other"], 

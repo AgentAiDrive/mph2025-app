@@ -442,7 +442,7 @@ def render_step0():
     with row2_col1:
         render_home_card(
             title="SOURCES",
-            expander_label="Source Type Counts",
+            expander_label="Types & Counts",
             expander_body=lambda: [
                 st.markdown(
                     f"<p class='home-small'>{atype}: "

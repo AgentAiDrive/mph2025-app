@@ -3,6 +3,7 @@ import openai
 import json
 import os
 import time
+from typing import Callable
 from pydantic import BaseModel
 
 # ---------------------------------------------------------------------------

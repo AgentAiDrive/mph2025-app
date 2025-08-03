@@ -396,14 +396,12 @@ def render_step0():
             title="AGENTS",
             buttons=[
                 ("SAVED AGENTS", "home_profiles", lambda: st.session_state.profiles,
-                    lambda: (st.session_state.__setitem__('step', 9), st.rerun())),
-                ("NEW AGENT",    "home_create",  None,
-                    lambda: (st.session_state.__setitem__('step', 1), st.rerun())),
+                    lambda: (st.session_state.__setitem__('step', 9), st.rerun()),
             ],
      with row1_col2:
             buttons=[
                 ("NEW AGENT",    "home_create",  None,
-                    lambda: (st.session_state.__setitem__('step', 1), st.rerun())),
+                    lambda: (st.session_state.__setitem__('step', 1), st.rerun()),
             ],
             expander_label="Saved Profiles",
             expander_body=lambda: (

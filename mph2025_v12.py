@@ -193,17 +193,19 @@ def render_top_nav() -> None:
     st.markdown('<div class="top-nav-container">', unsafe_allow_html=True)
     col1 = st.columns(1)[0]
     with col1:
-        st.markdown('<div class="biglabel-B">', unsafe_allow_html=True)
         if st.button(" Home", key="nav_home"):
             st.session_state.step = 0
-            st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
+            st.rerun()    
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('<div class="biglabel-B">', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 # ---------------------------------------------------------------------------
 #  BOTTOM NAVIGATION
 # ---------------------------------------------------------------------------
 
 def render_bottom_nav():
+    st.markdown('<div class="biglabel-B">', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
     c1, c2 = st.columns(2)
     with c1:
         if st.button(" Chat", key="nav_chat_bottom"):

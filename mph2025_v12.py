@@ -92,7 +92,7 @@ body {
   background: #1ec97b!important;
   color: #fff!important;
   margin: 6px 0!important;
-  width: 100%!important;
+  width: 50%!important;
 }
 .st-btn-blue > button {
   border-radius: 26px !important;

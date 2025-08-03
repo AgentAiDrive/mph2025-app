@@ -400,6 +400,11 @@ def render_step0():
                 ("NEW AGENT",    "home_create",  None,
                     lambda: (st.session_state.__setitem__('step', 1), st.rerun())),
             ],
+     with row1_col2:
+            buttons=[
+                ("NEW AGENT",    "home_create",  None,
+                    lambda: (st.session_state.__setitem__('step', 1), st.rerun())),
+            ],
             expander_label="Saved Profiles",
             expander_body=lambda: (
                 [st.markdown(f"<p class='home-small'>{p['profile_name']}</p>",

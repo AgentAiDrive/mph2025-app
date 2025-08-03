@@ -610,18 +610,16 @@ def render_step6():
     """, unsafe_allow_html=True)
     render_top_nav()
 
-# ---------------------------------------------------------------------------
-#  STEP 7: CHAT INTERFACE
-# ---------------------------------------------------------------------------
 def render_step7():
     render_top_nav()
 
+    # 1) Profile selection
     st.markdown('<div class="biglabel-G">1. SELECT AN AGENT</div>', unsafe_allow_html=True)
     names = [p["profile_name"] for p in st.session_state.profiles]
     idx   = st.selectbox("Agent Profiles:", range(len(names)), format_func=lambda i: names[i], key="chat_profile")
     sel   = st.session_state.profiles[idx]
 
-    # RESPONSE TYPE SHORTCUTS
+    # 2) Shortcut buttons
     st.session_state.setdefault("shortcut", " DEFAULT")
     shortcuts = [" DEFAULT"," CONNECT"," GROW"," EXPLORE"," RESOLVE","❤ SUPPORT"]
     cols = st.columns(len(shortcuts))
@@ -630,90 +628,97 @@ def render_step7():
             if st.button(sc.strip(), key=f"sc_{sc}"):
                 st.session_state.shortcut = sc
 
-    # PERSISTENT MEMORY TOGGLE
+    # 3) Memory toggle & display history
     st.checkbox("Use persistent memory", key="persistent_memory")
-
-    # DISPLAY HISTORY
-    conv = (st.session_state.conversation.get(sel["profile_name"], [])
+    hist = (st.session_state.conversation.get(sel["profile_name"], [])
             if st.session_state.persistent_memory
             else st.session_state.temp_conversation.get(sel["profile_name"], []))
-    for msg in conv:
+    for msg in hist:
         role = "You" if msg["role"]=="user" else "Agent"
         style = "background:#144d2f;" if msg["role"]=="user" else ""
-        st.markdown(f"<div class='answer-box' style='{style}'><strong>{role}:</strong> {msg['content']}</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div class='answer-box' style='{style}'><strong>{role}:</strong> {msg['content']}</div>",
+            unsafe_allow_html=True
+        )
 
-    # USER QUERY
+    # 4) User types query
     st.markdown('<div class="home-small">3. WHAT DO YOU WANT TO ASK?</div>', unsafe_allow_html=True)
     query = st.text_area("Type here", key="chat_query")
 
-    c1, c2 = st.columns(2)
-    with c1:
-        if st.button("Save Response", key="save_response"):
-            record = {
-                "profile": sel["profile_name"],
-                "shortcut": st.session_state.shortcut,
-                "question": query,
-                "answer":   st.session_state.last_answer,
-                "persistent_memory": st.session_state.persistent_memory
-            }
-            if record["persistent_memory"]:
-                record["conversation"] = st.session_state.conversation.get(sel["profile_name"], []).copy()
-            if record not in st.session_state.saved_responses:
-                st.session_state.saved_responses.append(record)
-                save_json(RESPONSES_FILE, st.session_state.saved_responses)
-            st.success("Response saved!")
+    # 5) Send button
+    if st.button("SEND", key="send_btn"):
+        base = (
+            f"Adopt the persona: {sel['persona_description']}. "
+            f"You are conversing with Parent {sel['parent_name']} (Child: {sel['child_name']}, Age {sel['child_age']})."
+        )
+        extras = {
+            " CONNECT":" Help explain with examples.",
+            " GROW":" Offer advanced strategies.",
+            " EXPLORE":" Age-appropriate Q&A.",
+            " RESOLVE":" Step-by-step resolution.",
+            "❤ SUPPORT":" Empathetic support."
+        }[st.session_state.shortcut]
 
-    with c2:
-        if st.button("SEND", key="send_btn"):
-            base = (
-                f"Adopt the persona: {sel['persona_description']}. "
-                f"You are conversing with Parent {sel['parent_name']} (Child: {sel['child_name']}, Age {sel['child_age']})."
+        # Build one large input string instead of a 'messages' list
+        if st.session_state.persistent_memory:
+            # Flatten previous conversation
+            history_text = ""
+            for m in hist:
+                who = "You" if m["role"]=="user" else "Agent"
+                history_text += f"{who}: {m['content']}\n"
+            prompt = (
+                f"{base}{extras}\n"
+                f"{history_text}"
+                f"You: {query}\n"
+                "Return a JSON object with key 'answer'."
             )
-            extras = {
-                " CONNECT":" Help explain with examples.",
-                " GROW":" Offer advanced strategies.",
-                " EXPLORE":" Age-appropriate Q&A.",
-                " RESOLVE":" Step-by-step resolution.",
-                "❤ SUPPORT":" Empathetic support."
-            }[st.session_state.shortcut]
+        else:
+            prompt = (
+                f"{base}{extras}\n"
+                f"You: {query}\n"
+                "Return a JSON object with key 'answer'."
+            )
 
-            prompt = base + extras + "\n" + query + "\nReturn a JSON object with key 'answer'."
+        try:
+            params = {
+                "model": "gpt-4o",
+                "input": prompt
+            }
+            # call Responses API with only 'input'
+            out = client.responses.create(**add_tool_params(params, sel))
+            raw = out.output_text
 
+            # manual JSON parsing
             try:
-                if st.session_state.persistent_memory:
-                    hist = st.session_state.conversation.get(sel["profile_name"], [])
-                    system = base + extras + "\nReturn a JSON object with key 'answer'."
-                    messages = [{"role":"system","content":system}] + hist + [{"role":"user","content":query}]
-                    params = {"model":"gpt-4o","messages":messages}
-                else:
-                    params = {"model":"gpt-4o","input":prompt}
+                parsed = json.loads(raw)
+                answer = parsed.get("answer", raw)
+            except Exception:
+                answer = raw
 
-                out = client.responses.create(**add_tool_params(params, sel))
-                raw = out.output_text
-                try:
-                    parsed = json.loads(raw)
-                    answer = parsed.get("answer", raw)
-                except Exception:
-                    answer = raw
+            st.session_state.last_answer = answer
 
-                st.session_state.last_answer = answer
+            # update conversation history
+            if st.session_state.persistent_memory:
+                new_hist = hist + [
+                    {"role":"user","content":query},
+                    {"role":"assistant","content":answer}
+                ]
+                st.session_state.conversation[sel["profile_name"]] = new_hist
+                save_json(MEMORY_FILE, st.session_state.conversation)
+                st.session_state.temp_conversation[sel["profile_name"]] = new_hist.copy()
+            else:
+                tmp = hist + [
+                    {"role":"user","content":query},
+                    {"role":"assistant","content":answer}
+                ]
+                st.session_state.temp_conversation[sel["profile_name"]] = tmp
 
-                # update history
-                if st.session_state.persistent_memory:
-                    new_hist = hist + [{"role":"user","content":query},{"role":"assistant","content":answer}]
-                    st.session_state.conversation[sel["profile_name"]] = new_hist
-                    save_json(MEMORY_FILE, st.session_state.conversation)
-                    st.session_state.temp_conversation[sel["profile_name"]] = new_hist.copy()
-                else:
-                    tmp = st.session_state.temp_conversation.get(sel["profile_name"], [])
-                    tmp += [{"role":"user","content":query},{"role":"assistant","content":answer}]
-                    st.session_state.temp_conversation[sel["profile_name"]] = tmp
-
-                st.rerun()
-            except Exception as e:
-                st.error(f"OpenAI API error: {e}")
+            st.rerun()
+        except Exception as e:
+            st.error(f"OpenAI API error: {e}")
 
     render_bottom_nav()
+
 
 # ---------------------------------------------------------------------------
 #  STEP 8: VIEW SAVED CHATS

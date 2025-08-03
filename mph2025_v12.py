@@ -398,7 +398,7 @@ def render_step0():
             buttons=[
                 ("SAVED AGENTS", "home_profiles", lambda: st.session_state.profiles,
                     lambda: (st.session_state.__setitem__('step', 9), st.rerun())),
-                ("NEW AGENT",    "home_create",  None,
+                ("CREATE AGENT",    "home_create",  None,
                     lambda: (st.session_state.__setitem__('step', 1), st.rerun())),
             ],
             expander_label="Saved Profiles",
@@ -422,7 +422,7 @@ def render_step0():
             buttons=[
                 ("SAVED CHATS", "home_saved", lambda: st.session_state.saved_responses,
                     lambda: (st.session_state.__setitem__('step', 8), st.rerun())),
-                ("NEW CHAT",    "home_chat",   None,
+                ("START CHAT",    "home_chat",   None,
                     lambda: (
                         st.session_state.__setitem__('step', 7 if st.session_state.profiles else 1),
                         st.warning('No profiles – create one first.') if not st.session_state.profiles else None,

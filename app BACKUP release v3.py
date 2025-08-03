@@ -191,13 +191,13 @@ body {
 def render_top_nav() -> None:
     """Render a sticky top navigation bar with just Home."""
     st.markdown('<div class="top-nav-container">', unsafe_allow_html=True)
-    st.markdown('<div class="biglabel-B">', unsafe_allow_html=True)
     col1 = st.columns(1)[0]
     with col1:
         if st.button(" Home", key="nav_home"):
             st.session_state.step = 0
             st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('<div class="biglabel-B">', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 # ---------------------------------------------------------------------------
 #  BOTTOM NAVIGATION
@@ -205,6 +205,7 @@ def render_top_nav() -> None:
 
 def render_bottom_nav():
     c1, c2 = st.columns(2)
+    st.markdown('<div class="biglabel-B">', unsafe_allow_html=True)
     with c1:
         if st.button(" Chat", key="nav_chat_bottom"):
             st.session_state.step = 7 if st.session_state.profiles else 1
@@ -216,7 +217,7 @@ def render_bottom_nav():
             else:
                 st.warning("No saved responses yet.")
             st.rerun()
-
+    st.markdown('</div>', unsafe_allow_html=True)
 # ---------------------------------------------------------------------------
 #  HELPER FUNCTIONS & CONSTANTS
 # ---------------------------------------------------------------------------

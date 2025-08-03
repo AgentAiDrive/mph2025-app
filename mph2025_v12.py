@@ -553,7 +553,7 @@ def render_step5():
 
         prof_nm     = st.text_input("Profile name")
         rag_upload  = st.checkbox("Enable document uploads (RAG)")
-        search_docs = st.checkbox("Enable document search")
+        #search_docs = st.checkbox("Enable document search")
         search_web  = st.checkbox("Enable web search")
         uploads     = st.file_uploader("Upload documents", accept_multiple_files=True) if rag_upload else []
         saved       = st.form_submit_button("SAVE")

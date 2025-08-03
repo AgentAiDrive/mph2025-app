@@ -24,11 +24,6 @@ DEFAULT_EXTRAS_MAP  = {
 # ---------------------------------------------------------------------------
 #  LOAD / INIT EXTRAS_MAP
 # ---------------------------------------------------------------------------
-loaded = load_json(SHORTCUTS_FILE)
-if isinstance(loaded, dict) and loaded:
-    st.session_state.setdefault("extras_map", loaded)
-else:
-    st.session_state.setdefault("extras_map", DEFAULT_EXTRAS_MAP.copy())
 
 
 # ---------------------------------------------------------------------------
@@ -50,6 +45,9 @@ def save_json(path: str, data):
             json.dump(data, f, indent=2)
     except Exception as e:
         st.error(f"Error writing {path}: {e}")
+# ---------------------------------------------------------------------------
+#  LOAD / INIT EXTRAS_MAP
+# ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
 #  OPENAI CLIENT
@@ -94,6 +92,11 @@ if "sources" not in st.session_state:
         "Teacher": TEACHER_SOURCES,
         "Other":   OTHER_SOURCES
     }
+loaded = load_json(SHORTCUTS_FILE)
+if isinstance(loaded, dict) and loaded:
+    st.session_state.setdefault("extras_map", loaded)
+else:
+    st.session_state.setdefault("extras_map", DEFAULT_EXTRAS_MAP.copy())
 
 # ---------------------------------------------------------------------------
 #  GLOBAL CSS

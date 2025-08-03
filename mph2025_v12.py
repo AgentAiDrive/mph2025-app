@@ -442,7 +442,7 @@ def render_step0():
     with row2_col1:
         render_home_card(
             title="SOURCES",
-            expander_label="Counts",
+            expander_label="Source Type Counts",
             expander_body=lambda: [
                 st.markdown(
                     f"<p class='home-small'>{atype}: "
@@ -464,7 +464,7 @@ def render_step0():
     with row2_col2:
         render_home_card(
             title="DATA",
-            expander_label="Counts",
+            expander_label="Data Type Counts",
             expander_body=lambda: (
                 st.markdown(
                     f"<p class='home-small'>Profiles: {len(st.session_state.profiles)}</p>",

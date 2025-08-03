@@ -157,14 +157,14 @@ body {
 }
 /* --- COLOR BUTTONS --- */
 .stButton>button {
-  border-radius: 26px!important;
-  font-weight: 700!important;
-  font-size: .7em!important;
+  border-radius: 20px !important;
+  font-weight: 700 !important;
+  font-size: .7em !important;
   padding: .4em !important;
-  background: #1ec97b!important;
-  color: #fff!important;
-  margin: 5% 5%!important;
-  width: 100%!important;
+  background: #1ec97b !important;
+  color: #fff !important;
+  margin: 5% 5% !important;
+  width: 90% !important;
 }
 .st-btn-blue > button {
   border-radius: 26px !important;

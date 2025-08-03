@@ -367,7 +367,7 @@ def render_home_card(title, subtitle=None, buttons=None, expander_label=None, ex
 def render_step0():
     """Render the home page with cards for agents, chats, sources, and data."""
     row1_col1, row1_col2 = st.columns(2)
-    row2 = st.columns(1)
+    row2_col1 = st.columns(1)
 
     with row1_col1:
         render_home_card(
@@ -379,7 +379,7 @@ def render_step0():
             ("NEW AGENT", "home_create", None,
              lambda: (st.session_state.__setitem__('step', 1), st.rerun())),
         ],
-    with row2:
+    with row2_col1:
         expander_label="SAVED PROFILES",
         expander_body=lambda: (
             [st.button(

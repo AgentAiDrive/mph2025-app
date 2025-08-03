@@ -142,13 +142,7 @@ def add_tool_params(params: Dict, profile: Dict) -> Dict:
     if tools:
         params["tools"] = tools
     return params
-```
 
----
-
-### ── Part 2: Home Card & Steps 0–3 ──
-
-```python
 # ---------------------------------------------------------------------------
 #  HOME CARD RENDERER
 # ---------------------------------------------------------------------------

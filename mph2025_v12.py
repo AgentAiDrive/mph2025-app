@@ -308,7 +308,11 @@ class PersonaProfile(BaseModel):
 def get_enabled_tools(profile: Dict) -> List[Dict]:
     tools = []
     if profile.get("search_documents"):
-        tools.append({"type": "file_search"})
+        # vector_store_ids is required even if empty
+        tools.append({
+            "type": "file_search",
+            "vector_store_ids": []
+        })
     if profile.get("search_web"):
         tools.append({"type": "web_search"})
     return tools

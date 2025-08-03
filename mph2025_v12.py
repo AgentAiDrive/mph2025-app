@@ -307,12 +307,12 @@ class PersonaProfile(BaseModel):
 
 def get_enabled_tools(profile: Dict) -> List[Dict]:
     tools = []
-    if profile.get("search_documents"):
+   # if profile.get("search_documents"):
         # vector_store_ids is required even if empty
-        tools.append({
-            "type": "file_search",
-            "vector_store_ids": []
-        })
+    #    tools.append({
+   #         "type": "file_search",
+    #        "vector_store_ids": []
+   #     })
     if profile.get("search_web"):
         tools.append({"type": "web_search"})
     return tools
@@ -528,7 +528,7 @@ def render_step4():
         if st.button("Save Persona", key="btn_save4"):
             st.session_state.step = 5; st.rerun()
 
-    render_top_nav(); render_bottom_nav()
+    render_top_nav(); 
 
 # ---------------------------------------------------------------------------
 #  STEP 5: PERSONALIZE & SAVE PROFILE

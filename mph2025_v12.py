@@ -396,12 +396,12 @@ def render_step0():
             title="AGENTS",
             subtitle=None,
             buttons=[
-                ("SAVED AGENTS", "home_profiles", lambda: st.session_state.profiles,
+                ("EDIT AGENTS", "home_profiles", lambda: st.session_state.profiles,
                     lambda: (st.session_state.__setitem__('step', 9), st.rerun())),
                 ("CREATE AGENT",    "home_create",  None,
                     lambda: (st.session_state.__setitem__('step', 1), st.rerun())),
             ],
-            expander_label="Saved Profiles",
+            expander_label="Saved Agents",
             expander_body=lambda: (
                 [st.markdown(f"<p class='home-small'>{p['profile_name']}</p>",
                              unsafe_allow_html=True)
@@ -429,7 +429,7 @@ def render_step0():
                         st.rerun()
                     )),
             ],
-            expander_label="Saved Chats",
+            expander_label="Chat History",
             expander_body=lambda: (
                 [st.markdown(f"<p class='home-small'>{t}</p>", unsafe_allow_html=True)
                  for t in saved_titles]

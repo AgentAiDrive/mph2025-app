@@ -342,59 +342,73 @@ TOOLTIPS = {
 # ---------------------------------------------------------------------------
 #  HOME PAGE CARD RENDERING
 # ---------------------------------------------------------------------------
-def render_home_card(title, subtitle=None, buttons=None, expander_label=None, expander_body=None) -> None:
+
+def render_home_card(
+    title: str,
+    subtitle: str = None,
+    expander_label: str = None,
+    expander_body: Callable = None,
+    buttons: List[Tuple[str, str, Callable, Callable]] = None,
+) -> None:
+    """Render a card on the home page with:
+       1. Title
+       2. Optional subtitle
+       3. Optional expander (immediately after subtitle)
+       4. Optional buttons (rendered after expander)
+    """
+    # 1) Title
     st.markdown(f'<div class="biglabel-B">{title}</div>', unsafe_allow_html=True)
+
+    # 2) Subtitle
     if subtitle:
         st.markdown(subtitle, unsafe_allow_html=True)
-    # Buttons FIRST
-    if buttons:
-        for label, key, condition, action in buttons:
-            if st.button(label, key=key):
-                if condition is None or condition():
-                    action()
-    # Expander after buttons
+
+    # 3) Expander
     if expander_label and expander_body:
         with st.expander(expander_label):
+            # expander_body may be a function or static content
             if callable(expander_body):
                 expander_body()
             else:
                 st.write(expander_body)
 
-# ---------------------------------------------------------------------------
-#  STEP FUNCTIONS
-# ---------------------------------------------------------------------------
+    # 4) Buttons
+    if buttons:
+        for label, key, condition, action in buttons:
+            if st.button(label, key=key):
+                if condition is None or condition():
+                    action()
+
 
 def render_step0():
-    """Render the home page with cards for agents, chats, sources, and data."""
+    """Render the home page with cards for Agents, Chats, Sources, and Data."""
+    # Two cards per row
     row1_col1, row1_col2 = st.columns(2)
-    row2_col1 = st.columns(1)
+    row2_col1, row2_col2 = st.columns(2)
 
+    # AGENTS card
     with row1_col1:
         render_home_card(
-        "AGENTS",
-        buttons=[
-            ("SAVED AGENTS", "home_profiles", lambda: st.session_state.profiles,
-             lambda: (st.session_state.__setitem__('step', 9), st.rerun())),
-    with row1_col2:
-            ("NEW AGENT", "home_create", None,
-             lambda: (st.session_state.__setitem__('step', 1), st.rerun())),
-        ],
-    with row2_col1:
-        expander_label="SAVED PROFILES",
-        expander_body=lambda: (
-            [st.button(
-                f"{p['profile_name']}",
-                key=f"profile_link_{i}",
-                on_click=lambda idx=i: (
-                    st.session_state.__setitem__('profile_select', idx),
-                    st.session_state.__setitem__('step', 9),
-                    st.rerun()
+            title="AGENTS",
+            expander_label="Saved Profiles",
+            expander_body=lambda: (
+                [st.markdown(f"<p class='home-small'>{p['profile_name']}</p>",
+                             unsafe_allow_html=True)
+                 for p in st.session_state.profiles]
+                if st.session_state.profiles
+                else st.markdown(
+                    '<p class="home-small">No profiles yet.</p>',
+                    unsafe_allow_html=True
                 )
-            ) for i, p in enumerate(st.session_state.profiles)]
-            if st.session_state.profiles
-            else st.markdown('<p class="home-small">No profiles yet.</p>', unsafe_allow_html=True)
+            ),
+            buttons=[
+                ("SAVED AGENTS", "home_profiles", lambda: st.session_state.profiles,
+                    lambda: (st.session_state.__setitem__('step', 9), st.rerun())),
+                ("NEW AGENT",    "home_create",  None,
+                    lambda: (st.session_state.__setitem__('step', 1), st.rerun())),
+            ]
         )
-    )
+
     # CHATS card
     with row1_col2:
         saved_titles = [
@@ -402,108 +416,78 @@ def render_step0():
             for i, r in enumerate(st.session_state.saved_responses)
         ]
         render_home_card(
-            "CHATS",
-            buttons=[
-                ("SAVED CHATS", "home_saved", lambda: st.session_state.saved_responses,
-                 lambda: (st.session_state.__setitem__('step', 8), st.rerun())),
-                ("NEW CHAT",    "home_chat",   None,
-                 lambda: (
-                     st.session_state.__setitem__('step', 7 if st.session_state.profiles else 1),
-                     st.warning('No profiles – create one first.') if not st.session_state.profiles else None,
-                     st.rerun()
-                 ))
-            ],
-            expander_label="SAVED CHATS",
+            title="CHATS",
+            expander_label="Saved Chats",
             expander_body=lambda: (
                 [st.markdown(f"<p class='home-small'>{t}</p>", unsafe_allow_html=True)
                  for t in saved_titles]
                 if saved_titles
-                else st.markdown('<p class="home-small">No saved chats.</p>', unsafe_allow_html=True)
-            )
+                else st.markdown(
+                    '<p class="home-small">No saved chats.</p>',
+                    unsafe_allow_html=True
+                )
+            ),
+            buttons=[
+                ("SAVED CHATS", "home_saved", lambda: st.session_state.saved_responses,
+                    lambda: (st.session_state.__setitem__('step', 8), st.rerun())),
+                ("NEW CHAT",    "home_chat",   None,
+                    lambda: (
+                        st.session_state.__setitem__('step', 7 if st.session_state.profiles else 1),
+                        st.warning('No profiles – create one first.') if not st.session_state.profiles else None,
+                        st.rerun()
+                    )),
+            ]
         )
 
     # SOURCES card
     with row2_col1:
         render_home_card(
-            "SOURCES",
-            buttons=[
-                ("EDIT SOURCES", "edit_sources", None,
-                 lambda: (st.session_state.__setitem__('step', 10), st.rerun()))
-            ], 
+            title="SOURCES",
             expander_label="Counts",
             expander_body=lambda: [
                 st.markdown(
                     f"<p class='home-small'>{atype}: "
-                    f"{sum(len(st.session_state['sources'].get(atype, {}).get(t, [])) for t in ['Book','Expert','Style'])}</p>",
+                    f"{sum(len(st.session_state['sources']
+                                 .get(atype, {})
+                                 .get(t, []))
+                         for t in ['Book','Expert','Style'])}</p>",
                     unsafe_allow_html=True
-                ) for atype in AGENT_TYPES
+                )
+                for atype in AGENT_TYPES
+            ],
+            buttons=[
+                ("EDIT SOURCES", "edit_sources", None,
+                    lambda: (st.session_state.__setitem__('step', 10), st.rerun()))
             ]
         )
 
     # DATA card
     with row2_col2:
         render_home_card(
-            "DATA",
-            buttons=[
-                ("CLEAR DATA", "clear_data", None, lambda: (
-                    st.session_state.__setitem__('profiles', []),
-                    st.session_state.__setitem__('saved_responses', []),
-                    save_json(PROFILES_FILE, []),
-                    save_json(RESPONSES_FILE, []),
-                    st.success("All data cleared.")
-                ))
-            ],
+            title="DATA",
             expander_label="Counts",
             expander_body=lambda: (
-                st.markdown(f"<p class='home-small'>Profiles: "
-                            f"{len(st.session_state.profiles)}</p>", 
-                            unsafe_allow_html=True),
-                st.markdown(f"<p class='home-small'>Chats: "
-                            f"{len(st.session_state.saved_responses)}</p>", 
-                            unsafe_allow_html=True)
-            )
+                st.markdown(
+                    f"<p class='home-small'>Profiles: {len(st.session_state.profiles)}</p>",
+                    unsafe_allow_html=True
+                ),
+                st.markdown(
+                    f"<p class='home-small'>Chats: {len(st.session_state.saved_responses)}</p>",
+                    unsafe_allow_html=True
+                )
+            ),
+            buttons=[
+                ("CLEAR DATA", "clear_data", None,
+                    lambda: (
+                        st.session_state.__setitem__('profiles', []),
+                        st.session_state.__setitem__('saved_responses', []),
+                        save_json(PROFILES_FILE, []),
+                        save_json(RESPONSES_FILE, []),
+                        st.success("All data cleared.")
+                    ))
+            ]
         )
 
-# ...render_step1 through render_step8 unchanged...
-
-def render_step9():
-    """List agent profiles and allow editing or deletion."""
-    render_top_nav()
-    st.markdown('<div class="biglabel-B">AGENT PROFILES</div>', 
-                unsafe_allow_html=True)
-    if not st.session_state.profiles:
-        st.info("No profiles stored."); st.session_state.step = 0; st.rerun()
-    titles = [f"{i+1}. {p['profile_name']}" for i, p in enumerate(st.session_state.profiles)]
-    idx = st.selectbox("Select a profile to view / edit", 
-                       range(len(titles)), format_func=lambda i: titles[i], 
-                       key="profile_select")
-    prof = st.session_state.profiles[idx]
-    with st.form("edit_profile"):
-        p_name = st.text_input("Parent first name", value=prof.get("parent_name", ""))
-        c_age  = st.number_input("Child age", 1, 21, value=max(1, prof.get("child_age", 1)))
-        c_name = st.text_input("Child first name", value=prof.get("child_name", ""))
-        prof_nm= st.text_input("Profile name", value=prof.get("profile_name", ""))
-        a_type = st.selectbox("Agent type", ["Parent", "Teacher", "Other"], 
-            index=["Parent","Teacher","Other"].index(prof.get("agent_type", "Parent")))
-        desc   = st.text_area("Persona description", value=prof.get("persona_description", ""), height=150)
-        saved  = st.form_submit_button("SAVE CHANGES")
-    if saved:
-        prof.update(parent_name=p_name, child_age=int(c_age), 
-        child_name=c_name, profile_name=prof_nm, persona_description=desc, 
-        agent_type=a_type)
-        st.session_state.profiles[idx] = prof
-        save_json(PROFILES_FILE, st.session_state.profiles)
-        st.success("Profile updated!")
-    c1, c2 = st.columns(2)
-    with c1:
-        if st.button("DELETE PROFILE", key="btn_delete_profile"):
-            st.session_state.profiles.pop(idx)
-            save_json(PROFILES_FILE, st.session_state.profiles)
-            st.rerun()
-    with c2:
-        if st.button("CLOSE", key="btn_close_profile"):
-            st.session_state.step = 0
-            st.rerun()        
 def render_step1():
     """Render the page to select the agent type (Parent, Teacher, Other)."""
    
@@ -1018,42 +1002,32 @@ def render_step8():
             st.session_state.step = 0
             st.rerun()
     render_bottom_nav()
+
 def render_step9():
     """List agent profiles and allow editing or deletion."""
     render_top_nav()
-    st.markdown('<div class="biglabel-B">AGENT PROFILES</div>', unsafe_allow_html=True)
+    st.markdown('<div class="biglabel-B">AGENT PROFILES</div>', 
+                unsafe_allow_html=True)
     if not st.session_state.profiles:
-        st.info("No profiles stored.")
-        st.session_state.step = 0
-        st.rerun()
+        st.info("No profiles stored."); st.session_state.step = 0; st.rerun()
     titles = [f"{i+1}. {p['profile_name']}" for i, p in enumerate(st.session_state.profiles)]
-    idx = st.selectbox("Select a profile to view / edit",
-                       range(len(titles)), format_func=lambda i: titles[i],
+    idx = st.selectbox("Select a profile to view / edit", 
+                       range(len(titles)), format_func=lambda i: titles[i], 
                        key="profile_select")
     prof = st.session_state.profiles[idx]
-
     with st.form("edit_profile"):
         p_name = st.text_input("Parent first name", value=prof.get("parent_name", ""))
-        # Safeguard age value
-        age_val = prof.get("child_age", 1)
-        if not isinstance(age_val, int):
-            try:
-                age_val = int(age_val)
-            except Exception:
-                age_val = 1
-        age_val = max(1, min(age_val, 21))
-        c_age  = st.number_input("Child age", 1, 21, value=age_val)
+        c_age  = st.number_input("Child age", 1, 21, value=max(1, prof.get("child_age", 1)))
         c_name = st.text_input("Child first name", value=prof.get("child_name", ""))
         prof_nm= st.text_input("Profile name", value=prof.get("profile_name", ""))
-        a_type = st.selectbox("Agent type", ["Parent","Teacher","Other"],
-            index=["Parent","Teacher","Other"].index(prof.get("agent_type","Parent")))
-        desc   = st.text_area("Persona description", value=prof.get("persona_description",""), height=150)
+        a_type = st.selectbox("Agent type", ["Parent", "Teacher", "Other"], 
+            index=["Parent","Teacher","Other"].index(prof.get("agent_type", "Parent")))
+        desc   = st.text_area("Persona description", value=prof.get("persona_description", ""), height=150)
         saved  = st.form_submit_button("SAVE CHANGES")
-
     if saved:
-        prof.update(parent_name=p_name, child_age=int(c_age),
-                    child_name=c_name, profile_name=prof_nm, persona_description=desc,
-                    agent_type=a_type)
+        prof.update(parent_name=p_name, child_age=int(c_age), 
+        child_name=c_name, profile_name=prof_nm, persona_description=desc, 
+        agent_type=a_type)
         st.session_state.profiles[idx] = prof
         save_json(PROFILES_FILE, st.session_state.profiles)
         st.success("Profile updated!")
@@ -1066,8 +1040,9 @@ def render_step9():
     with c2:
         if st.button("CLOSE", key="btn_close_profile"):
             st.session_state.step = 0
-            st.rerun()
-    render_bottom_nav()
+            st.rerun()  
+
+
 def render_step10():
     """Render the page for editing the available source lists."""
     render_top_nav()

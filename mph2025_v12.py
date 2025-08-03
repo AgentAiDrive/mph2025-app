@@ -197,8 +197,6 @@ def render_top_nav() -> None:
             st.session_state.step = 0
             st.rerun()    
     st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown('<div class="biglabel-B">', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
 # ---------------------------------------------------------------------------
 #  BOTTOM NAVIGATION
 # ---------------------------------------------------------------------------

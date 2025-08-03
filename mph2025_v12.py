@@ -268,8 +268,6 @@ def render_top_nav() -> None:
             st.session_state.step = 0
             st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown('<div class="biglabel-B">', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
 # ---------------------------------------------------------------------------
 #  BOTTOM NAVIGATION
 # ---------------------------------------------------------------------------
@@ -277,6 +275,7 @@ def render_top_nav() -> None:
 def render_bottom_nav():
     c1, c2 = st.columns(2)
     st.markdown('<div class="biglabel-B">', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
     with c1:
         if st.button(" Chat", key="nav_chat_bottom"):
             st.session_state.step = 7 if st.session_state.profiles else 1
@@ -288,7 +287,6 @@ def render_bottom_nav():
             else:
                 st.warning("No saved responses yet.")
             st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
 
 # ---------------------------------------------------------------------------
 #  DATA MODEL & TOOL HELPERS

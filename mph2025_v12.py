@@ -286,7 +286,7 @@ def render_bottom_nav():
             else:
                 st.warning("No saved responses yet.")
             st.rerun()
-     st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 # ---------------------------------------------------------------------------
 #  DATA MODEL & TOOL HELPERS
 # ---------------------------------------------------------------------------

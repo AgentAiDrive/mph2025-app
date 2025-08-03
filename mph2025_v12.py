@@ -13,6 +13,23 @@ PROFILES_FILE   = "parent_helpers_profiles.json"
 RESPONSES_FILE  = "parent_helpers_responses.json"
 SOURCES_FILE    = "parent_helpers_sources.json"
 MEMORY_FILE     = "parent_helpers_memory.json"
+SHORTCUTS_FILE  = "parent_helpers_shortcuts.json"
+DEFAULT_EXTRAS_MAP  = {
+    " CONNECT": " Help explain with examples.",
+    " GROW":    " Offer advanced strategies.",
+    " EXPLORE": " Age-appropriate Q&A.",
+    " RESOLVE":" Step-by-step resolution.",
+    "❤ SUPPORT":" Empathetic support."
+}
+# ---------------------------------------------------------------------------
+#  LOAD / INIT EXTRAS_MAP
+# ---------------------------------------------------------------------------
+loaded = load_json(SHORTCUTS_FILE)
+if isinstance(loaded, dict) and loaded:
+    st.session_state.setdefault("extras_map", loaded)
+else:
+    st.session_state.setdefault("extras_map", DEFAULT_EXTRAS_MAP.copy())
+
 
 # ---------------------------------------------------------------------------
 #  JSON LOAD / SAVE UTILITIES
@@ -678,14 +695,7 @@ def render_step7():
                 f"You are conversing with Parent {sel['parent_name']} "
                 f"(Child: {sel['child_name']}, Age {sel['child_age']})."
             )
-            extras_map = {
-                " CONNECT": " Help explain with examples.",
-                " GROW": " Offer advanced strategies.",
-                " EXPLORE": " Age-appropriate Q&A.",
-                " RESOLVE": " Step-by-step resolution.",
-                "❤ SUPPORT": " Empathetic support."
-            }
-            extras = extras_map.get(st.session_state.shortcut, "")
+            extras = st.session_state["extras_map"].get(st.session_state.shortcut, "")
 
             # Build a single input string
             if use_mem:
@@ -882,6 +892,21 @@ def render_step10():
 
     st.write(srcs[agent_type][source_type])
     render_bottom_nav()
+    # -----------------------------------------------------------------------
+    #  SHORTCUT BUTTONS EDITOR
+    # -----------------------------------------------------------------------
+    st.markdown("### Edit Shortcut Buttons")
+    new_map: Dict[str,str] = {}
+    for key, desc in st.session_state["extras_map"].items():
+        # strip leading space for nicer label
+        label = key.strip() or "(DEFAULT)"
+        new_desc = st.text_input(f"Label for '{label}' shortcut", desc, key=f"shortcut_{label}")
+        new_map[key] = new_desc
+
+    if st.button("Save Shortcuts", key="save_shortcuts"):
+        st.session_state["extras_map"] = new_map
+        save_json(SHORTCUTS_FILE, new_map)
+        st.success("Shortcut buttons updated!")
 
 # ---------------------------------------------------------------------------
 #  ENTRY POINT

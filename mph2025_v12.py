@@ -81,9 +81,113 @@ if "sources" not in st.session_state:
 # ---------------------------------------------------------------------------
 #  GLOBAL CSS
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+#  GLOBAL CSS
+# ---------------------------------------------------------------------------
 st.markdown("""
 <style>
-/* (CSS exactly as before—omitted here for brevity; copy from previous) */
+body {
+  background: linear-gradient(135deg,#2fe273 0%,#09742a 100%)!important;
+  min-height: 100vh;
+}
+.stApp {
+  background: linear-gradient(335deg,#2fe273 0%,#09742a 100%)!important;
+  border-radius: 32px;
+  max-width: 400px;
+  min-height: 100vh;
+  height: 100vh;
+  overflow-y: auto;
+  margin: 32px auto;
+  box-shadow: 0 8px 32px rgba(60,60,60,.25), 0 1.5px 8px rgba(30,90,40,.06);
+  border: 3px solid #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 10px 10px;
+}
+/* --- COLOR LABELS --- */
+.biglabel-B {
+  font-size:1.1em; font-weight:800; color:#ffffff;
+  margin:4px 0 10px; text-align:center; letter-spacing:0.5px;
+  background:rgba(0,0,255,0.55); padding:6px 12px; border-radius:12px;
+}
+.biglabel-R {
+  font-size:1.1em; font-weight:800; color:#ffffff;
+  margin:4px 0 10px; text-align:center; letter-spacing:0.5px;
+  background:rgba(255,0,0,0.55); padding:6px 12px; border-radius:12px;
+}
+.biglabel-G {
+  font-size:1.1em; font-weight:800; color:#ffffff;
+  margin:4px 0 10px; text-align:center; letter-spacing:0.5px;
+  background:rgba(0,255,0,0.55); padding:6px 12px; border-radius:12px;
+}
+.biglabel {
+  font-size:1.1em; font-weight:800; color:#ffffff;
+  margin:4px 0 10px; text-align:center; letter-spacing:0.5px;
+  background:rgba(255,255,255,0.55); padding:6px 12px; border-radius:12px;
+}
+.frame-avatar {
+  font-size:1.4em; margin:6px 0 6px; display:flex;
+  justify-content:center; color:#ffffff;
+}
+/* --- COLOR BUTTONS --- */
+.stButton>button {
+  border-radius:26px!important; font-weight:700!important;
+  font-size:.7em!important; padding:.4em 0!important;
+  background:#1ec97b!important; color:#fff!important;
+  margin:0 5%!important; width:100%!important;
+}
+.st-btn-blue>button {
+  border-radius:26px!important; font-weight:700!important;
+  font-size:.9em!important; padding:.4em 0!important;
+  background:#2966d8!important; color:#fff!important;
+  margin:6px 0!important; width:100%!important;
+  border:none!important; box-shadow:0 2px 12px rgba(44,99,180,0.12);
+  transition:background 0.2s;
+}
+.st-btn-green>button {
+  border-radius:26px!important; font-weight:700!important;
+  font-size:.9em!important; padding:.4em!important;
+  background:#1ec97b!important; color:#fff!important;
+  margin:0 5%!important; width:40%!important;
+  border:none!important; box-shadow:0 2px 12px rgba(44,180,99,0.12);
+  transition:background 0.2s;
+}
+.st-btn-red>button {
+  border-radius:26px!important; font-weight:700!important;
+  font-size:.9em!important; padding:.4em 0!important;
+  background:#d8293c!important; color:#fff!important;
+  margin:6px 0!important; width:100%!important;
+  border:none!important; box-shadow:0 2px 12px rgba(180,44,99,0.12);
+  transition:background 0.2s;
+}
+/* --- TOP NAV BAR--- */
+.top-nav-container {
+  padding:12px!important; border-radius:32px!important;
+  margin:-10px -10px 24px -10px!important;
+  width:calc(100% + 20px)!important;
+}
+/* --- Answer bubble --- */
+.answer-box {
+  background:#23683c; border-radius:12px; padding:14px 18px;
+  color:#fff; white-space:pre-wrap; margin-top:8px;
+}
+/* --- Home cards --- */
+.home-card {
+  background:rgba(255,255,255,0.15); border-radius:16px;
+  padding:12px; margin:6px; color:#fff;
+}
+.home-card-title { font-weight:800; margin-bottom:6px; }
+.home-small {
+  font-size:0.8em; opacity:0.85; background:white;
+  border:3px solid #000; margin:4px 4px; padding:4px;
+}
+.home-button {
+  font-size:0.8em; opacity:0.85; background:white; border:3px solid #000;
+}
+/* --- MEDIA QUERIES --- */
+@media (max-height:750px){ .stApp { min-height:640px; } }
+@media (max-width:400px){ .stApp { padding:10px 4px; margin:16px auto; } }
 </style>
 """, unsafe_allow_html=True)
 

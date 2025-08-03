@@ -92,8 +92,8 @@ body {
   padding: .4em 0!important;
   background: #1ec97b!important;
   color: #fff!important;
-  margin: 6px 0!important;
-  width: 50%!important;
+  margin: 0 5%!important;
+  width: 40%!important;
 }
 .st-btn-blue > button {
   border-radius: 26px !important;
@@ -112,11 +112,11 @@ body {
   border-radius: 26px !important;
   font-weight: 700 !important;
   font-size: .9em !important;
-  padding: .4em 0 !important;
+  padding: .4em!important;
   background: #1ec97b !important;
   color: #fff !important;
-  margin: 6px 0 !important;
-  width: 100% !important;
+  margin: 0 5% !important;
+  width: 40% !important;
   border: none !important;
   box-shadow: 0 2px 12px rgba(44,180,99,0.12);
   transition: background 0.2s;
@@ -375,10 +375,12 @@ def render_home_card(
 
     # 4) Buttons
     if buttons:
-        for label, key, condition, action in buttons:
-            if st.button(label, key=key):
-                if condition is None or condition():
-                    action()
+            cols = st.columns(len(buttons), gap="small")
+            for col, (label, key, condition, action) in zip(cols, buttons):
+                with col:
+                    if st.button(label, key=key):
+                        if condition is None or condition():
+                            action()
 
 
 def render_step0():

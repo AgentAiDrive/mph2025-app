@@ -160,20 +160,20 @@ body {
   border-radius: 26px!important;
   font-weight: 700!important;
   font-size: .7em!important;
-  padding: .4em 0!important;
+  padding: .4em !important;
   background: #1ec97b!important;
   color: #fff!important;
-  margin: 0 5%!important;
+  margin: 5% 5%!important;
   width: 100%!important;
 }
 .st-btn-blue > button {
   border-radius: 26px !important;
   font-weight: 700 !important;
   font-size: .9em !important;
-  padding: .4em 0 !important;
+  padding: .4em !important;
   background: #2966d8 !important;
   color: #fff !important;
-  margin: 6px 0 !important;
+  margin: 5% !important;
   width: 100% !important;
   border: none !important;
   box-shadow: 0 2px 12px rgba(44,99,180,0.12);
@@ -183,10 +183,10 @@ body {
   border-radius: 26px !important;
   font-weight: 700 !important;
   font-size: .9em !important;
-  padding: .4em!important;
+  padding: .4em !important;
   background: #1ec97b !important;
   color: #fff !important;
-  margin: 0 5% !important;
+  margin: 5% !important;
   width: 40% !important;
   border: none !important;
   box-shadow: 0 2px 12px rgba(44,180,99,0.12);

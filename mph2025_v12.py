@@ -300,13 +300,7 @@ def render_step3():
                 st.session_state.pop("persona_description", None)
                 st.session_state.step = 4; st.rerun()
     render_top_nav(); render_bottom_nav()
-```
 
----
-
-### ── Part 3: Render Step 4 (Persona Generation) ──
-
-```python
 # ---------------------------------------------------------------------------
 #  STEP 4: GENERATE PERSONA DESCRIPTION
 # ---------------------------------------------------------------------------
@@ -352,13 +346,7 @@ def render_step4():
             st.session_state.step = 5; st.rerun()
 
     render_top_nav(); render_bottom_nav()
-```
 
----
-
-### ── Part 4: Render Step 5 & 6 (Profile Form & Confirmation) ──
-
-```python
 # ---------------------------------------------------------------------------
 #  STEP 5: PERSONALIZE & SAVE PROFILE
 # ---------------------------------------------------------------------------
@@ -442,13 +430,7 @@ def render_step6():
     </div>
     """, unsafe_allow_html=True)
     render_top_nav()
-```
 
----
-
-### ── Part 5: Render Step 7 (Chat) ──
-
-```python
 # ---------------------------------------------------------------------------
 #  STEP 7: CHAT INTERFACE
 # ---------------------------------------------------------------------------
@@ -553,13 +535,7 @@ def render_step7():
                 st.error(f"OpenAI API error: {e}")
 
     render_bottom_nav()
-```
 
----
-
-### ── Part 6: Steps 8–10 & Entry Point ──
-
-```python
 # ---------------------------------------------------------------------------
 #  STEP 8: VIEW SAVED CHATS
 # ---------------------------------------------------------------------------

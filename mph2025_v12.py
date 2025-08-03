@@ -275,7 +275,6 @@ def render_top_nav() -> None:
 def render_bottom_nav():
     c1, c2 = st.columns(2)
     st.markdown('<div class="biglabel-B">', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
     with c1:
         if st.button(" Chat", key="nav_chat_bottom"):
             st.session_state.step = 7 if st.session_state.profiles else 1
@@ -287,7 +286,7 @@ def render_bottom_nav():
             else:
                 st.warning("No saved responses yet.")
             st.rerun()
-
+     st.markdown('</div>', unsafe_allow_html=True)
 # ---------------------------------------------------------------------------
 #  DATA MODEL & TOOL HELPERS
 # ---------------------------------------------------------------------------
@@ -441,6 +440,7 @@ def render_step1():
 #  STEP 2: SELECT SOURCE TYPE
 # ---------------------------------------------------------------------------
 def render_step2():
+    render_top_nav()
     st.markdown('<div class="biglabel-G">Select Agent Source Type</div>', unsafe_allow_html=True)
     cols = st.columns(3)
     for label, key, stype in [("📚 Book","btn_book","Book"),
@@ -450,13 +450,14 @@ def render_step2():
             if st.button(label, key=key):
                 st.session_state.source_type = stype
                 st.session_state.step        = 3
-                st.rerun()
-    render_top_nav(); render_bottom_nav()
+                st.rerun() 
+    render_bottom_nav()
 
 # ---------------------------------------------------------------------------
 #  STEP 3: CHOOSE SPECIFIC SOURCE
 # ---------------------------------------------------------------------------
 def render_step3():
+    render_top_nav(); 
     st.markdown(f'<div class="biglabel-G">Choose a {st.session_state.source_type}</div>', unsafe_allow_html=True)
     agent_type = st.session_state.agent_type
     opts = st.session_state["sources"][agent_type].get(st.session_state.source_type, [])
@@ -476,7 +477,8 @@ def render_step3():
                 st.session_state.source_name = src
                 st.session_state.pop("persona_description", None)
                 st.session_state.step = 4; st.rerun()
-    render_top_nav(); render_bottom_nav()
+ 
+    render_bottom_nav()
 
 # ---------------------------------------------------------------------------
 #  STEP 4: GENERATE PERSONA DESCRIPTION

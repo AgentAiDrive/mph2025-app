@@ -344,6 +344,8 @@ TOOLTIPS = {
 #  HOME PAGE CARD RENDERING
 # ---------------------------------------------------------------------------
 
+from typing import List, Tuple, Callable
+
 def render_home_card(
     title: str,
     subtitle: str = None,
@@ -354,8 +356,8 @@ def render_home_card(
     """Render a card on the home page with:
        1. Title
        2. Optional subtitle
-       3. Optional buttons (rendered after title or optional subtitle)
-       4. Optional expander (immediately after buttons)
+       3. Optional buttons (side-by-side)
+       4. Optional expander (full width, under buttons)
     """
     # 1) Title
     st.markdown(f'<div class="biglabel-B">{title}</div>', unsafe_allow_html=True)
@@ -364,29 +366,27 @@ def render_home_card(
     if subtitle:
         st.markdown(subtitle, unsafe_allow_html=True)
 
-   
-    # 4) Buttons
+    # 3) Buttons (side-by-side)
     if buttons:
-            cols = st.columns(len(buttons), gap="small")
-            for col, (label, key, condition, action) in zip(cols, buttons):
-                with col:
-                    if st.button(label, key=key):
-                        if condition is None or condition():
-                            action()
+        # create one column per button
+        btn_cols = st.columns(len(buttons), gap="small")
+        for col, (label, key, condition, action) in zip(btn_cols, buttons):
+            with col:
+                if st.button(label, key=key):
+                    if condition is None or condition():
+                        action()
 
-    # 3) Expander
+    # 4) Expander (full width under buttons)
     if expander_label and expander_body:
         with st.expander(expander_label):
-            # expander_body may be a function or static content
             if callable(expander_body):
                 expander_body()
             else:
                 st.write(expander_body)
 
 
+
 def render_step0():
-    """Render the home page with cards for Agents, Chats, Sources, and Data."""
-    # Two cards per row
     row1_col1, row1_col2 = st.columns(2)
     row2_col1, row2_col2 = st.columns(2)
 
@@ -394,25 +394,20 @@ def render_step0():
     with row1_col1:
         render_home_card(
             title="AGENTS",
+            subtitle=None,
             buttons=[
                 ("SAVED AGENTS", "home_profiles", lambda: st.session_state.profiles,
-                    lambda: (st.session_state.__setitem__('step', 9), st.rerun()),
-            ],
-     with row1_col2:
-            buttons=[
+                    lambda: (st.session_state.__setitem__('step', 9), st.rerun())),
                 ("NEW AGENT",    "home_create",  None,
-                    lambda: (st.session_state.__setitem__('step', 1), st.rerun()),
+                    lambda: (st.session_state.__setitem__('step', 1), st.rerun())),
             ],
             expander_label="Saved Profiles",
             expander_body=lambda: (
                 [st.markdown(f"<p class='home-small'>{p['profile_name']}</p>",
                              unsafe_allow_html=True)
                  for p in st.session_state.profiles]
-                if st.session_state.profiles
-                else st.markdown(
-                    '<p class="home-small">No profiles yet.</p>',
-                    unsafe_allow_html=True
-                )
+                or st.markdown('<p class="home-small">No profiles yet.</p>',
+                               unsafe_allow_html=True)
             )
         )
 
@@ -424,16 +419,6 @@ def render_step0():
         ]
         render_home_card(
             title="CHATS",
-            expander_label="Saved Chats",
-            expander_body=lambda: (
-                [st.markdown(f"<p class='home-small'>{t}</p>", unsafe_allow_html=True)
-                 for t in saved_titles]
-                if saved_titles
-                else st.markdown(
-                    '<p class="home-small">No saved chats.</p>',
-                    unsafe_allow_html=True
-                )
-            ),
             buttons=[
                 ("SAVED CHATS", "home_saved", lambda: st.session_state.saved_responses,
                     lambda: (st.session_state.__setitem__('step', 8), st.rerun())),
@@ -443,7 +428,14 @@ def render_step0():
                         st.warning('No profiles – create one first.') if not st.session_state.profiles else None,
                         st.rerun()
                     )),
-            ]
+            ],
+            expander_label="Saved Chats",
+            expander_body=lambda: (
+                [st.markdown(f"<p class='home-small'>{t}</p>", unsafe_allow_html=True)
+                 for t in saved_titles]
+                or st.markdown('<p class="home-small">No saved chats.</p>',
+                               unsafe_allow_html=True)
+            )
         )
 
     # SOURCES card

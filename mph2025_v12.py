@@ -643,13 +643,19 @@ def render_step7():
     idx = st.selectbox("Agent Profiles:", range(len(names)), format_func=lambda i: names[i], key="chat_profile")
     sel = st.session_state.profiles[idx]
 
-    # 2) Shortcut buttons
+    # 2) Shortcut buttons + HIGHLIGHTING + LABEL
     st.session_state.setdefault("shortcut", " DEFAULT")
     shortcuts = [" DEFAULT", " CONNECT", " GROW", " EXPLORE", " RESOLVE", "❤ SUPPORT"]
     cols = st.columns(len(shortcuts))
+    st.markdown(
+        f"<div class='home-small'><b>Selected Shortcut:</b> "
+        f"<span style='color:#2966d8;font-weight:bold'>{st.session_state.shortcut.strip()}</span></div>",
+        unsafe_allow_html=True
+    )
     for sc, col in zip(shortcuts, cols):
+        btn_style = "st-btn-blue" if st.session_state.shortcut == sc else ""
         with col:
-            if st.button(sc.strip(), key=f"sc_{sc}"):
+            if st.button(sc.strip(), key=f"sc_{sc}", help=st.session_state["extras_map"].get(sc, "")):
                 st.session_state.shortcut = sc
 
     # 3) Persistent memory toggle
@@ -672,6 +678,13 @@ def render_step7():
     # 5) User query input
     st.markdown('<div class="home-small">3. WHAT DO YOU WANT TO ASK?</div>', unsafe_allow_html=True)
     query = st.text_area("Type here", key="chat_query")
+
+    # --- ANSWER WINDOW (NEW) ---
+    if st.session_state.last_answer:
+        st.markdown(
+            "<div class='answer-box'><b>Answer:</b><br>{}</div>".format(st.session_state.last_answer),
+            unsafe_allow_html=True
+        )
 
     # 6) Action buttons: Save and Send
     c1, c2 = st.columns(2)
@@ -754,7 +767,6 @@ def render_step7():
                 st.error(f"OpenAI API error: {e}")
 
     render_bottom_nav()
-
 
 # ---------------------------------------------------------------------------
 #  STEP 8: VIEW SAVED CHATS

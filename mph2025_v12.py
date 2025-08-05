@@ -17,10 +17,32 @@ def mph_splash():
         .mph-splash li { margin-bottom:4px; font-size:1.05em;}
         .mph-role {font-weight:700; font-size:1.09em;}
         .mph-getstarted {background:#fff; color:#15592c; padding:8px 14px; border-radius:16px; font-size:1.05em; margin:14px 0 8px 0;}
-        .mph-btn {margin-top:1em; text-align:center;}
+        .mph-btn-area { display:flex; justify-content:center; align-items:center; margin-bottom:8px; }
         .mph-shortcut { font-weight:600; color:#18542e; }
+        .mph-anchor-btn {
+            background:#1ec97b;
+            color:white;
+            padding:8px 28px;
+            border:none;
+            border-radius:22px;
+            font-size:1.07em;
+            font-weight:700;
+            box-shadow:0 2px 12px rgba(44,99,180,0.12);
+            cursor:pointer;
+            margin-bottom:18px;
+            margin-top:5px;
+            text-decoration:none;
+            display:inline-block;
+        }
     </style>
-    <div class="mph-splash">
+    """, unsafe_allow_html=True)
+    
+    st.markdown('<div class="mph-splash">', unsafe_allow_html=True)
+    
+    # Top anchor "button" (not a real button, just scrolls to real Start)
+    st.markdown('<div class="mph-btn-area"><a href="#mph_start" class="mph-anchor-btn">🚀 Start</a></div>', unsafe_allow_html=True)
+    
+    st.markdown("""
         <h1>🌿 Welcome to My Parent Helpers (MPH)!</h1>
         <h3>Your digital team of AI-powered helpers—for parenting, teaching, and any expert support you need.</h3>
         <ul>
@@ -44,17 +66,19 @@ def mph_splash():
         <div style="text-align:center; margin-top:10px; font-size:1.09em;">
             <b>MPH isn’t just AI advice—it’s a toolkit for shaping support, learning, and growth your way.</b>
         </div>
-    </div>
     """, unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Actual functional Start button (outside the splash/form)
+    st.markdown('<div class="mph-btn-area" id="mph_start">', unsafe_allow_html=True)
+    submitted = st.button("🚀 Start", use_container_width=True, key="splash_start_real")
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    return submitted
 
-    st.markdown("")
-    col = st.columns([1,2,1])[1]
-    with col:
-        start = st.button("🚀 Start", key="splash_start", use_container_width=True)
-    st.markdown("<br>", unsafe_allow_html=True)
-    return start
+# -------------------- SPLASH LOGIC --------------------
 
-# -------------------- SPLASH LOGIC - DO NOT SKIP THIS! --------------------
 if "splash_done" not in st.session_state:
     st.session_state.splash_done = False
 

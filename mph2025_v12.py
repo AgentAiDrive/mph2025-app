@@ -1,37 +1,32 @@
 import streamlit as st
 from openai import OpenAI
-import json
-import os
-import time
-from typing import List, Tuple, Callable, Dict
-from pydantic import BaseModel, Field
+import json, os, time
+from typing import List, Tuple, Callable 
+from typing import Dict, Optional
+from pydantic import BaseModel, Field, ConfigDict
 
 # ---------------------------------------------------------------------------
-#  CONSTANTS & FILE PATHS
+# CONSTANTS & FILE PATHS (unchanged)
 # ---------------------------------------------------------------------------
 PROFILES_FILE   = "parent_helpers_profiles.json"
 RESPONSES_FILE  = "parent_helpers_responses.json"
 SOURCES_FILE    = "parent_helpers_sources.json"
 MEMORY_FILE     = "parent_helpers_memory.json"
 SHORTCUTS_FILE  = "parent_helpers_shortcuts.json"
-DEFAULT_EXTRAS_MAP  = {
+DEFAULT_EXTRAS_MAP = {
+    " DEFAULT":  "General purpose answer.",
     " CONNECT": " Help explain with examples.",
     " GROW":    " Offer advanced strategies.",
     " EXPLORE": " Age-appropriate Q&A.",
     " RESOLVE":" Step-by-step resolution.",
     "❤ SUPPORT":" Empathetic support."
 }
-# ---------------------------------------------------------------------------
-#  LOAD / INIT EXTRAS_MAP
-# ---------------------------------------------------------------------------
-
 
 # ---------------------------------------------------------------------------
-#  JSON LOAD / SAVE UTILITIES
+# JSON LOAD / SAVE UTILITIES (unchanged)
 # ---------------------------------------------------------------------------
 def load_json(path: str):
-    if not os.path.exists(path):
-        return []
+    if not os.path.exists(path): return []
     try:
         with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
@@ -45,22 +40,18 @@ def save_json(path: str, data):
             json.dump(data, f, indent=2)
     except Exception as e:
         st.error(f"Error writing {path}: {e}")
-# ---------------------------------------------------------------------------
-#  LOAD / INIT EXTRAS_MAP
-# ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
-#  OPENAI CLIENT
+# OPENAI CLIENT
 # ---------------------------------------------------------------------------
 client = OpenAI(api_key=st.secrets.get("openai_key", "YOUR_OPENAI_API_KEY"))
 
 # ---------------------------------------------------------------------------
-#  AGENT TYPE DEFAULT SOURCES
+# AGENT TYPES & SOURCES (unchanged)
 # ---------------------------------------------------------------------------
 AGENT_TYPES = ["Parent", "Teacher", "Other"]
-
 PARENT_SOURCES = {
-    "Book":   ["The Whole-Brain Child", "Peaceful Parent, Happy Kids"],
+    "Book":   ["The Whole‑Brain Child", "Peaceful Parent, Happy Kids"],
     "Expert": ["Dr. Laura Markham", "Dr. Daniel Siegel"],
     "Style":  ["Authoritative", "Gentle Parenting"]
 }
@@ -76,12 +67,11 @@ OTHER_SOURCES = {
 }
 
 # ---------------------------------------------------------------------------
-#  SESSION STATE INIT
+# SESSION‑STATE INIT (unchanged)
 # ---------------------------------------------------------------------------
 st.session_state.setdefault("profiles",        load_json(PROFILES_FILE))
 st.session_state.setdefault("saved_responses", load_json(RESPONSES_FILE))
 st.session_state.setdefault("last_answer",     "")
-
 st.session_state.setdefault("conversation",     load_json(MEMORY_FILE) or {})
 st.session_state.setdefault("persistent_memory", False)
 st.session_state.setdefault("temp_conversation", {})
@@ -89,7 +79,7 @@ st.session_state.setdefault("temp_conversation", {})
 if "sources" not in st.session_state:
     st.session_state["sources"] = {
         "Parent":  PARENT_SOURCES,
-        "Teacher": TEACHER_SOURCES,
+        "Teacher":  TEACHER_SOURCES,
         "Other":   OTHER_SOURCES
     }
 loaded = load_json(SHORTCUTS_FILE)
@@ -104,135 +94,86 @@ else:
 st.markdown(
     """
 <style>
+/* ---- BODY & APP LAYOUT ---- */
 body {
-  background: linear-gradient(135deg,#2fe273 0%,#09742a 100%)!important;
+  background: linear-gradient(135deg,#2fe273 0%,#09742a 100%) !important;
   min-height: 100vh;
 }
 .stApp {
-  background: linear-gradient(335deg,#2fe273 0%,#09742a 100%)!important;
+  background: linear-gradient(335deg,#2fe273 0%,#09742a 100%) !important;
   border-radius: 32px;
   max-width: 400px;
   min-height: 100vh;
   height: 100vh;
-  overflow-y: auto;
   margin: 32px auto;
-  box-shadow: 0 8px 32px rgba(60,60,60,.25), 0 1.5px 8px rgba(30,90,40,.06);
-  border: 3px solid #ffffff;
+  box-shadow: 0 8px 32px rgba(60,60,60,0.25), 0 1.5px 8px rgba(30,90,40,0.06);
+  border: 3px solid #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px 10px 10px;
+  padding: 10px;
+  overflow-y: auto;
 }
-/* --- COLOR LABELS --- */
-.biglabel-B {
+
+/* ---- LABELS ---- */
+.biglabel, .biglabel-B, .biglabel-G, .biglabel-R {
   font-size: 1.1em;
   font-weight: 800;
-  color: #ffffff;
+  color: #fff;
   margin: 4px 0 10px;
   text-align: center;
   letter-spacing: 0.5px;
-  background: rgba(0, 0, 255, 0.55);
   padding: 6px 12px;
   border-radius: 12px;
 }
-.biglabel-R {
-  font-size: 1.1em;
-  font-weight: 800;
-  color: #ffffff;
-  margin: 4px 0 10px;
-  text-align: center;
-  letter-spacing: 0.5px;
-  background: rgba(255, 0, 0, 0.55);
-  padding: 6px 12px;
-  border-radius: 12px;
-}
-.biglabel-G {
-  font-size: 1.1em;
-  font-weight: 800;
-  color: #ffffff;
-  margin: 4px 0 10px;
-  text-align: center;
-  letter-spacing: 0.5px;
-  background: rgba(0, 255, 0, 0.55);
-  padding: 6px 12px;
-  border-radius: 12px;
-}
-.biglabel {
-  font-size: 1.1em;
-  font-weight: 800;
-  color: #ffffff;
-  margin: 4px 0 10px;
-  text-align: center;
-  letter-spacing: 0.5px;
-  background: rgba(255, 255, 255, 0.55);
-  padding: 6px 12px;
-  border-radius: 12px;
-}
+.biglabel   { background: rgba(255,255,255,0.55); }
+.biglabel-B { background: rgba(0,0,255,0.55); }
+.biglabel-G { background: rgba(41,102,216,0.55); }
+.biglabel-R { background: rgba(255,0,0,0.55); }
+
+/* ---- AVATAR FRAME ---- */
 .frame-avatar {
   font-size: 1.4em;
-  margin: 6px 0 6px;
+  margin: 6px 0;
   display: flex;
   justify-content: center;
-  color: #ffffff;
+  color: #fff;
 }
-/* --- COLOR BUTTONS --- */
-.stButton>button {
-  border-radius: 20px !important;
+
+/* ---- BUTTONS ---- */
+.stButton>button, .st-btn-blue > button, .st-btn-green > button, .st-btn-red > button {
   font-weight: 700 !important;
-  font-size: .7em !important;
-  padding: .4em !important;
-  background: #1ec97b !important;
-  color: #fff !important;
-  margin: 5% 5% !important;
-  width: 90% !important;
-}
-.st-btn-blue > button {
   border-radius: 26px !important;
-  font-weight: 700 !important;
-  font-size: .9em !important;
-  padding: .4em !important;
-  background: #2966d8 !important;
-  color: #fff !important;
+  padding: 0.4em !important;
   margin: 5% !important;
-  width: 100% !important;
-  border: none !important;
   box-shadow: 0 2px 12px rgba(44,99,180,0.12);
-  transition: background 0.2s;
+  transition: background 0.2s, filter 0.2s;
 }
-.st-btn-green > button {
-  border-radius: 26px !important;
-  font-weight: 700 !important;
-  font-size: .9em !important;
-  padding: .4em !important;
-  background: #1ec97b !important;
-  color: #fff !important;
-  margin: 5% !important;
-  width: 40% !important;
-  border: none !important;
-  box-shadow: 0 2px 12px rgba(44,180,99,0.12);
-  transition: background 0.2s;
+.stButton>button        { background: #1ec97b !important; color: #fff !important; font-size: 0.7em !important; width: 90% !important; border-radius: 20px !important;}
+.st-btn-blue > button   { background: #2966d8 !important; color: #fff !important; font-size: 0.9em !important; width: 100% !important; border: none !important;}
+.st-btn-green > button  { background: #1ec97b !important; color: #fff !important; font-size: 0.9em !important; width: 40% !important; border: none !important;}
+.st-btn-red > button    { background: #d8293c !important; color: #fff !important; font-size: 0.9em !important; width: 100% !important; border: none !important; margin: 6px 0 !important; padding: 0.4em 0 !important;}
+
+.stButton>button:hover,
+.st-btn-blue>button:hover,
+.st-btn-green>button:hover,
+.st-btn-red>button:hover {
+  filter: brightness(1.1);
 }
-.st-btn-red > button {
-  border-radius: 26px !important;
-  font-weight: 700 !important;
-  font-size: .9em !important;
-  padding: .4em 0 !important;
-  background: #d8293c !important;
-  color: #fff !important;
-  margin: 6px 0 !important;
-  width: 100% !important;
-  border: none !important;
-  box-shadow: 0 2px 12px rgba(180,44,99,0.12);
-  transition: background 0.2s;
-}
-/* --- TOP NAV BAR--- */
+
+/* ---- TOP NAVIGATION BAR ---- */
 .top-nav-container {
-  padding: 12px 12px 12px 12px !important;
+  padding: 12px !important;
   border-radius: 32px !important;
   margin: -10px -10px 24px -10px !important;
   width: calc(100% + 20px) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 100 !important;
+  background: rgba(0,0,0,0.1) !important;
 }
-/* --- Answer bubble --- */
+
+/* ---- ANSWER BUBBLE ---- */
 .answer-box {
   background: #23683c;
   border-radius: 12px;
@@ -241,74 +182,72 @@ body {
   white-space: pre-wrap;
   margin-top: 8px;
 }
-/* --- Home cards --- */
+
+/* ---- HOME CARDS & LISTS ---- */
 .home-card {
-  background: rgba(255,255,255,0.15);
-  border-radius: 16px;
-  padding: 12px;
+  background: rgba(255,255,255,0.25) !important;
+  border-radius: 20px !important;
+  padding: 16px !important;
   margin: 6px;
   color: #fff;
+  transition: transform 0.2s, box-shadow 0.2s !important;
+}
+.home-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.2) !important;
 }
 .home-card-title {
+  font-size: 1.3em !important;
+  color: #fff !important;
+  letter-spacing: 1px !important;
   font-weight: 800;
-  margin-bottom: 6px;
+  margin-bottom: 8px !important;
 }
 .home-small {
   font-size: 0.8em;
-  opacity: 0.85;
-  background: white;
-  border: 3px solid #000000;
-  margin: 4px 4px;
+  font-weight: 800;
+  color: #000;
+  text-align: left;
+  background: #fff;
+  border: 3px solid #000;
+  margin: 4px;
   padding: 4px;
 }
 .home-button {
   font-size: 0.8em;
   opacity: 0.85;
-  background: white;
-  border: 3px solid #000000;
+  background: #fff;
+  border: 3px solid #000;
 }
+
+/* ---- DASHBOARD GRID ---- */
+.stApp > div[data-testid="stVerticalBlock"] > div:nth-child(1) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  width: 100%;
+  padding: 0 8px;
+}
+
+/* ---- RESPONSIVE HEIGHT ---- */
 @media (max-height:750px){
-  .stApp{min-height:640px;}
+  .stApp { min-height: 640px; }
+}
+
+/* ---- BOTTOM NAV FIXED ---- */
+@media (min-width: 400px) {
+  .stApp > footer {
+    position: fixed !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    background: rgba(0,0,0,0.1) !important;
+  }
 }
 </style>
-    """,
-    unsafe_allow_html=True
-)
+""", unsafe_allow_html=True)
 
 # ---------------------------------------------------------------------------
-#  TOP NAVIGATION
-# ---------------------------------------------------------------------------
-
-def render_top_nav() -> None:
-    """Render a sticky top navigation bar with just Home."""
-    st.markdown('<div class="top-nav-container">', unsafe_allow_html=True)
-    col1 = st.columns(1)[0]
-    with col1:
-        if st.button(" Home", key="nav_home"):
-            st.session_state.step = 0
-            st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
-# ---------------------------------------------------------------------------
-#  BOTTOM NAVIGATION
-# ---------------------------------------------------------------------------
-
-def render_bottom_nav():
-    c1, c2 = st.columns(2)
-    st.markdown('<div class="biglabel-B">', unsafe_allow_html=True)
-    with c1:
-        if st.button(" Chat", key="nav_chat_bottom"):
-            st.session_state.step = 7 if st.session_state.profiles else 1
-            st.rerun()
-    with c2:
-        if st.button(" Saved", key="nav_saved_bottom"):
-            if st.session_state.saved_responses:
-                st.session_state.step = 8
-            else:
-                st.warning("No saved responses yet.")
-            st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
-# ---------------------------------------------------------------------------
-#  DATA MODEL & TOOL HELPERS
+# PERSONA PROFILE MODEL (updated)
 # ---------------------------------------------------------------------------
 class PersonaProfile(BaseModel):
     profile_name:        str
@@ -320,28 +259,84 @@ class PersonaProfile(BaseModel):
     source_name:         str
     persona_description: str
 
-    rag_upload:        bool      = False
-    search_documents:  bool      = False
-    search_web:        bool      = False
-    documents:         List[str] = Field(default_factory=list)
+    rag_upload:        bool = False
+    search_web:        bool = False
+    search_documents:  bool = False
+    vector_store_id:    Optional[str] = Field(default=None)
+    documents:         list[str] = Field(default_factory=list)
 
-def get_enabled_tools(profile: Dict) -> List[Dict]:
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+# ---------------------------------------------------------------------------
+# FILE‑SEARCH TOOL for RAG (updated)
+# ---------------------------------------------------------------------------
+def get_openai_tools(profile: Dict) -> list[Dict]:
     tools = []
-   # if profile.get("search_documents"):
-        # vector_store_ids is required even if empty
-    #    tools.append({
-   #         "type": "file_search",
-    #        "vector_store_ids": []
-   #     })
+    if profile.get("search_documents") and profile.get("vector_store_id"):
+        tools.append({
+            "type": "file_search",
+            "vector_store_ids": [profile["vector_store_id"]],
+            "max_num_results": 5
+        })
     if profile.get("search_web"):
         tools.append({"type": "web_search"})
     return tools
 
 def add_tool_params(params: Dict, profile: Dict) -> Dict:
-    tools = get_enabled_tools(profile)
+    tools = get_openai_tools(profile)
     if tools:
         params["tools"] = tools
+        if profile.get("vector_store_id"):
+            params["include"] = ["output[*].file_search_call.search_results"]
+        params["function_call"] = "auto"
     return params
+
+# ---------------------------------------------------------------------------
+# OPENAI API CALL WRAPPER (updated)
+# ---------------------------------------------------------------------------
+def openai_chat_or_responses(params: Dict, fallback_prompt: str):
+    """
+    Use chat.completions.create when no tools are needed.
+    Otherwise use responses.create (required for tools like file_search) with input=... and tools.
+    """
+    if hasattr(client, "chat") and hasattr(client.chat, "completions") and not params.get("tools"):
+        return client.chat.completions.create(**params)
+    else:
+        return client.responses.create(
+            model=params["model"],
+            input=fallback_prompt,
+            **({"tools": params["tools"]} if params.get("tools") else {})
+        )
+
+# ---------------------------------------------------------------------------
+# MESSAGE BUILDERS (unchanged except tool_line changes)
+# ---------------------------------------------------------------------------
+def build_openai_agent_messages(profile, shortcut, shortcut_desc, query, history):
+    tool_lines = []
+    if profile.get("search_web"):
+        tool_lines.append("You can search the web for up‑to‑date information.")
+    if profile.get("vector_store_id"):
+        tool_lines.append("You can use file_search to reference uploaded documents.")  # for auditing
+    system = (
+        f"You are a {profile['agent_type']} agent based on {profile['source_type']} “{profile['source_name']}”.\n"
+        f"Persona: {profile['persona_description']}\n"
+        f"Personalization: Parent {profile.get('parent_name','')}, Child {profile.get('child_name','')} (Age {profile.get('child_age','')}).\n"
+        f"Shortcut “{shortcut}”: {shortcut_desc}\n"
+        + ("\n".join(tool_lines) if tool_lines else "")
+        + "\nAlways respond with a JSON object: {\"answer\": \"…\"}."
+    )
+    messages = [{"role": "system", "content": system}]
+    if history:
+        messages += [{"role": m["role"], "content": m["content"]} for m in history]
+    messages.append({"role": "user", "content": query})
+    return messages
+
+def build_openai_params(profile, shortcut, shortcut_desc, query, history):
+    params = {
+        "model": "gpt-4o",
+        "messages": build_openai_agent_messages(profile, shortcut, shortcut_desc, query, history)
+    }
+    return add_tool_params(params, profile)
 
 # ---------------------------------------------------------------------------
 #  HOME CARD RENDERER
@@ -366,9 +361,118 @@ def render_home_card(
         with st.expander(expander_label):
             expander_body()
 
+def list_current_sources_and_shortcuts() -> None:
+    """List all sources by Agent Type and then list all shortcut labels."""
+    # 1) Sources by Agent Type
+    for atype, cats in st.session_state["sources"].items():
+        st.markdown(f"<p class='home-small'><strong>{atype}</strong></p>", unsafe_allow_html=True)
+        for cat in ["Book", "Expert", "Style"]:
+            items = cats.get(cat, [])
+            joined = ", ".join(items) if items else "— none —"
+            st.markdown(f"<p class='home-small'>&nbsp;&nbsp;{cat}: {joined}</p>", unsafe_allow_html=True)
+
+    # 2) Shortcuts
+    st.markdown("<hr style='border:1px solid rgba(255,255,255,0.3)'/>", unsafe_allow_html=True)
+    st.markdown("<p class='home-small'><strong>Shortcuts</strong></p>", unsafe_allow_html=True)
+    for key, desc in st.session_state["extras_map"].items():
+        label = key.strip() or "(DEFAULT)"
+        st.markdown(f"<p class='home-small'>&nbsp;&nbsp;{label}: {desc}</p>", unsafe_allow_html=True)
+# ---------------------------------------------------------------------------
+#  TOP NAVIGATION
+# ---------------------------------------------------------------------------
+def render_top_nav() -> None:
+    """Render a sticky top navigation bar with just Home."""
+    col1 = st.columns(1)[0]
+    with col1:
+        if st.button("🏠 Home", key="nav_home"):
+            st.session_state.step = 0
+            st.rerun()
+# ---------------------------------------------------------------------------
+#  BOTTOM NAVIGATION
+# ---------------------------------------------------------------------------
+def render_bottom_nav():
+    st.markdown('<div class="biglabel-B"></div>', unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+    with c1:
+        if st.button("💬 Chat", key="nav_chat_bottom"):
+            st.session_state.step = 7 if st.session_state.profiles else 1
+            st.rerun()
+    with c2:
+        if st.button("📂 Saved", key="nav_saved_bottom"):
+            if st.session_state.saved_responses:
+                st.session_state.step = 8
+            else:
+                st.warning("No saved responses yet.")
+            st.rerun()
+# ---------------------------------------------------------------------------
+#  SHORTCUT EDITOR
+# ---------------------------------------------------------------------------
+
+def render_shortcut_editor():
+    st.markdown("### Edit Shortcut Buttons (Label and Description)")
+
+    extras_map = st.session_state.get("extras_map", {})
+    shortcut_edits = []
+
+    # Display current shortcuts with an immediate-delete button
+    for i, (key, desc) in enumerate(list(extras_map.items())):
+        cols = st.columns([2, 4, 1])
+        with cols[0]:
+            new_label = st.text_input(
+                f"Label {i+1}", key=f"shortcut_label_{key}", value=key.strip()
+            )
+        with cols[1]:
+            new_desc = st.text_input(
+                f"Description {i+1}", key=f"shortcut_desc_{key}", value=desc
+            )
+        with cols[2]:
+            # Immediate deletion on click
+            if st.button("❌", key=f"delete_shortcut_{key}"):
+                # Remove from session and persist
+                st.session_state["extras_map"].pop(key, None)
+                save_json(SHORTCUTS_FILE, st.session_state["extras_map"])
+                st.success(f"Deleted shortcut '{key.strip()}'.")
+                st.rerun()
+        shortcut_edits.append((key, new_label.strip(), new_desc))
+
+    st.markdown("---")
+    st.markdown("**Add a new shortcut**")
+    with st.form("add_shortcut_form", clear_on_submit=True):
+        new_label = st.text_input("New shortcut label", key="add_shortcut_label")
+        new_desc  = st.text_input("New shortcut description", key="add_shortcut_desc")
+        add_it    = st.form_submit_button("Add Shortcut")
+        if add_it:
+            if not new_label:
+                st.warning("Label is required.")
+            elif new_label in extras_map:
+                st.warning("That label already exists.")
+            else:
+                st.session_state["extras_map"][new_label] = new_desc
+                save_json(SHORTCUTS_FILE, st.session_state["extras_map"])
+                st.success(f"Added shortcut '{new_label}'.")
+                st.rerun()
+
+    # Renaming logic (if a label or description was edited)
+    if st.button("Save Shortcut Edits", key="save_shortcuts"):
+        updated_map = {}
+        for old_key, new_key, new_desc in shortcut_edits:
+            # skip if the user cleared out the label text
+            if not new_key:
+                continue
+            # avoid collisions
+            if new_key in updated_map and new_key != old_key:
+                st.warning(f"Duplicate shortcut label: '{new_key}'")
+                continue
+            updated_map[new_key] = new_desc
+        st.session_state["extras_map"] = updated_map
+        save_json(SHORTCUTS_FILE, updated_map)
+        st.success("Shortcut labels and descriptions updated!")
+        st.rerun()
+
 # ---------------------------------------------------------------------------
 #  STEP 0: DASHBOARD
 # ---------------------------------------------------------------------------
+
 def render_step0():
     r1c1, r1c2 = st.columns(2)
     r2c1, r2c2 = st.columns(2)
@@ -382,7 +486,7 @@ def render_step0():
                 ("CREATE AGENT","home_create", None,
                     lambda: (st.session_state.update(step=1), st.rerun())),
             ],
-            expander_label="Saved Agents",
+            expander_label="Saved Agents 🖫",
             expander_body=lambda: [
                 st.markdown(f"<p class='home-small'>{p['profile_name']}</p>", unsafe_allow_html=True)
                 for p in st.session_state.profiles
@@ -390,7 +494,6 @@ def render_step0():
         )
 
     with r1c2:
-        titles = [f"{i+1}. {r['profile']} – {r['shortcut']}" for i,r in enumerate(st.session_state.saved_responses)]
         render_home_card(
             title="CHATS",
             buttons=[
@@ -403,10 +506,11 @@ def render_step0():
                         st.rerun()
                     )),
             ],
-            expander_label="Chat History",
+            expander_label="Chat History 🖫",
             expander_body=lambda: [
-                st.markdown(f"<p class='home-small'>{t}</p>", unsafe_allow_html=True)
-                for t in titles
+                st.markdown(f"<p class='home-small'>{i+1}. {r['profile']} – {r['shortcut']}</p>",
+                            unsafe_allow_html=True)
+                for i,r in enumerate(st.session_state.saved_responses)
             ] or st.markdown("<p class='home-small'>No saved chats.</p>", unsafe_allow_html=True)
         )
 
@@ -415,14 +519,8 @@ def render_step0():
             title="SOURCES",
             buttons=[("EDIT SOURCES","home_sources",None,
                       lambda:(st.session_state.update(step=10), st.rerun()))],
-            expander_label="Types & Counts",
-            expander_body=lambda: [
-                st.markdown(
-                    f"<p class='home-small'>{atype}: "
-                    f"{sum(len(st.session_state['sources'][atype][cat]) for cat in ['Book','Expert','Style'])}</p>",
-                    unsafe_allow_html=True)
-                for atype in AGENT_TYPES
-            ]
+            expander_label="Sources & Shortcuts",
+            expander_body=list_current_sources_and_shortcuts
         )
 
     with r2c2:
@@ -448,11 +546,11 @@ def render_step0():
 #  STEP 1: SELECT AGENT TYPE
 # ---------------------------------------------------------------------------
 def render_step1():
-    st.markdown('<div class="biglabel-G">Select An Agent Type</div>', unsafe_allow_html=True)
+    st.markdown('<div class="biglabel-G">Step 1: Select Agent Type - Choose what kind of agent you want to create (e.g., Parent, Teacher, or Other).</div>', unsafe_allow_html=True)
     cols = st.columns(3)
-    for label, key, atype in [("Parent","btn_parent","Parent"),
-                              ("Teacher","btn_teacher","Teacher"),
-                              ("Other","btn_other","Other")]:
+    for label, key, atype in [("👪 Parent","btn_parent","Parent"),
+                              ("🧑‍🏫 Teacher","btn_teacher","Teacher"),
+                              ("✨ Other","btn_other","Other")]:
         with cols.pop(0):
             if st.button(label, key=key):
                 st.session_state.agent_type = atype
@@ -464,8 +562,7 @@ def render_step1():
 #  STEP 2: SELECT SOURCE TYPE
 # ---------------------------------------------------------------------------
 def render_step2():
-    render_top_nav()
-    st.markdown('<div class="biglabel-G">Select Agent Source Type</div>', unsafe_allow_html=True)
+    st.markdown('<div class="biglabel-G">Step 2: Select Source Type - Pick the type of source you’d like your {st.session_state.agent_type} to be based on (Book, Style, or Expert).</div>', unsafe_allow_html=True)
     cols = st.columns(3)
     for label, key, stype in [("📚 Book","btn_book","Book"),
                               ("🧠 Expert","btn_expert","Expert"),
@@ -475,14 +572,13 @@ def render_step2():
                 st.session_state.source_type = stype
                 st.session_state.step        = 3
                 st.rerun() 
-    render_bottom_nav()
+    render_top_nav()
 
 # ---------------------------------------------------------------------------
 #  STEP 3: CHOOSE SPECIFIC SOURCE
 # ---------------------------------------------------------------------------
-def render_step3():
-    render_top_nav(); 
-    st.markdown(f'<div class="biglabel-G">Choose a {st.session_state.source_type}</div>', unsafe_allow_html=True)
+def render_step3(): 
+    st.markdown(f'<div class="biglabel-G">Step 3: Select Source Name - Select a specific {st.session_state.source_type} name for your agent’s persona.</div>', unsafe_allow_html=True)
     agent_type = st.session_state.agent_type
     opts = st.session_state["sources"][agent_type].get(st.session_state.source_type, [])
     if "Other..." not in opts: opts.append("Other...")
@@ -493,7 +589,7 @@ def render_step3():
         if st.button("← Back", key="btn_back3"):
             st.session_state.step = 2; st.rerun()
     with c2:
-        if st.button("Next →", key="btn_next3"):
+        if st.button("CREATE PERSONA →", key="btn_next3"):
             src = custom if choice=="Other..." else choice
             if not src:
                 st.warning("Please provide a name.")
@@ -502,11 +598,12 @@ def render_step3():
                 st.session_state.pop("persona_description", None)
                 st.session_state.step = 4; st.rerun()
  
-    render_bottom_nav()
+    render_bottom_nav();
+    render_top_nav()
+# ---------------------------------------------------------------------------
+# RENDER FUNCTION (Step 4)
+# ---------------------------------------------------------------------------
 
-# ---------------------------------------------------------------------------
-#  STEP 4: GENERATE PERSONA DESCRIPTION
-# ---------------------------------------------------------------------------
 def render_step4():
     st.markdown('<div class="biglabel-B">GENERATING YOUR AGENT PERSONA</div>', unsafe_allow_html=True)
     placeholder = st.empty()
@@ -516,18 +613,47 @@ def render_step4():
     if "persona_description" not in st.session_state:
         with st.spinner("Thinking…"):
             try:
-                prompt = (
-                    f"You are creating a persona description of the domain, philosophy, core principles, and "
-                    f"practices of the {st.session_state.source_type} '{st.session_state.source_name}'. "
-                    "In under 200 words, return a JSON object with key 'persona_description'."
-                )
-                params = {
-                    "model": "gpt-4o",
-                    "input": prompt,
+                # Build system and user messages with all context
+                profile_stub = {
+                    "agent_type": st.session_state.agent_type,
+                    "parent_name": "",
+                    "child_name": "",
+                    "child_age": "",
+                    "source_type": st.session_state.source_type,
+                    "source_name": st.session_state.source_name,
+                    "persona_description": "",
+                    "rag_upload": False,
+                    "search_web": False,
+                    "search_documents": False,
                 }
-                # call Responses API (no response_format)
-                out = client.responses.create(**add_tool_params(params, {}))
-                raw = out.output_text
+                shortcut_label = " DEFAULT"
+                shortcut_desc = "General purpose persona synthesis."
+                query = (
+                    f"Generate a concise persona description (domain, philosophy, core principles, and practices) "
+                    f"of a {st.session_state.agent_type} agent based on the {st.session_state.source_type} \"{st.session_state.source_name}\". "
+                    "In under 200 words. Return a JSON object: {\"persona_description\": \"...\"}"
+                )
+                params = build_openai_params(
+                    profile_stub, shortcut_label, shortcut_desc, query, history=None
+                )
+                # Conditional: use chat.completions.create if available, else responses.create
+                openai_method = None
+                if hasattr(client, "chat") and hasattr(client.chat, "completions"):
+                    openai_method = client.chat.completions.create
+                elif hasattr(client, "responses") and hasattr(client.responses, "create"):
+                    openai_method = client.responses.create
+                else:
+                    raise Exception("OpenAI client does not support chat.completions or responses.create")
+
+                out = openai_method(**params)
+                raw = (
+                    out.choices[0].message.content
+                    if hasattr(out, "choices") and out.choices and hasattr(out.choices[0], "message")
+                    else getattr(out, "output_text", None)
+                )
+                if not raw:
+                    st.error("No persona description returned from OpenAI.")
+                    return
                 try:
                     parsed = json.loads(raw)
                     st.session_state.persona_description = parsed.get("persona_description", raw)
@@ -538,27 +664,27 @@ def render_step4():
 
     placeholder.empty()
     if desc := st.session_state.get("persona_description"):
-        st.info(desc)
+        st.markdown(f"<div class='answer-box'>{desc}</div>", unsafe_allow_html=True)
 
     c1, c2 = st.columns(2)
     with c1:
-        if st.button("Retry", key="btn_retry4"):
+        if st.button("Retry →", key="btn_retry4"):
             st.session_state.pop("persona_description", None); st.rerun()
     with c2:
         if st.button("Save Persona", key="btn_save4"):
             st.session_state.step = 5; st.rerun()
 
-    render_top_nav(); 
+    render_top_nav()
 
 # ---------------------------------------------------------------------------
-#  STEP 5: PERSONALIZE & SAVE PROFILE
+# RENDER FUNCTION (Step 5)
 # ---------------------------------------------------------------------------
+
 def render_step5():
-    st.markdown('<div class="biglabel-G">PERSONALIZE AGENT</div>', unsafe_allow_html=True)
+    st.markdown('<div class="biglabel-G">Great! Now personalize your agent and add tools if desired</div>', unsafe_allow_html=True)
     agent_type = st.session_state.agent_type
 
     with st.form("profile"):
-        # Name & age fields
         if agent_type == "Parent":
             p_name = st.text_input("Parent first name")
             c_age   = st.number_input("Child age", 1, 21)
@@ -570,25 +696,24 @@ def render_step5():
         else:
             p_name = st.text_input("Name")
             c_age, c_name = 0, ""
-
         prof_nm     = st.text_input("Profile name")
         rag_upload  = st.checkbox("Enable document uploads (RAG)")
-        #search_docs = st.checkbox("Enable document search")
+        search_documents = st.checkbox("Enable document search")
         search_web  = st.checkbox("Enable web search")
         uploads     = st.file_uploader("Upload documents", accept_multiple_files=True) if rag_upload else []
         saved       = st.form_submit_button("SAVE")
 
     if saved:
         missing = []
-        if not p_name: missing.append("name")
-        if agent_type=="Parent" and not c_name: missing.append("child name")
         if not prof_nm: missing.append("profile name")
+        if not p_name: missing.append("name")
+        if agent_type == "Parent" and not c_name: missing.append("child name")
         if missing:
             st.warning(f"Please fill: {', '.join(missing)}")
         else:
             docs_list = []
             for f in uploads:
-                try: docs_list.append(f.read().decode("utf-8"))
+                try: docs_list.append(f.name)
                 except: pass
 
             profile = PersonaProfile(
@@ -596,15 +721,28 @@ def render_step5():
                 parent_name         = p_name,
                 child_name          = c_name,
                 child_age           = int(c_age),
+                agent_type          = agent_type,
                 source_type         = st.session_state.source_type,
                 source_name         = st.session_state.source_name,
                 persona_description = st.session_state.persona_description,
-                agent_type          = agent_type,
                 rag_upload          = rag_upload,
-                search_documents    = search_docs,
                 search_web          = search_web,
-                documents           = docs_list,
+                search_documents    = search_documents,
+                documents           = docs_list
             )
+
+            if rag_upload and uploads:
+                vs_name = f"{prof_nm}-{int(time.time())}"
+                try:
+                    vs = client.vector_stores.create(name=vs_name)
+                    streams = [open(f.name, "rb") for f in uploads]
+                    batch = client.vector_stores.file_batches.upload_and_poll(
+                        vector_store_id=vs.id,
+                        files=streams
+                    )
+                    profile.vector_store_id = vs.id
+                except Exception as e:
+                    st.warning(f"Vector store upload failed: {e}")
             st.session_state.profiles.append(profile.dict())
             save_json(PROFILES_FILE, st.session_state.profiles)
             st.success("Profile saved!")
@@ -619,7 +757,7 @@ def render_step5():
 #  STEP 6: PROFILE CREATED CONFIRMATION
 # ---------------------------------------------------------------------------
 def render_step6():
-    st.markdown('<div class="biglabel">AGENT PROFILE CREATED!</div>', unsafe_allow_html=True)
+    st.markdown('<div class="biglabel-G">AGENT PROFILE CREATED!</div>', unsafe_allow_html=True)
     p = st.session_state.profiles[-1]
     st.markdown(f"""
     <div class="home-card">
@@ -634,120 +772,143 @@ def render_step6():
     """, unsafe_allow_html=True)
     render_top_nav()
 
+
+
+# ---------------------------------------------------------------------------
+#  STEP 7: CHAT
+# ---------------------------------------------------------------------------
+
 def render_step7():
     render_top_nav()
 
-    # 1) Profile selection
+    # 1. Agent selection
     st.markdown('<div class="biglabel-G">1. SELECT AN AGENT</div>', unsafe_allow_html=True)
     names = [p["profile_name"] for p in st.session_state.profiles]
-    idx = st.selectbox("Agent Profiles:", range(len(names)), format_func=lambda i: names[i], key="chat_profile")
+    idx = st.selectbox("Agent Profiles:", range(len(names)),
+                       format_func=lambda i: names[i],
+                       key="chat_profile")
     sel = st.session_state.profiles[idx]
 
-    # 2) Shortcut buttons + HIGHLIGHTING + LABEL
-    st.session_state.setdefault("shortcut", " DEFAULT")
-    shortcuts = [" DEFAULT", " CONNECT", " GROW", " EXPLORE", " RESOLVE", "❤ SUPPORT"]
-    cols = st.columns(len(shortcuts))
+    # 2. Shortcut selection header
+    st.markdown('<div class="biglabel-G">2. SELECT A SHORTCUT</div>', unsafe_allow_html=True)
+    if ("shortcut" not in st.session_state
+        or st.session_state["shortcut"] not in st.session_state["extras_map"]):
+        st.session_state["shortcut"] = next(iter(st.session_state["extras_map"]), " DEFAULT")
+
+    shortcuts = list(st.session_state["extras_map"].keys())
+
+    # Display currently selected shortcut
     st.markdown(
-        f"<div class='home-small'><b>Selected Shortcut:</b> "
-        f"<span style='color:#2966d8;font-weight:bold'>{st.session_state.shortcut.strip()}</span></div>",
+        f"<div class='home-small'><strong>SELECTED SHORTCUT:</strong> "
+        f"<span style='color:#2966d8;font-weight:bold'>"
+        f"{st.session_state['shortcut'].strip()}"
+        f"</span></div>",
         unsafe_allow_html=True
     )
-    for sc, col in zip(shortcuts, cols):
-        btn_style = "st-btn-blue" if st.session_state.shortcut == sc else ""
-        with col:
-            if st.button(sc.strip(), key=f"sc_{sc}", help=st.session_state["extras_map"].get(sc, "")):
-                st.session_state.shortcut = sc
 
-    # 3) Persistent memory toggle
-    use_mem = st.checkbox("Use persistent memory", key="persistent_memory")
+    # Lay out shortcut buttons in rows of three
+    from math import ceil
+    rows = ceil(len(shortcuts) / 3)
+    for row in range(rows):
+        row_items = shortcuts[row*3:(row+1)*3]
+        cols = st.columns(3)
+        for sc, col in zip(row_items, cols):
+            with col:
+                if st.button(sc.strip(), key=f"sc_{sc}",
+                             help=st.session_state["extras_map"][sc]):
+                    st.session_state["shortcut"] = sc
 
-    # 4) Display history only when memory is on
+    # ── Per-chat tool toggles ───────────────────────────────────────────────
+    use_web  = st.checkbox(
+        "ENABLE WEB SEARCH for this chat",
+        value=sel.get("search_web", False),
+        key="chat_use_web"
+    )
+    use_docs = st.checkbox(
+        "ENABLE DOCUMENT SEARCH for this chat",
+        value=sel.get("search_documents", False),
+        key="chat_use_docs"
+    )
+    # ────────────────────────────────────────────────────────────────────────
+
+    # 3. Persistent memory toggle
+    use_mem = st.checkbox("ENABLE PERSISTENT MEMORY - CHAT HISTORY", key="persistent_memory")
     if use_mem:
         history = st.session_state.conversation.get(sel["profile_name"], [])
         with st.expander("View chat history"):
             if not history:
                 st.info("No previous messages.")
             for msg in history:
-                who = "You" if msg["role"] == "user" else "Agent"
+                who  = "You" if msg["role"] == "user" else "Agent"
                 style = "background:#144d2f;" if msg["role"] == "user" else ""
                 st.markdown(
-                    f"<div class='answer-box' style='{style}'><strong>{who}:</strong> {msg['content']}</div>",
+                    f"<div class='answer-box' style='{style}'>"
+                    f"<strong>{who}:</strong> {msg['content']}</div>",
                     unsafe_allow_html=True
                 )
 
-    # 5) User query input
-    st.markdown('<div class="home-small">3. WHAT DO YOU WANT TO ASK?</div>', unsafe_allow_html=True)
+    # 4. User query input
+    st.markdown('<div class="biglabel-G">3. ASK & SEND</div>', unsafe_allow_html=True)
     query = st.text_area("Type here", key="chat_query")
 
-    # --- ANSWER WINDOW (NEW) ---
+    # 5. Show last answer if present
     if st.session_state.last_answer:
         st.markdown(
-            "<div class='answer-box'><b>Answer:</b><br>{}</div>".format(st.session_state.last_answer),
+            "<div class='answer-box'><strong>Answer:</strong><br>"
+            f"{st.session_state.last_answer}</div>",
             unsafe_allow_html=True
         )
 
-    # 6) Action buttons: Save and Send
+    # 6. Save + Send buttons
     c1, c2 = st.columns(2)
     with c1:
-        # Save Response button remains visible at all times
-        if st.button("Save Response", key="save_response"):
+        if st.button("SAVE RESPONSE 🖫", key="save_response"):
             record = {
-                "profile": sel["profile_name"],
-                "shortcut": st.session_state.shortcut,
-                "question": query,
-                "answer": st.session_state.last_answer,
+                "profile":          sel["profile_name"],
+                "shortcut":         st.session_state["shortcut"],
+                "question":         query,
+                "answer":           st.session_state.last_answer,
                 "persistent_memory": use_mem
             }
             if use_mem:
                 record["conversation"] = st.session_state.conversation.get(sel["profile_name"], []).copy()
-            st.session_state.saved_responses.append(record)
-            save_json(RESPONSES_FILE, st.session_state.saved_responses)
+            if record not in st.session_state.saved_responses:
+                st.session_state.saved_responses.append(record)
+                save_json(RESPONSES_FILE, st.session_state.saved_responses)
             st.success("Response saved!")
 
     with c2:
-        if st.button("SEND", key="send_btn"):
-            base = (
-                f"Adopt the persona: {sel['persona_description']}. "
-                f"You are conversing with Parent {sel['parent_name']} "
-                f"(Child: {sel['child_name']}, Age {sel['child_age']})."
-            )
-            extras = st.session_state["extras_map"].get(st.session_state.shortcut, "")
+        if st.button("SEND →", key="send_btn"):
+            history = (st.session_state.conversation.get(sel["profile_name"], [])
+                       if use_mem else None)
 
-            # Build a single input string
-            if use_mem:
-                prev = st.session_state.conversation.get(sel["profile_name"], [])
-                history_text = ""
-                for m in prev:
-                    who = "You" if m["role"] == "user" else "Agent"
-                    history_text += f"{who}: {m['content']}\n"
-                prompt = (
-                    f"{base}{extras}\n"
-                    f"{history_text}"
-                    f"You: {query}\n"
-                    "Return a JSON object with key 'answer'."
-                )
-            else:
-                prompt = (
-                    f"{base}{extras}\n"
-                    f"You: {query}\n"
-                    "Return a JSON object with key 'answer'."
-                )
+            # make a one-off copy of the profile to override its tool flags
+            oneoff = sel.copy()
+            oneoff["search_web"]       = use_web
+            oneoff["search_documents"] = use_docs
+
+            params = build_openai_params(
+                oneoff,
+                st.session_state["shortcut"],
+                st.session_state["extras_map"][st.session_state["shortcut"]],
+                query,
+                history
+            )
 
             try:
-                params = {"model": "gpt-4o", "input": prompt}
-                out = client.responses.create(**add_tool_params(params, sel))
-                raw = out.output_text
-                try:
-                    parsed = json.loads(raw)
-                    answer = parsed.get("answer", raw)
-                except Exception:
-                    answer = raw
-
+                out = openai_chat_or_responses(params, fallback_prompt=query)
+                raw = ""
+                if hasattr(out, "choices") and out.choices:
+                    raw = out.choices[0].message.content
+                else:
+                    raw = getattr(out, "output_text", "") or ""
+                parsed = json.loads(raw) if raw.strip().startswith("{") else {}
+                answer = parsed.get("answer", raw)
                 st.session_state.last_answer = answer
 
-                # Update history
+                # Update memory
                 if use_mem:
-                    new_hist = prev + [
+                    new_hist = (history or []) + [
                         {"role": "user", "content": query},
                         {"role": "assistant", "content": answer}
                     ]
@@ -763,17 +924,17 @@ def render_step7():
                     st.session_state.temp_conversation[sel["profile_name"]] = tmp
 
                 st.rerun()
+
             except Exception as e:
-                st.error(f"OpenAI API error: {e}")
+                st.error(f"OpenAI API error (chat): {e}")
 
     render_bottom_nav()
-
 # ---------------------------------------------------------------------------
 #  STEP 8: VIEW SAVED CHATS
 # ---------------------------------------------------------------------------
 def render_step8():
     render_top_nav()
-    st.markdown('<div class="biglabel-B">SELECT A SAVED CHAT</div>', unsafe_allow_html=True)
+    st.markdown('<div class="biglabel-B">SAVED CHATS</div>', unsafe_allow_html=True)
     if not st.session_state.saved_responses:
         st.info("No saved responses."); st.session_state.step=0; st.rerun()
     titles = [f"{i+1}. {r['profile']} – {r['shortcut']}" for i,r in enumerate(st.session_state.saved_responses)]
@@ -794,12 +955,12 @@ def render_step8():
 
     c1, c2 = st.columns(2)
     with c1:
-        if st.button("Delete", key="btn_delete_saved"):
+        if st.button("DELETE", key="btn_delete_saved"):
             st.session_state.saved_responses.pop(sel_idx)
             save_json(RESPONSES_FILE, st.session_state.saved_responses)
             st.rerun()
     with c2:
-        if st.button("Close", key="btn_close_saved"):
+        if st.button("CLOSE", key="btn_close_saved"):
             st.session_state.step = 0; st.rerun()
 
 # ---------------------------------------------------------------------------
@@ -844,26 +1005,31 @@ def render_step9():
             search_web=web,
             documents=docs_list,
         )
+
+    # if they just disabled document search, forget the old vector store
+    if not docs:
+        prof["vector_store_id"] = None
+
         st.session_state.profiles[idx] = prof
         save_json(PROFILES_FILE, st.session_state.profiles)
         st.success("Profile updated!")
 
     c1, c2 = st.columns(2)
     with c1:
-        if st.button("Delete Profile", key="btn_delete_profile"):
+        if st.button("DELETE PROFILE", key="btn_delete_profile"):
             st.session_state.profiles.pop(idx)
             save_json(PROFILES_FILE, st.session_state.profiles)
             st.rerun()
     with c2:
-        if st.button("Close", key="btn_close_profile"):
+        if st.button("CLOSE", key="btn_close_profile"):
             st.session_state.step = 0; st.rerun()
-
+    render_bottom_nav()
 # ---------------------------------------------------------------------------
-#  STEP 10: EDIT SOURCES
+#  STEP 10: EDIT SOURCES AND SHORTCUTS
 # ---------------------------------------------------------------------------
 def render_step10():
     render_top_nav()
-    st.markdown('<div class="biglabel-R">EDIT SOURCE LISTS</div>', unsafe_allow_html=True)
+    st.markdown('<div class="biglabel-G">EDIT SOURCE LISTS</div>', unsafe_allow_html=True)
 
     def save_sources(sources):
         try:
@@ -886,7 +1052,7 @@ def render_step10():
     items    = srcs[agent_type].get(source_type, [])
     to_remove= st.multiselect("Select to remove", items, key="remove_sources")
     new_item = st.text_input(f"Add new {source_type}:", key="add_source")
-
+    st.markdown('<div class="biglabel-R"></div>', unsafe_allow_html=True)
     c1, c2, c3 = st.columns(3)
     with c1:
         if st.button("Remove Selected"):
@@ -907,25 +1073,14 @@ def render_step10():
 
     st.write(srcs[agent_type][source_type])
     render_bottom_nav()
-    # -----------------------------------------------------------------------
-    #  SHORTCUT BUTTONS EDITOR
-    # -----------------------------------------------------------------------
-    st.markdown("### Edit Shortcut Buttons")
-    new_map: Dict[str,str] = {}
-    for key, desc in st.session_state["extras_map"].items():
-        # strip leading space for nicer label
-        label = key.strip() or "(DEFAULT)"
-        new_desc = st.text_input(f"Label for '{label}' shortcut", desc, key=f"shortcut_{label}")
-        new_map[key] = new_desc
 
-    if st.button("Save Shortcuts", key="save_shortcuts"):
-        st.session_state["extras_map"] = new_map
-        save_json(SHORTCUTS_FILE, new_map)
-        st.success("Shortcut buttons updated!")
+    # --- DYNAMIC SHORTCUT EDITOR ---
+    render_shortcut_editor()
 
 # ---------------------------------------------------------------------------
 #  ENTRY POINT
 # ---------------------------------------------------------------------------
+
 def main():
     step = st.session_state.get("step", 0)
     {

@@ -8,12 +8,6 @@ from pydantic import BaseModel, Field, ConfigDict
 # ===================== MPH SPLASH SECTION (SHOWS ON APP LOAD) =====================
 
 def mph_splash():
-    st.markdown("")
-    col = st.columns([1,2,1])[1]
-    with col:
-        start = st.button("🚀 Start", key="splash_start", use_container_width=True)
-    st.markdown("<br>", unsafe_allow_html=True)
-    return start
     st.markdown("""
     <style>
         .mph-splash { background: linear-gradient(135deg,#2fe273 0%,#09742a 100%)!important; border-radius:24px; padding:28px 20px 24px 20px; margin:22px auto 18px auto; box-shadow:0 4px 24px rgba(44,99,80,.10); max-width:450px; }

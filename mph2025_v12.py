@@ -1,7 +1,7 @@
 import streamlit as st
 from openai import OpenAI
 import json, os, time
-from typing import List, Tuple, Callable 
+from typing import List, Tuple, Callable
 from typing import Dict, Optional
 from pydantic import BaseModel, Field, ConfigDict
 
@@ -13,6 +13,43 @@ RESPONSES_FILE  = "parent_helpers_responses.json"
 SOURCES_FILE    = "parent_helpers_sources.json"
 MEMORY_FILE     = "parent_helpers_memory.json"
 SHORTCUTS_FILE  = "parent_helpers_shortcuts.json"
+DOMAIN_SHORTCUTS = {
+    "Cardiologist": {
+        " SUMMARY": "Concise findings summary.",
+        " DIFFERENTIAL": "Differential diagnosis (list, brief).",
+        " PLAN": "Recommended diagnostic/treatment plan.",
+        " COUNSEL": "Key patient counseling points.",
+        " RED FLAGS": "Red flag symptoms/warnings.",
+    },
+    "AI Prompt Engineer": {
+        " OUTLINE": "Show step-by-step plan or pseudocode.",
+        " EXPLAIN": "Explain with analogies/examples.",
+        " DEBUG": "Suggest debugging/troubleshooting steps.",
+        " FORMAT": "Format as markdown code block.",
+        " PITFALLS": "List common mistakes to avoid.",
+    },
+    "AV Systems Design Engineer": {
+        " SCOPE": "Summarize project/system scope.",
+        " RISKS": "Identify design/deployment risks.",
+        " DIAGRAM": "Describe/outline AV system diagram.",
+        " SPECS": "Output key hardware/software specs.",
+        " ROI": "Show business impact/ROI argument.",
+    },
+    "Geneticist": {
+        " SUMMARY": "Summarize genetic findings.",
+        " PATHWAYS": "Outline relevant pathways/genes.",
+        " IMPLICATIONS": "Explain clinical/research impact.",
+        " COUNSEL": "Suggest patient/family counseling.",
+        " REFERENCES": "List key references/reviews.",
+    },
+    "Physicist": {
+        " FORMULA": "State formula/principle used.",
+        " STEPS": "Step-by-step calculation.",
+        " EXPLAIN": "Explain in plain language.",
+        " PITFALLS": "Common misconceptions.",
+        " VISUAL": "Describe or suggest a diagram/graph.",
+    }
+}
 DEFAULT_EXTRAS_MAP = {
     " DEFAULT":  "General purpose answer.",
     " CONNECT": " Help explain with examples.",
@@ -20,6 +57,29 @@ DEFAULT_EXTRAS_MAP = {
     " EXPLORE": " Age-appropriate Q&A.",
     " RESOLVE":" Step-by-step resolution.",
     "❤ SUPPORT":" Empathetic support."
+}
+
+# ---------------------------------------------------------------------------
+# AGENT TYPES & SOURCES (corrected: domains preloaded dynamically)
+# ---------------------------------------------------------------------------
+AGENT_TYPES = ["Parent", "Teacher", "Other"]
+PARENT_SOURCES = {
+    "Book":   ["The Whole‑Brain Child", "Peaceful Parent, Happy Kids"],
+    "Expert": ["Dr. Laura Markham", "Dr. Daniel Siegel"],
+    "Style":  ["Authoritative", "Gentle Parenting"]
+}
+TEACHER_SOURCES = {
+    "Book":   ["Teach Like a Champion", "Mindset"],
+    "Expert": ["Carol Dweck", "Doug Lemov"],
+    "Style":  ["Project-Based Learning", "SEL"]
+}
+# --- Automatically sync domain names with OTHER_SOURCES["Expert"]
+other_expert_domains = list(DOMAIN_SHORTCUTS.keys())
+custom_option = "Custom Expert (enter manually)"
+OTHER_SOURCES = {
+    "Book":   ["Custom Book (enter manually)"],
+    "Expert": other_expert_domains + [custom_option],
+    "Style":  ["Custom Style (enter manually)"]
 }
 
 # ---------------------------------------------------------------------------
@@ -47,26 +107,6 @@ def save_json(path: str, data):
 client = OpenAI(api_key=st.secrets.get("openai_key", "YOUR_OPENAI_API_KEY"))
 
 # ---------------------------------------------------------------------------
-# AGENT TYPES & SOURCES (unchanged)
-# ---------------------------------------------------------------------------
-AGENT_TYPES = ["Parent", "Teacher", "Other"]
-PARENT_SOURCES = {
-    "Book":   ["The Whole‑Brain Child", "Peaceful Parent, Happy Kids"],
-    "Expert": ["Dr. Laura Markham", "Dr. Daniel Siegel"],
-    "Style":  ["Authoritative", "Gentle Parenting"]
-}
-TEACHER_SOURCES = {
-    "Book":   ["Teach Like a Champion", "Mindset"],
-    "Expert": ["Carol Dweck", "Doug Lemov"],
-    "Style":  ["Project-Based Learning", "SEL"]
-}
-OTHER_SOURCES = {
-    "Book":   ["Custom Book (enter manually)"],
-    "Expert": ["Custom Expert (enter manually)"],
-    "Style":  ["Custom Style (enter manually)"]
-}
-
-# ---------------------------------------------------------------------------
 # SESSION‑STATE INIT (unchanged)
 # ---------------------------------------------------------------------------
 st.session_state.setdefault("profiles",        load_json(PROFILES_FILE))
@@ -79,7 +119,7 @@ st.session_state.setdefault("temp_conversation", {})
 if "sources" not in st.session_state:
     st.session_state["sources"] = {
         "Parent":  PARENT_SOURCES,
-        "Teacher":  TEACHER_SOURCES,
+        "Teacher": TEACHER_SOURCES,
         "Other":   OTHER_SOURCES
     }
 loaded = load_json(SHORTCUTS_FILE)
@@ -88,6 +128,9 @@ if isinstance(loaded, dict) and loaded:
 else:
     st.session_state.setdefault("extras_map", DEFAULT_EXTRAS_MAP.copy())
 
+# ---------------------------------------------------------------------------
+#  GLOBAL CSS (unchanged)
+# ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 #  GLOBAL CSS
 # ---------------------------------------------------------------------------
@@ -247,7 +290,7 @@ body {
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------------------------
-# PERSONA PROFILE MODEL (updated)
+# PERSONA PROFILE MODEL (corrected for Pydantic v2)
 # ---------------------------------------------------------------------------
 class PersonaProfile(BaseModel):
     profile_name:        str
@@ -262,15 +305,21 @@ class PersonaProfile(BaseModel):
     rag_upload:        bool = False
     search_web:        bool = False
     search_documents:  bool = False
-    vector_store_id:    Optional[str] = Field(default=None)
-    documents:         list[str] = Field(default_factory=list)
-
+    vector_store_id:   Optional[str] = Field(default=None)
+    documents:         List[str] = Field(default_factory=list)      # FIXED
+    shortcuts:         Dict[str, str] = Field(default_factory=dict) # FIXED
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
 # ---------------------------------------------------------------------------
-# FILE‑SEARCH TOOL for RAG (updated)
+# Shortcuts domain fetch (ADDED HELPER)
 # ---------------------------------------------------------------------------
-def get_openai_tools(profile: Dict) -> list[Dict]:
+def get_shortcuts_for_domain(domain):
+    return DOMAIN_SHORTCUTS.get(domain, DEFAULT_EXTRAS_MAP.copy())
+
+# ---------------------------------------------------------------------------
+# FILE‑SEARCH TOOL for RAG (unchanged)
+# ---------------------------------------------------------------------------
+def get_openai_tools(profile: dict) -> list:
     tools = []
     if profile.get("search_documents") and profile.get("vector_store_id"):
         tools.append({
@@ -282,7 +331,7 @@ def get_openai_tools(profile: Dict) -> list[Dict]:
         tools.append({"type": "web_search"})
     return tools
 
-def add_tool_params(params: Dict, profile: Dict) -> Dict:
+def add_tool_params(params: dict, profile: dict) -> dict:
     tools = get_openai_tools(profile)
     if tools:
         params["tools"] = tools
@@ -292,9 +341,9 @@ def add_tool_params(params: Dict, profile: Dict) -> Dict:
     return params
 
 # ---------------------------------------------------------------------------
-# OPENAI API CALL WRAPPER (updated)
+# OPENAI API CALL WRAPPER (unchanged)
 # ---------------------------------------------------------------------------
-def openai_chat_or_responses(params: Dict, fallback_prompt: str):
+def openai_chat_or_responses(params: dict, fallback_prompt: str):
     """
     Use chat.completions.create when no tools are needed.
     Otherwise use responses.create (required for tools like file_search) with input=... and tools.
@@ -679,29 +728,76 @@ def render_step4():
 # ---------------------------------------------------------------------------
 # RENDER FUNCTION (Step 5)
 # ---------------------------------------------------------------------------
-
 def render_step5():
     st.markdown('<div class="biglabel-G">Great! Now personalize your agent and add tools if desired</div>', unsafe_allow_html=True)
-    agent_type = st.session_state.agent_type
+    agent_type   = st.session_state.agent_type
+    source_type  = st.session_state.source_type
+    source_name  = st.session_state.source_name
 
+    # --- Per-profile shortcut logic ---
+    # On first load, pre-fill from domain or default if new profile
+    if "profile_shortcuts" not in st.session_state:
+        if agent_type == "Other" and source_type == "Expert" and source_name in DOMAIN_SHORTCUTS:
+            st.session_state["profile_shortcuts"] = get_shortcuts_for_domain(source_name)
+        else:
+            st.session_state["profile_shortcuts"] = DEFAULT_EXTRAS_MAP.copy()
+    shortcut_map = st.session_state["profile_shortcuts"]
+
+    # Editable list
+    st.markdown("**Customize This Agent’s Shortcuts**")
+    shortcut_items = list(shortcut_map.items())
+    to_delete = set()
+    new_shortcuts = {}
+
+    for i, (label, desc) in enumerate(shortcut_items):
+        cols = st.columns([2, 4, 1])
+        with cols[0]:
+            new_label = st.text_input(f"Label {i+1}", value=label, key=f"shortcut_label_{i}")
+        with cols[1]:
+            new_desc = st.text_input(f"Description {i+1}", value=desc, key=f"shortcut_desc_{i}")
+        with cols[2]:
+            if st.button("❌", key=f"delete_shortcut_{i}"):
+                to_delete.add(label)
+        # Only add non-deleted
+        if new_label.strip() and label not in to_delete:
+            new_shortcuts[new_label.strip()] = new_desc.strip()
+
+    # Add new shortcut
+    st.markdown("---")
+    st.markdown("**Add New Shortcut**")
+    new_slabel = st.text_input("New Shortcut Label", key="add_shortcut_label_pf")
+    new_sdesc = st.text_input("New Shortcut Description", key="add_shortcut_desc_pf")
+    if st.button("Add Shortcut to Agent Profile"):
+        if new_slabel and new_slabel not in new_shortcuts:
+            new_shortcuts[new_slabel] = new_sdesc
+            st.session_state["profile_shortcuts"] = new_shortcuts
+            st.success("Shortcut added!")
+            st.rerun()
+        else:
+            st.warning("Shortcut label required and must be unique.")
+
+    # Save in session for profile creation
+    st.session_state["profile_shortcuts"] = new_shortcuts
+
+    # --- Profile form ---
     with st.form("profile"):
         if agent_type == "Parent":
             p_name = st.text_input("Parent first name")
-            c_age   = st.number_input("Child age", 1, 21)
+            c_age  = st.number_input("Child age", 1, 21)
             c_name = st.text_input("Child first name")
         elif agent_type == "Teacher":
             p_name = st.text_input("Teacher name")
-            c_age   = st.number_input("Class grade", 1, 12)
-            c_name  = ""
+            c_age  = st.number_input("Class grade", 1, 12)
+            c_name = ""
         else:
             p_name = st.text_input("Name")
             c_age, c_name = 0, ""
-        prof_nm     = st.text_input("Profile name")
-        rag_upload  = st.checkbox("Enable document uploads (RAG)")
+        prof_nm    = st.text_input("Profile name")
+        rag_upload = st.checkbox("Enable document uploads (RAG)")
         search_documents = st.checkbox("Enable document search")
-        search_web  = st.checkbox("Enable web search")
-        uploads     = st.file_uploader("Upload documents", accept_multiple_files=True) if rag_upload else []
-        saved       = st.form_submit_button("SAVE")
+        search_web = st.checkbox("Enable web search")
+        uploads    = st.file_uploader("Upload documents", accept_multiple_files=True) if rag_upload else []
+        saved      = st.form_submit_button("SAVE")
 
     if saved:
         missing = []
@@ -728,7 +824,8 @@ def render_step5():
                 rag_upload          = rag_upload,
                 search_web          = search_web,
                 search_documents    = search_documents,
-                documents           = docs_list
+                documents           = docs_list,
+                shortcuts           = st.session_state["profile_shortcuts"]
             )
 
             if rag_upload and uploads:
@@ -746,9 +843,11 @@ def render_step5():
             st.session_state.profiles.append(profile.dict())
             save_json(PROFILES_FILE, st.session_state.profiles)
             st.success("Profile saved!")
+            st.session_state.pop("profile_shortcuts", None)  # Reset for next profile
             st.session_state.step = 6; st.rerun()
 
     if st.button("← Back", key="btn_back5"):
+        st.session_state.pop("profile_shortcuts", None)  # Clean up
         st.session_state.step = 4; st.rerun()
 
     render_top_nav()
@@ -772,8 +871,6 @@ def render_step6():
     """, unsafe_allow_html=True)
     render_top_nav()
 
-
-
 # ---------------------------------------------------------------------------
 #  STEP 7: CHAT
 # ---------------------------------------------------------------------------
@@ -791,11 +888,14 @@ def render_step7():
 
     # 2. Shortcut selection header
     st.markdown('<div class="biglabel-G">2. SELECT A SHORTCUT</div>', unsafe_allow_html=True)
-    if ("shortcut" not in st.session_state
-        or st.session_state["shortcut"] not in st.session_state["extras_map"]):
-        st.session_state["shortcut"] = next(iter(st.session_state["extras_map"]), " DEFAULT")
+    shortcuts_map = sel.get("shortcuts", DEFAULT_EXTRAS_MAP)
+    if (
+        "shortcut" not in st.session_state
+        or st.session_state["shortcut"] not in shortcuts_map
+    ):
+        st.session_state["shortcut"] = next(iter(shortcuts_map), " DEFAULT")
 
-    shortcuts = list(st.session_state["extras_map"].keys())
+    shortcuts = list(shortcuts_map.keys())
 
     # Display currently selected shortcut
     st.markdown(
@@ -815,7 +915,7 @@ def render_step7():
         for sc, col in zip(row_items, cols):
             with col:
                 if st.button(sc.strip(), key=f"sc_{sc}",
-                             help=st.session_state["extras_map"][sc]):
+                             help=shortcuts_map[sc]):
                     st.session_state["shortcut"] = sc
 
     # ── Per-chat tool toggles ───────────────────────────────────────────────
@@ -890,7 +990,7 @@ def render_step7():
             params = build_openai_params(
                 oneoff,
                 st.session_state["shortcut"],
-                st.session_state["extras_map"][st.session_state["shortcut"]],
+                shortcuts_map[st.session_state["shortcut"]],
                 query,
                 history
             )
@@ -943,6 +1043,15 @@ def render_step8():
 
     st.markdown(f"<p style='color:#fff;'><strong>Profile:</strong> {item['profile']}</p>", unsafe_allow_html=True)
     st.markdown(f"<p style='color:#fff;'><strong>Shortcut:</strong> {item['shortcut']}</p>", unsafe_allow_html=True)
+
+    # Lookup and show shortcut description for this profile
+    sel_profile = next((p for p in st.session_state.profiles if p['profile_name'] == item['profile']), None)
+    sc_desc = ""
+    if sel_profile and "shortcuts" in sel_profile:
+        sc_desc = sel_profile["shortcuts"].get(item["shortcut"], "")
+    if sc_desc:
+        st.markdown(f"<p style='color:#fff;'><strong>Shortcut Description:</strong> {sc_desc}</p>", unsafe_allow_html=True)
+
     st.markdown(f"<p style='color:#fff;'><strong>Persistent memory:</strong> {'Yes' if item.get('persistent_memory') else 'No'}</p>", unsafe_allow_html=True)
     st.markdown(f"<p style='color:#fff;'><strong>Question:</strong></p><blockquote style='color:#fff;border-left:4px solid #27e67a;padding-left:8px;'>{item['question']}</blockquote>", unsafe_allow_html=True)
     st.markdown(f"<p style='color:#fff;'><strong>Answer:</strong></p><div class='answer-box'>{item['answer']}</div>", unsafe_allow_html=True)
@@ -962,37 +1071,81 @@ def render_step8():
     with c2:
         if st.button("CLOSE", key="btn_close_saved"):
             st.session_state.step = 0; st.rerun()
-
 # ---------------------------------------------------------------------------
-#  STEP 9: EDIT PROFILES
+#  STEP 9: EDIT PROFILES + SHORTCUTS
 # ---------------------------------------------------------------------------
 def render_step9():
     render_top_nav()
     st.markdown('<div class="biglabel-B">AGENT PROFILES</div>', unsafe_allow_html=True)
+
+    # No profiles? Go home
     if not st.session_state.profiles:
         st.info("No profiles stored."); st.session_state.step=0; st.rerun()
     titles = [f"{i+1}. {p['profile_name']}" for i,p in enumerate(st.session_state.profiles)]
     idx = st.selectbox("Select a profile:", range(len(titles)), format_func=lambda i: titles[i], key="profile_select")
     prof = st.session_state.profiles[idx]
 
+    # --- Begin Profile Edit Form ---
     with st.form("edit_profile"):
-        p_name = st.text_input("Parent first name", value=prof.get("parent_name",""))
-        c_age  = st.number_input("Child age", 1, 21, value=max(1,prof.get("child_age",1)))
-        c_name = st.text_input("Child first name", value=prof.get("child_name",""))
-        prof_nm= st.text_input("Profile name", value=prof.get("profile_name",""))
-        a_type = st.selectbox("Agent type", AGENT_TYPES, index=AGENT_TYPES.index(prof.get("agent_type","Parent")))
-        desc   = st.text_area("Persona description", value=prof.get("persona_description",""), height=150)
-        rag    = st.checkbox("Enable document uploads (RAG)", value=prof.get("rag_upload",False))
-        docs   = st.checkbox("Enable document search",    value=prof.get("search_documents",False))
-        web    = st.checkbox("Enable web search",         value=prof.get("search_web",False))
-        uploads= st.file_uploader("Upload documents", accept_multiple_files=True) if rag else []
-        saved  = st.form_submit_button("SAVE CHANGES")
+        p_name = st.text_input("Parent/Agent Name", value=prof.get("parent_name", ""))
+        c_age  = st.number_input("Child Age (or Class Grade)", 1, 99, value=max(1, prof.get("child_age", 1)))
+        c_name = st.text_input("Child Name", value=prof.get("child_name", ""))
+        prof_nm = st.text_input("Profile Name", value=prof.get("profile_name", ""))
+        a_type = st.selectbox("Agent Type", AGENT_TYPES, index=AGENT_TYPES.index(prof.get("agent_type", "Parent")))
+        desc = st.text_area("Persona Description", value=prof.get("persona_description", ""), height=150)
+        rag = st.checkbox("Enable document uploads (RAG)", value=prof.get("rag_upload", False))
+        docs = st.checkbox("Enable document search", value=prof.get("search_documents", False))
+        web = st.checkbox("Enable web search", value=prof.get("search_web", False))
+        uploads = st.file_uploader("Upload documents", accept_multiple_files=True) if rag else []
 
+        # --- Shortcuts Editor for this profile ---
+        st.markdown("#### Shortcuts for this Agent")
+        shortcuts = dict(prof.get("shortcuts", {}))
+        shortcut_edits = []
+        delete_keys = set()
+
+        for i, (label, description) in enumerate(list(shortcuts.items())):
+            cols = st.columns([2, 4, 1])
+            with cols[0]:
+                new_label = st.text_input(f"Shortcut Label {i+1}", value=label, key=f"profile_sc_label_{i}")
+            with cols[1]:
+                new_desc = st.text_input(f"Description {i+1}", value=description, key=f"profile_sc_desc_{i}")
+            with cols[2]:
+                to_delete = st.checkbox("Delete?", key=f"profile_sc_delete_{i}")
+                if to_delete:
+                    delete_keys.add(label)
+            shortcut_edits.append((label, new_label.strip(), new_desc))
+
+        st.markdown("---")
+        st.markdown("**Add a new shortcut for this agent**")
+        new_sc_label = st.text_input("New Shortcut Label", key="profile_new_sc_label")
+        new_sc_desc  = st.text_input("New Shortcut Description", key="profile_new_sc_desc")
+        add_sc = st.form_submit_button("Add Shortcut")
+        if add_sc and new_sc_label:
+            if new_sc_label in shortcuts:
+                st.warning("That shortcut already exists for this agent.")
+            else:
+                shortcuts[new_sc_label] = new_sc_desc
+                st.success(f"Added shortcut '{new_sc_label}'.")
+
+        # --- Save Profile Edits ---
+        saved = st.form_submit_button("SAVE CHANGES")
+
+    # --- Apply Edits After Form Submission ---
     if saved:
-        docs_list = prof.get("documents",[])
-        for f in uploads:
-            try: docs_list.append(f.read().decode("utf-8"))
-            except: pass
+        # Remove checked shortcuts
+        for k in delete_keys:
+            shortcuts.pop(k, None)
+        # Apply edits (label/desc), renaming as needed
+        new_shortcuts = {}
+        for old_label, new_label, new_desc in shortcut_edits:
+            if not new_label: continue  # skip empty
+            if new_label in new_shortcuts and new_label != old_label:
+                st.warning(f"Duplicate shortcut label: '{new_label}'")
+                continue
+            new_shortcuts[new_label] = new_desc
+        shortcuts = {**shortcuts, **new_shortcuts}
+
         prof.update(
             parent_name=p_name,
             child_age=int(c_age),
@@ -1003,17 +1156,17 @@ def render_step9():
             rag_upload=rag,
             search_documents=docs,
             search_web=web,
-            documents=docs_list,
+            documents=prof.get("documents", []),
+            shortcuts=shortcuts,   # updated per-profile shortcuts
         )
-
-    # if they just disabled document search, forget the old vector store
-    if not docs:
-        prof["vector_store_id"] = None
-
+        # If doc search disabled, forget old vector store
+        if not docs:
+            prof["vector_store_id"] = None
         st.session_state.profiles[idx] = prof
         save_json(PROFILES_FILE, st.session_state.profiles)
         st.success("Profile updated!")
 
+    # --- Danger Zone ---
     c1, c2 = st.columns(2)
     with c1:
         if st.button("DELETE PROFILE", key="btn_delete_profile"):
@@ -1024,6 +1177,7 @@ def render_step9():
         if st.button("CLOSE", key="btn_close_profile"):
             st.session_state.step = 0; st.rerun()
     render_bottom_nav()
+
 # ---------------------------------------------------------------------------
 #  STEP 10: EDIT SOURCES AND SHORTCUTS
 # ---------------------------------------------------------------------------
@@ -1080,7 +1234,6 @@ def render_step10():
 # ---------------------------------------------------------------------------
 #  ENTRY POINT
 # ---------------------------------------------------------------------------
-
 def main():
     step = st.session_state.get("step", 0)
     {

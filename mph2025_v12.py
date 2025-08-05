@@ -10,14 +10,22 @@ from pydantic import BaseModel, Field, ConfigDict
 def mph_splash():
     st.markdown("""
     <style>
-        .mph-splash { background: linear-gradient(135deg,#2fe273 0%,#09742a 100%)!important; border-radius:24px; padding:28px 20px 24px 20px; margin:22px auto 18px auto; box-shadow:0 4px 24px rgba(44,99,80,.10); max-width:450px; }
-        .mph-splash h1 { text-align:center; font-size:2.2em; margin-bottom:0.35em; color:#18542e; font-weight:900;}
-        .mph-splash h3 { text-align:center; font-size:1.2em; color:#23683c;}
-        .mph-splash ul { padding-left:1.1em;}
-        .mph-splash li { margin-bottom:4px; font-size:1.05em;}
-        .mph-role {font-weight:700; font-size:1.09em;}
-        .mph-getstarted {background:#fff; color:#15592c; padding:8px 14px; border-radius:16px; font-size:1.05em; margin:14px 0 8px 0;}
-        .mph-btn-area { display:flex; justify-content:center; align-items:center; margin-bottom:8px; }
+        .mph-splash {
+            background: linear-gradient(135deg,#2fe273 0%,#09742a 100%) !important;
+            border-radius: 24px;
+            padding: 24px 14px 12px 14px;
+            margin: 22px auto 20px auto;
+            box-shadow: 0 4px 24px rgba(44,99,80,.10);
+            max-width: 480px;
+            width: 98vw;
+        }
+        .mph-splash h1 { text-align:center; font-size:2.2em; margin-bottom:0.33em; color:#18542e; font-weight:900;}
+        .mph-splash h3 { text-align:center; font-size:1.13em; color:#23683c;}
+        .mph-splash ul { padding-left:1.18em;}
+        .mph-splash li { margin-bottom:4px; font-size:1.08em;}
+        .mph-role {font-weight:700; font-size:1.10em;}
+        .mph-getstarted {background:#fff; color:#15592c; padding:8px 14px; border-radius:16px; font-size:1.04em; margin:14px 0 8px 0;}
+        .mph-btn-area { display:flex; justify-content:center; align-items:center; margin: 7px 0;}
         .mph-shortcut { font-weight:600; color:#18542e; }
         .mph-anchor-btn {
             background:#1ec97b;
@@ -25,23 +33,29 @@ def mph_splash():
             padding:8px 28px;
             border:none;
             border-radius:22px;
-            font-size:1.07em;
+            font-size:1.06em;
             font-weight:700;
             box-shadow:0 2px 12px rgba(44,99,180,0.12);
             cursor:pointer;
-            margin-bottom:18px;
+            margin-bottom:12px;
             margin-top:5px;
             text-decoration:none;
             display:inline-block;
+            transition: filter 0.18s;
+        }
+        .mph-anchor-btn:active { filter: brightness(1.1);}
+        @media (max-width:520px) {
+            .mph-splash { max-width: 99vw; padding: 8vw 1vw; }
+            .mph-splash h1 { font-size: 1.32em;}
+            .mph-splash h3 { font-size: 1em;}
         }
     </style>
     """, unsafe_allow_html=True)
-    
+
     st.markdown('<div class="mph-splash">', unsafe_allow_html=True)
-    
-    # Top anchor "button" (not a real button, just scrolls to real Start)
+
+    # Top anchor - just scrolls user to real button
     st.markdown('<div class="mph-btn-area"><a href="#mph_start" class="mph-anchor-btn">🚀 Start</a></div>', unsafe_allow_html=True)
-    
     st.markdown("""
         <h1>🌿 Welcome to My Parent Helpers (MPH)!</h1>
         <h3>Your digital team of AI-powered helpers—for parenting, teaching, and any expert support you need.</h3>
@@ -67,14 +81,15 @@ def mph_splash():
             <b>MPH isn’t just AI advice—it’s a toolkit for shaping support, learning, and growth your way.</b>
         </div>
     """, unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Actual functional Start button (outside the splash/form)
+
+    # Bottom Start button, with an anchor
     st.markdown('<div class="mph-btn-area" id="mph_start">', unsafe_allow_html=True)
-    submitted = st.button("🚀 Start", use_container_width=True, key="splash_start_real")
+    submitted = st.button("🚀 Start", use_container_width=True, key="mph_splash_start")
     st.markdown('</div>', unsafe_allow_html=True)
-    
+
+    st.markdown('</div>', unsafe_allow_html=True)
+    return submitted
+
     return submitted
 
 # -------------------- SPLASH LOGIC --------------------

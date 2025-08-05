@@ -79,7 +79,7 @@ if not st.session_state.splash_done:
     st.set_page_config(page_title="My Parent Helpers", page_icon="🌿", layout="centered")
     if mph_splash():
         st.session_state.splash_done = True
-        st.experimental_rerun()
+        st.rerun()
     st.stop()
 # ---------------------------------------------------------------------------
 # CONSTANTS & FILE PATHS (unchanged)

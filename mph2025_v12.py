@@ -37,7 +37,7 @@ def mph_splash():
         <div class="mph-btn-anchor">
             <a href="#mph_start_real" class="mph-anchor-link">🚀 Start</a>
         </div>
-        <h1>🌿 Welcome to My Parent Helpers (MPH)!</h1>
+        <h1>🌿 Welcome to My Parent Helpers!</h1>
         <h3>Your digital team of AI-powered helpers—for parenting, teaching, and any expert support you need.</h3>
         <ul>
             <li><span class="mph-role">👨‍👩‍👧‍👦 Parent Agents:</span> Age-appropriate advice for your family.</li>

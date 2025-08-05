@@ -5,6 +5,8 @@ from typing import List, Tuple, Callable
 from typing import Dict, Optional
 from pydantic import BaseModel, Field, ConfigDict
 
+# ===================== MPH SPLASH SECTION (SHOWS ON APP LOAD) =====================
+
 def mph_splash():
     st.markdown("""
     <style>
@@ -15,50 +17,42 @@ def mph_splash():
         .mph-splash li { margin-bottom:4px; font-size:1.05em;}
         .mph-role {font-weight:700; font-size:1.09em;}
         .mph-getstarted {background:#fff; color:#15592c; padding:8px 14px; border-radius:16px; font-size:1.05em; margin:14px 0 8px 0;}
-        .mph-btn-area { display:flex; justify-content:center; align-items:center; margin-bottom:8px; }
+        .mph-btn {margin-top:1em; text-align:center;}
         .mph-shortcut { font-weight:600; color:#18542e; }
     </style>
+    <div class="mph-splash">
+        <h1>🌿 Welcome to My Parent Helpers (MPH)!</h1>
+        <h3>Your digital team of AI-powered helpers—for parenting, teaching, and any expert support you need.</h3>
+        <ul>
+            <li><span class="mph-role">👨‍👩‍👧‍👦 Parent Agents:</span> Personalized, age-appropriate advice for your unique family.</li>
+            <li><span class="mph-role">🧑‍🏫 Teacher Agents:</span> Lesson outlines, Q&A, and classroom support tailored for educators.</li>
+            <li><span class="mph-role">🌟 Other (Expert) Agents:</span> Create custom assistants for any field—AV, science, health, and more.</li>
+        </ul>
+        <ul>
+            <li><span class="mph-shortcut">💬 Shortcuts:</span> Instantly choose how you want answers: explain, teach, resolve, support, or just chat.</li>
+            <li><span class="mph-shortcut">🧩 Fully Customizable:</span> Add your own sources, edit shortcuts, and create the helpers you need.</li>
+            <li><span class="mph-shortcut">🔄 Save & Manage:</span> Save responses, edit profiles, and switch between Agents any time.</li>
+            <li><span class="mph-shortcut">📱 Mobile-First:</span> Works on any device. No account needed. Your data stays private.</li>
+        </ul>
+        <div class="mph-getstarted">
+            <b>Get Started:</b><br>
+            1. Create an Agent (Parent, Teacher, or Expert)<br>
+            2. Choose or add a source<br>
+            3. Ask a question and pick a Shortcut<br>
+            4. Save or revisit answers any time<br>
+        </div>
+        <div style="text-align:center; margin-top:10px; font-size:1.09em;">
+            <b>MPH isn’t just AI advice—it’s a toolkit for shaping support, learning, and growth your way.</b>
+        </div>
+    </div>
     """, unsafe_allow_html=True)
-    
-    with st.form("mph_splash_form"):
-        st.markdown('<div class="mph-splash">', unsafe_allow_html=True)
-        
-        # Optional: Top anchor that scrolls to start button
-        st.markdown('<div class="mph-btn-area"><a href="#mph_start" style="text-decoration:none;"><button style="background:#1ec97b;color:white;padding:7px 24px;border:none;border-radius:22px;font-size:1.04em;font-weight:700;box-shadow:0 2px 12px rgba(44,99,180,0.12);cursor:pointer;">🚀 Start</button></a></div>', unsafe_allow_html=True)
 
-        st.markdown("""
-            <h1>🌿 Welcome to My Parent Helpers (MPH)!</h1>
-            <h3>Your digital team of AI-powered helpers—for parenting, teaching, and any expert support you need.</h3>
-            <ul>
-                <li><span class="mph-role">👨‍👩‍👧‍👦 Parent Agents:</span> Personalized, age-appropriate advice for your unique family.</li>
-                <li><span class="mph-role">🧑‍🏫 Teacher Agents:</span> Lesson outlines, Q&A, and classroom support tailored for educators.</li>
-                <li><span class="mph-role">🌟 Other (Expert) Agents:</span> Create custom assistants for any field—AV, science, health, and more.</li>
-            </ul>
-            <ul>
-                <li><span class="mph-shortcut">💬 Shortcuts:</span> Instantly choose how you want answers: explain, teach, resolve, support, or just chat.</li>
-                <li><span class="mph-shortcut">🧩 Fully Customizable:</span> Add your own sources, edit shortcuts, and create the helpers you need.</li>
-                <li><span class="mph-shortcut">🔄 Save & Manage:</span> Save responses, edit profiles, and switch between Agents any time.</li>
-                <li><span class="mph-shortcut">📱 Mobile-First:</span> Works on any device. No account needed. Your data stays private.</li>
-            </ul>
-            <div class="mph-getstarted">
-                <b>Get Started:</b><br>
-                1. Create an Agent (Parent, Teacher, or Expert)<br>
-                2. Choose or add a source<br>
-                3. Ask a question and pick a Shortcut<br>
-                4. Save or revisit answers any time<br>
-            </div>
-            <div style="text-align:center; margin-top:10px; font-size:1.09em;">
-                <b>MPH isn’t just AI advice—it’s a toolkit for shaping support, learning, and growth your way.</b>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        # Bottom Start button (single submit button with anchor id)
-        st.markdown('<div class="mph-btn-area" id="mph_start">', unsafe_allow_html=True)
-        submitted = st.form_submit_button("🚀 Start", use_container_width=True)
-        st.markdown('</div></div>', unsafe_allow_html=True)
-    
-    return submitted
-
+    st.markdown("")
+    col = st.columns([1,2,1])[1]
+    with col:
+        start = st.button("🚀 Start", key="splash_start", use_container_width=True)
+    st.markdown("<br>", unsafe_allow_html=True)
+    return start
 
 # -------------------- SPLASH LOGIC - DO NOT SKIP THIS! --------------------
 if "splash_done" not in st.session_state:
@@ -70,7 +64,6 @@ if not st.session_state.splash_done:
         st.session_state.splash_done = True
         st.experimental_rerun()
     st.stop()
-
 # ---------------------------------------------------------------------------
 # CONSTANTS & FILE PATHS (unchanged)
 # ---------------------------------------------------------------------------

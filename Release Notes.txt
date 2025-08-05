@@ -1,5 +1,80 @@
-Release v1.1.0 – “Foundations” (2025-07-30)
-(See mph2025 for previous releases)
+*****************************************************************************************
+***** Release v1.2.0 – “Shortcuts, Hybrid Tools & Enhanced Management” (2025-08-04) *****
+*****************************************************************************************
+
+What's New
+
+Shortcut Button Editor
+– Live Shortcut Editing: Edit, add, rename, and delete all shortcut buttons (e.g., Default, Connect, Grow, etc.) directly from the UI.
+– Changes are instantly reflected everywhere—no more hardcoded shortcut lists.
+– All edits saved to parent_helpers_shortcuts.json for full persistence.
+
+Hybrid Tooling & RAG
+– Document & Web Search: Enable/disable document search (RAG) and web search on a per-profile basis, with per-chat overrides for maximum flexibility.
+– Profile tools can now be set during creation, editing, or per chat—no need to re-create agents.
+– Vector store links are automatically removed if document search is disabled.
+
+Profile & Source Management
+– Full profile editing: Update all profile details, including personalization, tools, and descriptions.
+– Dynamic source management: Add or remove Books, Experts, and Styles for each agent type—fully editable and persistent.
+– Profile, response, and shortcut data remain fully local and persist in their respective JSON files.
+
+Chat, Memory & UI Enhancements
+– Responsive shortcut buttons: All edits are reflected instantly in the chat screen; select any shortcut for any chat turn.
+– Per-chat toggles for web/doc search: Temporarily enable or disable advanced tools in any session.
+– Mobile-optimized dashboard with improved card layouts, emoji navigation buttons, and clear expanders for lists and details.
+– Live chat history and memory: Option to enable persistent memory for any chat.
+– Instant feedback for saving, deleting, and sending actions.
+
+Fixes & Improvements
+– All shortcut and source changes propagate reliably across the app—no mismatches or stale buttons.
+– Improved error handling for file uploads, vector store management, and API calls.
+– Refined and unified visual style across all screens, supporting both mobile and desktop.
+
+-> COMING SOON:
+Agent sharing, 
+Advanced context schemas
+Deeper AI function integrations (Computer Use, Storage, Structured Format Templates) coming in v1.3+
+
+****************************************************************
+***** Release v1.1.0 – “Memory & UX Polishes” (2025-08-01) ***** 
+****************************************************************
+
+What’s New
+
+Persistent Memory Toggle
+- On the Chat screen, enable “Use persistent memory” to save and re-inject full conversation history (parent_helpers_memory.json) on each turn.
+
+Live Conversation Feed
+- Chat turns now appear above the input box in real time.
+
+Profile Hover Details
+- User messages include an ℹ️ icon revealing profile details on hover.
+
+Saved Chats Expander
+- Home-screen CHATS card’s expander now lists each saved chat title (e.g. “1. Parent – GROW”) instead of just a count.
+
+Dynamic Personalization Forms
+- Parent: Parent name + Child age & name
+- Teacher: Teacher name + Class grade
+- Other: First name only
+
+Card Layout Reorder
+- Dashboard cards rearranged for better navigation and flow.
+
+On-Hover Profile Tooltips
+- Throughout the chat UI, hovering over ℹ️ displays full agent metadata (type, source, names, age, persona).
+
+-> COMING SOON:
+- Agent Functions
+- Sharing
+- Shortcut Editing, 
+- Advanced context structures.
+
+*******************************************************
+***** Release v1.1.0 – “Foundations” (2025-07-30) *****
+*******************************************************
+What's New
 
 Agent Creation & Persona Generation
 – Select Parent, Teacher or Other profiles
@@ -23,31 +98,11 @@ Source Editing
 Local Persistence
 – All state stored in local JSON files—no account required
 – Streamlit-style mobile UI with cards and top navigation
+(See mph2025 for previous releases)
 
-Release v1.1.0 – “Memory & UX Polishes” (2025-08-01)
-What’s New
+-> COMING SOON
+- Context Message Editing
+- Migrate to OpenAI Responses API for Agentic foundation
+- MCP Server
+- Tools
 
-Persistent Memory Toggle
-On the Chat screen, enable “Use persistent memory” to save and re-inject full conversation history (in parent_helpers_memory.json) on each turn.
-
-Live Conversation Feed
-Chat turns now appear above the input box in real time.
-
-User messages include an ℹ️ icon revealing profile details on hover.
-
-Saved Chats Expander
-Home-screen CHATS card’s expander now lists each saved chat title (e.g. “1. Parent – GROW”) instead of showing a count.
-
-Dynamic Personalization Forms
-
-Parent: Parent name + Child age & name
-Teacher: Teacher name + Class grade
-Other: First name only
-
-Card Layout Reorder
-
-On-Hover Profile Tooltips
-
-############# Agent Functions, Sharing, Shortcut Editing, Advanced context structures coming soon.
-
-Throughout the chat UI, hovering over ℹ️ displays full agent metadata (type, source, names, age, persona).

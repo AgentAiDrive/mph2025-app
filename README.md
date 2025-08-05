@@ -1,4 +1,4 @@
-🌿 My Parent Helpers (MPH)
+non-technical (end user) style  update the following: 🌿 My Parent Helpers (MPH)
 
 Test drive the app → https://mph-2025.streamlit.app/
 

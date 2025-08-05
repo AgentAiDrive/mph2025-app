@@ -10,87 +10,47 @@ from pydantic import BaseModel, Field, ConfigDict
 def mph_splash():
     st.markdown("""
     <style>
-        .mph-splash {
-            background: linear-gradient(135deg,#2fe273 0%,#09742a 100%) !important;
-            border-radius: 24px;
-            padding: 24px 14px 12px 14px;
-            margin: 22px auto 20px auto;
-            box-shadow: 0 4px 24px rgba(44,99,80,.10);
-            max-width: 480px;
-            width: 98vw;
-        }
-        .mph-splash h1 { text-align:center; font-size:2.2em; margin-bottom:0.33em; color:#18542e; font-weight:900;}
-        .mph-splash h3 { text-align:center; font-size:1.13em; color:#23683c;}
-        .mph-splash ul { padding-left:1.18em;}
-        .mph-splash li { margin-bottom:4px; font-size:1.08em;}
-        .mph-role {font-weight:700; font-size:1.10em;}
-        .mph-getstarted {background:#fff; color:#15592c; padding:8px 14px; border-radius:16px; font-size:1.04em; margin:14px 0 8px 0;}
-        .mph-btn-area { display:flex; justify-content:center; align-items:center; margin: 7px 0;}
+        .mph-splash { background: linear-gradient(135deg,#2fe273 0%,#09742a 100%)!important; border-radius:24px; padding:24px 18px 18px 18px; margin:22px auto 12px auto; box-shadow:0 4px 24px rgba(44,99,80,.10); max-width:420px; }
+        .mph-splash h1 { text-align:center; font-size:2.1em; margin-bottom:0.22em; color:#18542e; font-weight:900;}
+        .mph-splash h3 { text-align:center; font-size:1.09em; color:#23683c;}
+        .mph-splash ul { padding-left:1.1em; margin-bottom:12px;}
+        .mph-splash li { margin-bottom:4px; font-size:1em;}
+        .mph-role {font-weight:700;}
+        .mph-getstarted {background:#fff; color:#15592c; padding:6px 10px; border-radius:13px; font-size:0.99em; margin:10px 0 7px 0;}
         .mph-shortcut { font-weight:600; color:#18542e; }
-        .mph-anchor-btn {
-            background:#1ec97b;
-            color:white;
-            padding:8px 28px;
-            border:none;
-            border-radius:22px;
-            font-size:1.06em;
-            font-weight:700;
-            box-shadow:0 2px 12px rgba(44,99,180,0.12);
-            cursor:pointer;
-            margin-bottom:12px;
-            margin-top:5px;
-            text-decoration:none;
-            display:inline-block;
-            transition: filter 0.18s;
-        }
-        .mph-anchor-btn:active { filter: brightness(1.1);}
-        @media (max-width:520px) {
-            .mph-splash { max-width: 99vw; padding: 8vw 1vw; }
-            .mph-splash h1 { font-size: 1.32em;}
-            .mph-splash h3 { font-size: 1em;}
-        }
+        .mph-btn-top { width: 100%; display: flex; justify-content: center; margin-bottom: 10px; }
     </style>
-    """, unsafe_allow_html=True)
-
-    st.markdown('<div class="mph-splash">', unsafe_allow_html=True)
-
-    # Top anchor - just scrolls user to real button
-    st.markdown('<div class="mph-btn-area"><a href="#mph_start" class="mph-anchor-btn">🚀 Start</a></div>', unsafe_allow_html=True)
-    st.markdown("""
+    <div class="mph-splash">
+        <div class="mph-btn-top">
+            <form action="#">
+                <button type="submit" style="background:#1ec97b;color:#fff;font-weight:700;border:none;border-radius:16px;padding:8px 24px;font-size:1.07em;cursor:pointer;">🚀 Start</button>
+            </form>
+        </div>
         <h1>🌿 Welcome to My Parent Helpers (MPH)!</h1>
         <h3>Your digital team of AI-powered helpers—for parenting, teaching, and any expert support you need.</h3>
         <ul>
-            <li><span class="mph-role">👨‍👩‍👧‍👦 Parent Agents:</span> Personalized, age-appropriate advice for your unique family.</li>
-            <li><span class="mph-role">🧑‍🏫 Teacher Agents:</span> Lesson outlines, Q&A, and classroom support tailored for educators.</li>
-            <li><span class="mph-role">🌟 Other (Expert) Agents:</span> Create custom assistants for any field—AV, science, health, and more.</li>
+            <li><span class="mph-role">👨‍👩‍👧‍👦 Parent Agents:</span> Age-appropriate advice for your family.</li>
+            <li><span class="mph-role">🧑‍🏫 Teacher Agents:</span> Lesson outlines, Q&A, and class support.</li>
+            <li><span class="mph-role">🌟 Expert Agents:</span> Custom helpers for any field—AV, science, more.</li>
         </ul>
         <ul>
-            <li><span class="mph-shortcut">💬 Shortcuts:</span> Instantly choose how you want answers: explain, teach, resolve, support, or just chat.</li>
-            <li><span class="mph-shortcut">🧩 Fully Customizable:</span> Add your own sources, edit shortcuts, and create the helpers you need.</li>
-            <li><span class="mph-shortcut">🔄 Save & Manage:</span> Save responses, edit profiles, and switch between Agents any time.</li>
-            <li><span class="mph-shortcut">📱 Mobile-First:</span> Works on any device. No account needed. Your data stays private.</li>
+            <li><span class="mph-shortcut">💬 Shortcuts:</span> Choose how you want answers: explain, resolve, chat.</li>
+            <li><span class="mph-shortcut">🧩 Fully Customizable:</span> Add your own sources, edit shortcuts.</li>
+            <li><span class="mph-shortcut">📱 Mobile-First:</span> Works on any device. No account needed.</li>
         </ul>
         <div class="mph-getstarted">
-            <b>Get Started:</b><br>
-            1. Create an Agent (Parent, Teacher, or Expert)<br>
-            2. Choose or add a source<br>
-            3. Ask a question and pick a Shortcut<br>
-            4. Save or revisit answers any time<br>
+            <b>Get Started:</b> 1. Create Agent &nbsp;2. Add Source &nbsp;3. Chat &nbsp;4. Save
         </div>
-        <div style="text-align:center; margin-top:10px; font-size:1.09em;">
+        <div style="text-align:center; margin-top:8px; font-size:1em;">
             <b>MPH isn’t just AI advice—it’s a toolkit for shaping support, learning, and growth your way.</b>
         </div>
+    </div>
     """, unsafe_allow_html=True)
 
-    # Bottom Start button, with an anchor
-    st.markdown('<div class="mph-btn-area" id="mph_start">', unsafe_allow_html=True)
-    submitted = st.button("🚀 Start", use_container_width=True, key="mph_splash_start")
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown('</div>', unsafe_allow_html=True)
-    return submitted
-
-    return submitted
+    # Detect start button press using st.form for Streamlit compatibility
+    with st.form("mph_splash_start_top"):
+        start = st.form_submit_button("🚀 Start", use_container_width=True)
+    return start
 
 # -------------------- SPLASH LOGIC --------------------
 

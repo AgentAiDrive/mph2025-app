@@ -5,50 +5,73 @@ from typing import List, Tuple, Callable
 from typing import Dict, Optional
 from pydantic import BaseModel, Field, ConfigDict
 
-# ===================== MPH SPLASH SECTION (SHOWS ON APP LOAD) =====================
 def mph_splash():
     st.markdown("""
     <style>
-        .mph-splash { background: linear-gradient(135deg,#2fe273 0%,#09742a 100%)!important; border-radius:20px; padding:16px 8px 10px 8px; margin:12px auto 6px auto; box-shadow:0 4px 24px rgba(44,99,80,.10); max-width:380px; }
-        .mph-splash h1 { text-align:center; font-size:1.6em; color:#18542e; font-weight:900; margin-bottom:0.18em;}
-        .mph-splash h3 { text-align:center; font-size:1.05em; color:#23683c;}
-        .mph-splash ul { padding-left:1.0em; margin-bottom:8px;}
-        .mph-splash li { margin-bottom:2px; font-size:0.98em;}
-        .mph-role {font-weight:700;}
-        .mph-getstarted {background:#fff; color:#15592c; padding:4px 7px; border-radius:9px; font-size:0.98em; margin:7px 0 5px 0;}
+        .mph-splash { background: linear-gradient(135deg,#2fe273 0%,#09742a 100%)!important; border-radius:24px; padding:28px 20px 24px 20px; margin:22px auto 18px auto; box-shadow:0 4px 24px rgba(44,99,80,.10); max-width:450px; }
+        .mph-splash h1 { text-align:center; font-size:2.2em; margin-bottom:0.35em; color:#18542e; font-weight:900;}
+        .mph-splash h3 { text-align:center; font-size:1.2em; color:#23683c;}
+        .mph-splash ul { padding-left:1.1em;}
+        .mph-splash li { margin-bottom:4px; font-size:1.05em;}
+        .mph-role {font-weight:700; font-size:1.09em;}
+        .mph-getstarted {background:#fff; color:#15592c; padding:8px 14px; border-radius:16px; font-size:1.05em; margin:14px 0 8px 0;}
         .mph-btn-area { display:flex; justify-content:center; align-items:center; margin-bottom:8px; }
+        .mph-shortcut { font-weight:600; color:#18542e; }
     </style>
-    <div class="mph-splash">
     """, unsafe_allow_html=True)
+    
+    with st.form("mph_splash_form"):
+        st.markdown('<div class="mph-splash">', unsafe_allow_html=True)
+        
+        # Top Start button
+        st.markdown('<div class="mph-btn-area">', unsafe_allow_html=True)
+        st.form_submit_button("🚀 Start", use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        st.markdown("""
+            <h1>🌿 Welcome to My Parent Helpers (MPH)!</h1>
+            <h3>Your digital team of AI-powered helpers—for parenting, teaching, and any expert support you need.</h3>
+            <ul>
+                <li><span class="mph-role">👨‍👩‍👧‍👦 Parent Agents:</span> Personalized, age-appropriate advice for your unique family.</li>
+                <li><span class="mph-role">🧑‍🏫 Teacher Agents:</span> Lesson outlines, Q&A, and classroom support tailored for educators.</li>
+                <li><span class="mph-role">🌟 Other (Expert) Agents:</span> Create custom assistants for any field—AV, science, health, and more.</li>
+            </ul>
+            <ul>
+                <li><span class="mph-shortcut">💬 Shortcuts:</span> Instantly choose how you want answers: explain, teach, resolve, support, or just chat.</li>
+                <li><span class="mph-shortcut">🧩 Fully Customizable:</span> Add your own sources, edit shortcuts, and create the helpers you need.</li>
+                <li><span class="mph-shortcut">🔄 Save & Manage:</span> Save responses, edit profiles, and switch between Agents any time.</li>
+                <li><span class="mph-shortcut">📱 Mobile-First:</span> Works on any device. No account needed. Your data stays private.</li>
+            </ul>
+            <div class="mph-getstarted">
+                <b>Get Started:</b><br>
+                1. Create an Agent (Parent, Teacher, or Expert)<br>
+                2. Choose or add a source<br>
+                3. Ask a question and pick a Shortcut<br>
+                4. Save or revisit answers any time<br>
+            </div>
+            <div style="text-align:center; margin-top:10px; font-size:1.09em;">
+                <b>MPH isn’t just AI advice—it’s a toolkit for shaping support, learning, and growth your way.</b>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        # Bottom Start button
+        st.markdown('<div class="mph-btn-area">', unsafe_allow_html=True)
+        submitted = st.form_submit_button("🚀 Start", use_container_width=True)
+        st.markdown('</div></div>', unsafe_allow_html=True)
+    
+    return submitted
 
-    # Top Start button
-    st.markdown('<div class="mph-btn-area">', unsafe_allow_html=True)
-    start_top = st.button("🚀 Start", key="splash_start_top", use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+# -------------------- SPLASH LOGIC - DO NOT SKIP THIS! --------------------
+if "splash_done" not in st.session_state:
+    st.session_state.splash_done = False
 
-    st.markdown("""
-        <h1>🌿 Welcome to MPH!</h1>
-        <h3>Personalized AI helpers for Parents, Teachers, and Experts.</h3>
-        <ul>
-            <li>👨‍👩‍👧‍👦 Parent • 🧑‍🏫 Teacher • 🌟 Expert Agents</li>
-            <li>💬 Shortcuts for instant, tailored answers</li>
-            <li>🧩 Fully customizable • 📱 Mobile-First</li>
-        </ul>
-        <div class="mph-getstarted">
-            <b>How to Start:</b> Create Agent → Add Source → Chat
-        </div>
-    """, unsafe_allow_html=True)
+if not st.session_state.splash_done:
+    st.set_page_config(page_title="My Parent Helpers", page_icon="🌿", layout="centered")
+    if mph_splash():
+        st.session_state.splash_done = True
+        st.experimental_rerun()
+    st.stop()
 
-    # Bottom Start button
-    st.markdown('<div class="mph-btn-area">', unsafe_allow_html=True)
-    start_bottom = st.button("🚀 Start", key="splash_start_bottom", use_container_width=True)
-    st.markdown('</div></div>', unsafe_allow_html=True)
-
-    # The splash ends here
-
-    return start_top or start_bottom
-
-# ==========================================================================
 # ---------------------------------------------------------------------------
 # CONSTANTS & FILE PATHS (unchanged)
 # ---------------------------------------------------------------------------

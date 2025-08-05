@@ -1044,7 +1044,7 @@ def render_step7():
     st.markdown('<div class="biglabel-G">2. SELECT A SHORTCUT</div>', unsafe_allow_html=True)
     shortcuts_map = sel.get("shortcuts")
     if not isinstance(shortcuts_map, dict) or not shortcuts_map:
-    shortcuts_map = DEFAULT_EXTRAS_MAP.copy()
+        shortcuts_map = DEFAULT_EXTRAS_MAP.copy()
     if (
         "shortcut" not in st.session_state
         or st.session_state["shortcut"] not in shortcuts_map

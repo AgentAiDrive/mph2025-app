@@ -4,6 +4,11 @@
 
 What’s New
 
+## Summary
+This release introduces a modular, fully persistent shortcut system, granular hybrid tool controls (web + document search), expanded CRUD support for profiles and sources, and a unified context-injection architecture for agentic workflows. Major refactors ensure that all shortcut, source, and tool config changes propagate instantly throughout the UI, backend, and API calls, supporting multi-domain/discipline agents and advanced RAG patterns.
+
+### [Added]  
+#### Shortcut System Refactor
 Shortcut Button Editor
 - **Live Editing:** Instantly edit, add, rename, or delete any shortcut button (e.g., Default, Connect, Grow) directly from the UI—no more hardcoded lists.
 - **Universal Updates:** All shortcut edits are reflected everywhere, in real time, across profile builders and chat.

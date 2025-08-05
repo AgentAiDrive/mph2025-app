@@ -6,7 +6,6 @@ from typing import Dict, Optional
 from pydantic import BaseModel, Field, ConfigDict
 
 # ===================== MPH SPLASH SECTION (SHOWS ON APP LOAD) =====================
-
 def mph_splash():
     st.markdown("""
     <style>
@@ -18,13 +17,25 @@ def mph_splash():
         .mph-role {font-weight:700;}
         .mph-getstarted {background:#fff; color:#15592c; padding:6px 10px; border-radius:13px; font-size:0.99em; margin:10px 0 7px 0;}
         .mph-shortcut { font-weight:600; color:#18542e; }
-        .mph-btn-top { width: 100%; display: flex; justify-content: center; margin-bottom: 10px; }
+        .mph-btn-anchor {
+            width: 100%; display: flex; justify-content: center; margin-bottom: 12px;
+        }
+        .mph-anchor-link {
+            background: #1ec97b; color: #fff; font-weight: 700;
+            border: none; border-radius: 16px; padding: 10px 30px;
+            font-size: 1.09em; cursor: pointer; text-decoration: none; box-shadow: 0 2px 12px rgba(44,99,180,0.12);
+            transition: filter 0.18s;
+        }
+        .mph-anchor-link:active { filter: brightness(1.08);}
+        .mph-btn-bottom {
+            width: 100%; display: flex; justify-content: center; margin-top: 15px;
+        }
+        /* Make anchor scrolling smooth on supported browsers */
+        html { scroll-behavior: smooth;}
     </style>
     <div class="mph-splash">
-        <div class="mph-btn-top">
-            <form action="#">
-                <button type="submit" style="background:#1ec97b;color:#fff;font-weight:700;border:none;border-radius:16px;padding:8px 24px;font-size:1.07em;cursor:pointer;">🚀 Start</button>
-            </form>
+        <div class="mph-btn-anchor">
+            <a href="#mph_start_real" class="mph-anchor-link">🚀 Start</a>
         </div>
         <h1>🌿 Welcome to My Parent Helpers (MPH)!</h1>
         <h3>Your digital team of AI-powered helpers—for parenting, teaching, and any expert support you need.</h3>
@@ -44,13 +55,20 @@ def mph_splash():
         <div style="text-align:center; margin-top:8px; font-size:1em;">
             <b>MPH isn’t just AI advice—it’s a toolkit for shaping support, learning, and growth your way.</b>
         </div>
-    </div>
+        <div class="mph-btn-bottom" id="mph_start_real">
+            <!-- Streamlit button goes here -->
     """, unsafe_allow_html=True)
 
-    # Detect start button press using st.form for Streamlit compatibility
-    with st.form("mph_splash_start_top"):
-        start = st.form_submit_button("🚀 Start", use_container_width=True)
+    # Only the bottom button is a real Streamlit control
+    start = st.button("🚀 Start", use_container_width=True, key="mph_splash_start_real")
+
+    st.markdown("""
+        </div> <!-- End mph-btn-bottom -->
+    </div> <!-- End mph-splash -->
+    """, unsafe_allow_html=True)
+
     return start
+
 
 # -------------------- SPLASH LOGIC --------------------
 

@@ -23,11 +23,9 @@ def mph_splash():
     with st.form("mph_splash_form"):
         st.markdown('<div class="mph-splash">', unsafe_allow_html=True)
         
-        # Top Start button
-        st.markdown('<div class="mph-btn-area">', unsafe_allow_html=True)
-        st.form_submit_button("🚀 Start", use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-        
+        # Optional: Top anchor that scrolls to start button
+        st.markdown('<div class="mph-btn-area"><a href="#mph_start" style="text-decoration:none;"><button style="background:#1ec97b;color:white;padding:7px 24px;border:none;border-radius:22px;font-size:1.04em;font-weight:700;box-shadow:0 2px 12px rgba(44,99,180,0.12);cursor:pointer;">🚀 Start</button></a></div>', unsafe_allow_html=True)
+
         st.markdown("""
             <h1>🌿 Welcome to My Parent Helpers (MPH)!</h1>
             <h3>Your digital team of AI-powered helpers—for parenting, teaching, and any expert support you need.</h3>
@@ -54,12 +52,13 @@ def mph_splash():
             </div>
         """, unsafe_allow_html=True)
         
-        # Bottom Start button
-        st.markdown('<div class="mph-btn-area">', unsafe_allow_html=True)
+        # Bottom Start button (single submit button with anchor id)
+        st.markdown('<div class="mph-btn-area" id="mph_start">', unsafe_allow_html=True)
         submitted = st.form_submit_button("🚀 Start", use_container_width=True)
         st.markdown('</div></div>', unsafe_allow_html=True)
     
     return submitted
+
 
 # -------------------- SPLASH LOGIC - DO NOT SKIP THIS! --------------------
 if "splash_done" not in st.session_state:

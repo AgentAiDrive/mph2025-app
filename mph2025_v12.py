@@ -5,6 +5,8 @@ from typing import List, Tuple, Callable
 from typing import Dict, Optional
 from pydantic import BaseModel, Field, ConfigDict
 
+# ===================== MPH SPLASH SECTION (SHOWS ON APP LOAD) =====================
+
 def mph_splash():
     st.markdown("""
     <style>
@@ -21,20 +23,17 @@ def mph_splash():
     <div class="mph-splash">
         <h1>🌿 Welcome to My Parent Helpers (MPH)!</h1>
         <h3>Your digital team of AI-powered helpers—for parenting, teaching, and any expert support you need.</h3>
-
         <ul>
             <li><span class="mph-role">👨‍👩‍👧‍👦 Parent Agents:</span> Personalized, age-appropriate advice for your unique family.</li>
             <li><span class="mph-role">🧑‍🏫 Teacher Agents:</span> Lesson outlines, Q&A, and classroom support tailored for educators.</li>
             <li><span class="mph-role">🌟 Other (Expert) Agents:</span> Create custom assistants for any field—AV, science, health, and more.</li>
         </ul>
-
         <ul>
             <li><span class="mph-shortcut">💬 Shortcuts:</span> Instantly choose how you want answers: explain, teach, resolve, support, or just chat.</li>
             <li><span class="mph-shortcut">🧩 Fully Customizable:</span> Add your own sources, edit shortcuts, and create the helpers you need.</li>
             <li><span class="mph-shortcut">🔄 Save & Manage:</span> Save responses, edit profiles, and switch between Agents any time.</li>
             <li><span class="mph-shortcut">📱 Mobile-First:</span> Works on any device. No account needed. Your data stays private.</li>
         </ul>
-
         <div class="mph-getstarted">
             <b>Get Started:</b><br>
             1. Create an Agent (Parent, Teacher, or Expert)<br>
@@ -42,7 +41,6 @@ def mph_splash():
             3. Ask a question and pick a Shortcut<br>
             4. Save or revisit answers any time<br>
         </div>
-
         <div style="text-align:center; margin-top:10px; font-size:1.09em;">
             <b>MPH isn’t just AI advice—it’s a toolkit for shaping support, learning, and growth your way.</b>
         </div>
@@ -55,6 +53,18 @@ def mph_splash():
         start = st.button("🚀 Start", key="splash_start", use_container_width=True)
     st.markdown("<br>", unsafe_allow_html=True)
     return start
+
+# -------------------- SPLASH LOGIC - DO NOT SKIP THIS! --------------------
+if "splash_done" not in st.session_state:
+    st.session_state.splash_done = False
+
+if not st.session_state.splash_done:
+    st.set_page_config(page_title="My Parent Helpers", page_icon="🌿", layout="centered")
+    if mph_splash():
+        st.session_state.splash_done = True
+        st.experimental_rerun()
+    st.stop()
+# ==========================================================================
 # ---------------------------------------------------------------------------
 # CONSTANTS & FILE PATHS (unchanged)
 # ---------------------------------------------------------------------------

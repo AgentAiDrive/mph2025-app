@@ -1,230 +1,187 @@
-non-technical (end user) style  update the following: 🌿 My Parent Helpers (MPH)
+# 🌿 My Parent Helpers (MPH)
 
-Test drive the app → https://mph-2025.streamlit.app/
+**Test drive the app:** [mph-2025.streamlit.app](https://mph-2025.streamlit.app/)
 
-My Parent Helpers (MPH) is a mobile-friendly, AI-powered application that enables parents to create personalized digital parenting assistants — called Agents — based on parenting books, experts, or styles. These agents provide contextual, age-appropriate guidance tailored to your child’s developmental needs and your preferred parenting approach.
-
-
----
-
-🚀 Features
-
-🧠 Contextual Prompt Engineering
-
-MPH uses a multi-layered context injection technique to shape how the AI responds. Every query sent to the model dynamically injects:
-
-✅ Persona Description – Synthesized from your chosen parenting source
-
-✅ Parent and Child Names – For personalization
-
-✅ Child’s Age – For developmentally appropriate language
-
-✅ Structured Prompt Type – Defines format, tone, and purpose
-
-
-This ensures every response is context-aware, customized, and aligned with your parenting goals.
-
+**My Parent Helpers (MPH)** is your all-in-one, AI-powered assistant for real-world support—at home, in the classroom, or anywhere you need an expert at your side. MPH lets you create **personalized digital assistants (“Agents”)** based on your favorite books, experts, or styles, for Parenting, Teaching, or any custom domain you choose.
 
 ---
 
-👨‍👩‍👧‍👦 Agent Creation & Persona Generation
+## 🚀 Key Features
 
-Create up to 99 unique parenting agents, each with:
+### 🧠 Personalized, Context-Aware Guidance for Any Role
 
-A selected parenting source:
+MPH’s advanced AI doesn’t just give generic advice—it uses everything you provide to deliver relevant, age-appropriate, and role-specific support, every time.
 
-📚 Books
+**Your Agents’ responses are always shaped by:**
 
-🧑‍ Experts
-
-✨ Styles
-
-
-A dynamically generated persona using GPT-4o
-
-Custom values: Parent name, child name, age, profile name
-
-Editable persona summaries before saving
-
-
+* **Your chosen parenting style, educational approach, or expert** (select from included lists or add your own)
+* **Your name and your child’s name (or your role as teacher/expert)**
+* **Your child’s age, class grade, or leave blank for custom expert Agents**
+* **The “Shortcut” you pick for each answer (see below!)**
 
 ---
 
-💬 AI Chat With Purposeful Shortcuts
+### 👨‍👩‍👧‍👦🧑‍🏫🌟 Build Agents for Any Situation
 
-Each query can be refined using a response Shortcut that adjusts:
+* **Create up to 99 unique Agents**, each with their own:
 
-Format
+  * Parenting source (Book, Expert, or Style)
+  * Educational method or teaching philosophy
+  * Custom domain expertise (technology, health, science, etc.)
+  * GPT-powered, automatically generated persona—summarizing key principles and style
+  * Editable values: name, age/grade, profile name, persona summary
 
-Instruction to the model
+**Perfect for:**
 
-Comprehension level
-
-
-Shortcut	Purpose	Format	Language Level
-
-💬 Default	Generic AI chat	Natural	Adaptive
-🤝 Connect	Explain complex ideas	3 Examples	Child age
-🌱 Grow	Parenting strategies	3 Advanced Tips	Adult
-🔍 Explore	Interactive Q&A	Guided Answer	Child age
-🛠 Resolve	Conflict resolution	Step-by-step	Child age
-❤ Support	Emotional guidance	Supportive Advice	Child age
-
-
+* Parents with kids of different ages or approaches
+* Teachers with multiple classes or teaching methods
+* Professionals who want a digital expert (custom “Other” Agents)
 
 ---
 
-🔄 History & Management
+### 💬 AI Chat With Purposeful Shortcuts
 
-Save and manage AI responses per profile
+**Every question can be fine-tuned with a “Shortcut” button.**
+Shortcuts define the format, purpose, and level of every answer.
 
-View and edit saved chats
+| Shortcut   | Example Use                  | Format / Focus         | Language Level |
+| ---------- | ---------------------------- | ---------------------- | -------------- |
+| 💬 Default | General chat/advice          | Conversational         | Adaptive       |
+| 🤝 Connect | Explain something complex    | 3 Examples             | Child’s age    |
+| 🌱 Grow    | Get strategies/tips          | 3 Advanced Suggestions | Adult/Parent   |
+| 🔍 Explore | Learn something new/Q\&A     | Guided Answer          | Child’s age    |
+| 🛠 Resolve | Resolve a conflict/challenge | Step-by-Step           | Child’s age    |
+| ❤ Support  | Emotional guidance           | Supportive Advice      | Child’s age    |
 
-Edit or delete agent profiles
+**Teacher and Expert Agents come with their own shortcuts, too—like:**
 
-Full export and persistence using local .json files
+* Lesson Outline
+* Explain Concept
+* Give Example
+* Step-by-Step
+* Pitfalls/Avoid
 
-
+**Custom shortcuts for Other Agents are fully editable—make your Agent fit any domain or workflow!**
 
 ---
 
-🔐 Requirements
+### 🔄 Save, Edit, and Manage—With Full Control
 
-Python 3.9+
-
-OpenAI API key
-
-
+* **Save answers and conversations** for each Agent—review them anytime.
+* **Edit or delete profiles, sources, and chats** with a tap.
+* **All changes are instant**—no reload or restart needed.
 
 ---
 
-📦 Installation
+### 🧩 Full Customization & Extensibility
 
+* **Edit the lists of Books, Experts, Styles, and Domain Areas** for any Agent type—add your favorites or custom entries.
+* **Add or modify shortcuts for any Agent**, at any time—tailor every chat to your real needs.
+* **Instantly apply changes across the app**—new shortcuts and sources are available immediately for Agent creation and chat.
+
+---
+
+### 👨‍👩‍👧‍👦🧑‍🏫🌟 Multi-Role & Multi-Domain Support
+
+* **Parent Agents:** Age-appropriate, style-aligned advice for any family scenario
+* **Teacher Agents:** Lesson planning, Q\&A, explanations, and classroom support
+* **Other/Expert Agents:** Build assistants for technology, healthcare, science, business, or any custom field
+
+MPH is truly universal—**one app, endless possibilities**.
+
+---
+
+### 📱 Mobile-First, Friendly Interface
+
+* **Works beautifully on phones, tablets, and computers**
+* **Simple card-based navigation** for Agents, chats, and saved answers
+* **Tooltips and in-app help everywhere**
+
+---
+
+## 🛡️ Private & Local
+
+* Everything you create is saved **locally** on your device—your profiles, chats, and changes are yours alone.
+* **No account required, no cloud storage** (unless you choose to sync).
+
+---
+
+## 🛠️ Getting Started
+
+**What you need:**
+
+* Python 3.9+
+* An OpenAI API key (see below)
+
+**To install:**
+
+```sh
 git clone https://github.com/yourusername/mph2025-app.git
 cd mph2025-app
 pip install -r requirements.txt
 streamlit run app.py
+```
 
+**Set your OpenAI key:**
 
----
+* On Streamlit Cloud: Go to your app’s **Secrets** tab, and add
+  `openai_key = "sk-xxxxxxxxxxxx"`
+* Locally: Create a file `.streamlit/secrets.toml`
 
-🧬 Streamlit Secrets Setup
-
-🔹 On Streamlit Cloud
-
-1. Open your Streamlit Dashboard.
-
-
-2. Go to your app → Secrets tab.
-
-
-3. Add:
-
-
-
-openai_key = "sk-xxxxxxxxxxxxxxxxxxxxx"
-
-4. Save & rerun.
-
-
-
-🔹 Locally
-
-Create .streamlit/secrets.toml:
-
-[general]
-openai_key = "sk-xxxxxxxxxxxxxxxxxxxxx"
-
-Or update directly in code:
-
-openai.api_key = st.secrets.get("openai_key", "YOUR_OPENAI_API_KEY")
-
+  ```toml
+  [general]
+  openai_key = "sk-xxxxxxxxxxxx"
+  ```
 
 ---
 
-📂 Key Files
+## 📂 Key Files
 
-File	Purpose
-
-app.py	Main application logic
-parent_helpers_profiles.json	Saved agent profiles
-parent_helpers_responses.json	Saved chat history
-requirements.txt	Python dependencies
-
-
-
----
-
-📖 Documentation
-
-In-app User Manual and Quick Start Guide
-
-Full walk-through for first-time users
-
-Dynamic tooltips and responsive design
-
-Editable persona fields and saved state management
-
-
+| File                            | Purpose                    |
+| ------------------------------- | -------------------------- |
+| `app.py`                        | Main application logic     |
+| `parent_helpers_profiles.json`  | Saved Agent profiles       |
+| `parent_helpers_responses.json` | Saved chat history         |
+| `parent_helpers_sources.json`   | List of sources for Agents |
+| `parent_helpers_shortcuts.json` | Saved shortcuts/actions    |
+| `requirements.txt`              | Python dependencies        |
 
 ---
 
-✍️ Custom Sources & Editable Agents
+## 📖 Documentation & Help
 
-MPH gives parents full control over the knowledge base powering each agent.
+* **Quick Start Guide and User Manual**—built into the app for first-time users
+* **Dynamic tooltips and in-app help**—tap any “?” icon
+* **Editable persona and Agent details**
+* **All your changes are always saved**
 
-🔧 Source Management
-
-You can edit the parenting Books, Experts, and Styles used to generate personas:
-
-Add custom entries to the agent source lists
-
-Remove or update existing parenting sources
-
-Saved sources persist across sessions in a local JSON file
-
-Changes are reflected immediately in new agent creation
-
-
-🧑‍🎨 Editable Agent Personas
-
-Once a persona is generated:
-
-Review and approve the AI-generated summary
-
-Edit the persona’s tone, principles, or values to match your parenting philosophy
-
-Combine your custom source entries with a tailored persona for fully personalized parenting agents
-
-
-This flexibility allows you to:
-
-Reproduce advice aligned with your favorite parenting authors or mentors
-
-Build unique agent voices and tones for different children
-
-Continuously evolve your parenting strategies as your child grows
-
-
-MPH isn't just AI-assisted — it's AI-shaped by you.
-
+**More resources:** [www.myparenthelpers.com](https://www.myparenthelpers.com)
 
 ---
 
-🛡️ License
+## ✨ Why Choose MPH?
+
+* **Customizable, multi-role Agents:** Parenting, teaching, or any expert support you need
+* **Personalized and always in your words and style**
+* **Local, private, and under your control**
+* **Extensible for any new domain, shortcut, or method**
+* **Perfect for families, educators, students, and professionals**
+
+**MPH isn’t just AI-assisted—it’s AI-shaped by you.**
+
+---
+
+## 🤝 Questions or Suggestions?
+
+We love feedback!
+Visit [www.myparenthelpers.com](https://www.myparenthelpers.com) for support, feature requests, and contact info.
+
+---
+
+## 🛡️ License
 
 MIT License
 
-
 ---
 
-🤝 Contributing
-
-We welcome contributions! Fork this repo and submit a PR for improvements or bug fixes.
-
-
----
-
-📫 Contact
-
-Questions or feedback? Visit www.myparenthelpers.com for support, resources, and contact options.
+**MPH: Your own team of digital helpers, always ready to support your parenting, teaching, and expert needs—your way.**

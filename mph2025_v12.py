@@ -91,127 +91,109 @@ MEMORY_FILE     = "parent_helpers_memory.json"
 SHORTCUTS_FILE  = "parent_helpers_shortcuts.json"
 DOMAIN_SHORTCUTS = {
     "Cardiologist": {
-        " SUMMARY": "Concise findings summary.",
-        " DIFFERENTIAL": "Differential diagnosis (list, brief).",
-        " PLAN": "Recommended diagnostic/treatment plan.",
-        " COUNSEL": "Key patient counseling points.",
-        " RED FLAGS": "Red flag symptoms/warnings.",
+        " 📝 SUMMARY": "Concise findings summary.",
+        " 🩺 DIFFERENTIAL": "Differential diagnosis (list, brief).",
+        " 🗂️ PLAN": "Recommended diagnostic/treatment plan.",
+        " 🗣️ COUNSEL": "Key patient counseling points.",
+        " 🚩 RED FLAGS": "Red flag symptoms/warnings.",
     },
     "AI Prompt Engineer": {
-        " OUTLINE": "Show step-by-step plan or pseudocode.",
-        " EXPLAIN": "Explain with analogies/examples.",
-        " DEBUG": "Suggest debugging/troubleshooting steps.",
-        " FORMAT": "Format as markdown code block.",
-        " PITFALLS": "List common mistakes to avoid.",
+        " 📋 OUTLINE": "Show step-by-step plan or pseudocode.",
+        " 💡 EXPLAIN": "Explain with analogies/examples.",
+        " 🐞 DEBUG": "Suggest debugging/troubleshooting steps.",
+        " 🧾 FORMAT": "Format as markdown code block.",
+        " ⚠️ PITFALLS": "List common mistakes to avoid.",
     },
     "AV Systems Design Engineer": {
-        " SCOPE": "Summarize project/system scope.",
-        " RISKS": "Identify design/deployment risks.",
-        " DIAGRAM": "Describe/outline AV system diagram.",
-        " SPECS": "Output key hardware/software specs.",
-        " ROI": "Show business impact/ROI argument.",
-    },
-    "Geneticist": {
-        " SUMMARY": "Summarize genetic findings.",
-        " PATHWAYS": "Outline relevant pathways/genes.",
-        " IMPLICATIONS": "Explain clinical/research impact.",
-        " COUNSEL": "Suggest patient/family counseling.",
-        " REFERENCES": "List key references/reviews.",
-    },
-    "Physicist": {
-        " FORMULA": "State formula/principle used.",
-        " STEPS": "Step-by-step calculation.",
-        " EXPLAIN": "Explain in plain language.",
-        " PITFALLS": "Common misconceptions.",
-        " VISUAL": "Describe or suggest a diagram/graph.",
-    }
-    "AV Systems Design Engineer": {
-        " SCOPE": (
+        " 🗺️ SCOPE": (
             "Summarize the overall scope of the AV system or project. "
             "Include goals, primary functional requirements, and boundaries of responsibility. "
             "Present as a concise summary (2–4 sentences) followed by a bulleted list of core deliverables."
         ),
-        " RISKS": (
+        " ⚡ RISKS": (
             "Identify key risks or pitfalls in the AV design or deployment. "
             "List at least 3–5 specific risks. "
             "For each risk, give a brief description and suggest one mitigation strategy. "
             "Format as a bulleted list."
         ),
-        " DIAGRAM": (
+        " 🖉 DIAGRAM": (
             "Provide a clear outline or description of the system diagram for the AV project. "
             "List main components, connection flows, and signal paths. "
             "Describe the relationships and directionality where relevant. "
             "Output as a hierarchical text list or ASCII diagram, and include a one-sentence overview."
         ),
-        " SPECS": (
+        " 📑 SPECS": (
             "Output key technical specifications required for the system. "
             "Divide into sections: Hardware, Software, Network, and Control. "
             "For each, provide brand/generic names, critical specs (e.g., bandwidth, latency, resolution), and any standards to meet. "
             "Format as a table or sectioned bulleted lists."
         ),
-        " ROI": (
+        " 💰 ROI": (
             "Present a business-focused summary of the return on investment (ROI) for this AV solution. "
             "Include 2–3 specific quantifiable benefits (cost savings, increased productivity, reduced downtime, etc.). "
             "Use persuasive, executive-level language. "
             "Summarize in 2–3 sentences, followed by a numbered or bulleted breakdown."
         ),
     },
-
+    "Geneticist": {
+        " 🧬 SUMMARY": "Summarize genetic findings.",
+        " 🔗 PATHWAYS": "Outline relevant pathways/genes.",
+        " 💡 IMPLICATIONS": "Explain clinical/research impact.",
+        " 🗣️ COUNSEL": "Suggest patient/family counseling.",
+        " 📚 REFERENCES": "List key references/reviews.",
+    },
+    "Physicist": {
+        " 🧮 FORMULA": "State formula/principle used.",
+        " 👣 STEPS": "Step-by-step calculation.",
+        " 💬 EXPLAIN": "Explain in plain language.",
+        " ⚠️ PITFALLS": "Common misconceptions.",
+        " 📊 VISUAL": "Describe or suggest a diagram/graph.",
+    },
     "Audiovisual Consultant": {
-        " ASSESS": (
+        " 📋 ASSESS": (
             "Provide a step-by-step site readiness and assessment checklist for AV deployment. "
             "Ensure the list covers power, environment, cable paths, network, mounting points, and environmental factors. "
             "Use checkboxes or bullet points."
         ),
-        " TROUBLESHOOT": (
+        " 🛠️ TROUBLESHOOT": (
             "List the most common AV system faults, with diagnostic steps for each. "
             "Present as a decision tree or stepwise checklist. "
             "End with a table mapping symptoms to likely causes and solutions."
         ),
-        " UPGRADE": (
+        " 🔼 UPGRADE": (
             "Suggest possible upgrade pathways for modernizing the AV system. "
             "Prioritize solutions by impact and cost-effectiveness. "
             "For each upgrade, include pros, cons, and compatibility notes."
         ),
     },
-
     "AV Support Technician": {
-        " QUICK FIX": (
+        " ⚡ QUICK FIX": (
             "List rapid troubleshooting steps for immediate resolution of the most common AV issues (e.g., no audio, no video, system unresponsive). "
             "Prioritize actions by likelihood and simplicity. "
             "Provide concise step-by-step instructions; use bold for critical warnings."
         ),
-        " ESCALATE": (
+        " ⏫ ESCALATE": (
             "Describe when and how to escalate AV issues to higher-level support. "
             "Give a checklist of required information and documentation for escalation. "
             "Include criteria for escalation based on urgency and impact."
         ),
-        " CHECKLIST": (
+        " ✅ CHECKLIST": (
             "Present a daily and weekly preventative maintenance checklist for AV systems. "
             "Separate tasks by frequency. "
             "For each item, provide a brief rationale and indicate tools needed."
         ),
     },
-
     "AV Trainer/Instructional Technologist": {
-        " TRAINING": (
+        " 🎓 TRAINING": (
             "Create an outline for a training session aimed at end-users of the AV system. "
             "Break down the session into learning objectives, demo steps, and hands-on practice. "
             "Include tips for addressing common user mistakes."
         ),
-        " FAQ": (
+        " ❓ FAQ": (
             "List the top 5–10 frequently asked questions for this AV environment, with concise, user-friendly answers. "
             "Format as a Q&A."
         ),
     },
-}
-DEFAULT_EXTRAS_MAP = {
-    " DEFAULT":  "General purpose answer.",
-    " CONNECT": " Help explain with examples.",
-    " GROW":    " Offer advanced strategies.",
-    " EXPLORE": " Age-appropriate Q&A.",
-    " RESOLVE":" Step-by-step resolution.",
-    "❤ SUPPORT":" Empathetic support."
 }
 
 # ---------------------------------------------------------------------------

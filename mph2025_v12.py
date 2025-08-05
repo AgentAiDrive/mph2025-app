@@ -451,7 +451,24 @@ class PersonaProfile(BaseModel):
 # Shortcuts domain fetch (ADDED HELPER)
 # ---------------------------------------------------------------------------
 def get_shortcuts_for_domain(domain):
-    return DOMAIN_SHORTCUTS.get(domain, DEFAULT_EXTRAS_MAP.copy())
+    """Returns a copy of the shortcuts dict for a domain, or default extras if not found."""
+    if not domain:
+        return DEFAULT_EXTRAS_MAP.copy()
+    domain_key = domain.strip()
+    # Try exact match first
+    if domain_key in DOMAIN_SHORTCUTS:
+        return DOMAIN_SHORTCUTS[domain_key].copy()
+    # Try case-insensitive match
+    for key in DOMAIN_SHORTCUTS.keys():
+        if key.lower() == domain_key.lower():
+            return DOMAIN_SHORTCUTS[key].copy()
+    # Try partial match (optional, can be omitted for strictness)
+    for key in DOMAIN_SHORTCUTS.keys():
+        if domain_key.lower() in key.lower():
+            return DOMAIN_SHORTCUTS[key].copy()
+    # Not found: return default
+    # st.warning(f"Domain '{domain}' not found in DOMAIN_SHORTCUTS. Using default shortcuts.")
+    return DEFAULT_EXTRAS_MAP.copy()
 
 # ---------------------------------------------------------------------------
 # FILE‑SEARCH TOOL for RAG (unchanged)

@@ -1,187 +1,207 @@
-# 🌿 My Parent Helpers (MPH)
-
-**Test drive the app:** [mph-2025.streamlit.app](https://mph-2025.streamlit.app/)
-
-**My Parent Helpers (MPH)** is your all-in-one, AI-powered assistant for real-world support—at home, in the classroom, or anywhere you need an expert at your side. MPH lets you create **personalized digital assistants (“Agents”)** based on your favorite books, experts, or styles, for Parenting, Teaching, or any custom domain you choose.
+Absolutely! Here’s an updated, **technically driven README** for *My Parent Helpers (MPH)*, including technical concepts, context engineering, modularity, extensibility, and how the architecture supports advanced use-cases and maintainability. This version maintains clarity for power users, developers, or technical reviewers, and references “context injection”, modular domain/shortcut logic, and local data persistence.
 
 ---
 
-## 🚀 Key Features
+# 🌿 My Parent Helpers (MPH) – Technical Overview
 
-### 🧠 Personalized, Context-Aware Guidance for Any Role
-
-MPH’s advanced AI doesn’t just give generic advice—it uses everything you provide to deliver relevant, age-appropriate, and role-specific support, every time.
-
-**Your Agents’ responses are always shaped by:**
-
-* **Your chosen parenting style, educational approach, or expert** (select from included lists or add your own)
-* **Your name and your child’s name (or your role as teacher/expert)**
-* **Your child’s age, class grade, or leave blank for custom expert Agents**
-* **The “Shortcut” you pick for each answer (see below!)**
+**Live Demo:** [mph-2025.streamlit.app](https://mph-2025.streamlit.app/)
 
 ---
 
-### 👨‍👩‍👧‍👦🧑‍🏫🌟 Build Agents for Any Situation
+## ⚡ About the App
 
-* **Create up to 99 unique Agents**, each with their own:
+**My Parent Helpers (MPH)** is a modular, extensible AI-powered context agent platform. Designed for parents, teachers, and professionals, MPH enables the creation and management of multi-role digital assistants (“Agents”) driven by context-rich, user-controlled prompt engineering.
 
-  * Parenting source (Book, Expert, or Style)
-  * Educational method or teaching philosophy
-  * Custom domain expertise (technology, health, science, etc.)
-  * GPT-powered, automatically generated persona—summarizing key principles and style
-  * Editable values: name, age/grade, profile name, persona summary
-
-**Perfect for:**
-
-* Parents with kids of different ages or approaches
-* Teachers with multiple classes or teaching methods
-* Professionals who want a digital expert (custom “Other” Agents)
+Built in Python with Streamlit and OpenAI APIs, MPH supports custom persona creation, multi-domain context engineering, structured response formatting, and granular prompt injection—enabling highly adaptive, role- and scenario-specific answers for any user-defined need.
 
 ---
 
-### 💬 AI Chat With Purposeful Shortcuts
+## 🚀 Technical Features & Architecture
 
-**Every question can be fine-tuned with a “Shortcut” button.**
-Shortcuts define the format, purpose, and level of every answer.
+### 🔧 Context Engineering & Persona Injection
 
-| Shortcut   | Example Use                  | Format / Focus         | Language Level |
-| ---------- | ---------------------------- | ---------------------- | -------------- |
-| 💬 Default | General chat/advice          | Conversational         | Adaptive       |
-| 🤝 Connect | Explain something complex    | 3 Examples             | Child’s age    |
-| 🌱 Grow    | Get strategies/tips          | 3 Advanced Suggestions | Adult/Parent   |
-| 🔍 Explore | Learn something new/Q\&A     | Guided Answer          | Child’s age    |
-| 🛠 Resolve | Resolve a conflict/challenge | Step-by-Step           | Child’s age    |
-| ❤ Support  | Emotional guidance           | Supportive Advice      | Child’s age    |
+* **Dynamic Persona Profiles:**
 
-**Teacher and Expert Agents come with their own shortcuts, too—like:**
+  * Agent context is synthesized from user-defined parameters (source type/name, parent/child name, age/grade, domain).
+  * Persona synthesis uses multi-step knowledge assimilation (source → synthesis → summary), injected directly into the prompt system message.
+  * Persona parameters are always available for injection in subsequent queries, ensuring *stateful*, contextually aware conversations.
 
-* Lesson Outline
-* Explain Concept
-* Give Example
-* Step-by-Step
-* Pitfalls/Avoid
+* **Layered Prompt Injection:**
 
-**Custom shortcuts for Other Agents are fully editable—make your Agent fit any domain or workflow!**
+  * Prompts dynamically integrate:
+
+    * Persona description (domain, philosophy, and actionable principles)
+    * User/child names
+    * Age/grade (for adaptive language)
+    * User’s current query
+    * Optional: Shortcut-specific response instructions (see below)
+  * Injection is modular—custom domains, shortcut types, and formats can be added or changed in real time.
+
+* **Structured Response Shortcuts:**
+
+  * Each shortcut (Connect, Grow, Explore, Resolve, Support, etc.) defines a response template: expected structure, language level, and purpose.
+  * All shortcuts are user-editable, domain-extensible, and persistently stored.
+
+### 💡 Modular, Extensible Domain & Shortcut Logic
+
+* **Domain-Aware Shortcuts:**
+
+  * Domains (Parent, Teacher, Other/Custom) support their own pre-configured or custom shortcut sets.
+  * New domains or expert areas can be added at runtime via editable source/shortcut JSON.
+
+* **Fully Editable Sources & Shortcuts:**
+
+  * Books, experts, styles, and shortcuts are fully user-editable.
+  * All logic (lists, edits, persistence) is decoupled from code—empowering users to extend functionality via simple UI.
+
+* **Profile-Specific Tooling:**
+
+  * Enable per-profile RAG (document upload/vector search), web search, and other tools using simple checkboxes.
+  * OpenAI tool calls are dynamically composed, based on profile/tool flags.
+
+### 📦 Local-First Persistence
+
+* **No Cloud Dependency (by default):**
+
+  * All user data—profiles, chats, sources, shortcuts, and history—are stored locally as JSON, supporting privacy and offline access.
+  * Data structure is robust, human-readable, and portable (future upgrade: optional cloud sync or export).
+
+* **Atomic Save/Load:**
+
+  * Every change is instantly written to disk.
+  * Profiles, chats, shortcuts, and sources are updated independently for integrity and modularity.
+
+### 🧩 Modular UI & Navigation
+
+* **Step-based, Card-centric UI:**
+
+  * Modular navigation logic (per-page/step) with strong separation between creation, editing, chat, history, and settings.
+  * Codebase is clean, with well-separated UI, persistence, and agent logic (ideal for extension or mobile packaging).
+
+* **Mobile-first design:**
+
+  * Responsive CSS for card navigation, shortcut selection, and chat interfaces.
+  * Tooltips and dynamic help are present throughout.
 
 ---
 
-### 🔄 Save, Edit, and Manage—With Full Control
+## ⚙️ File & Directory Structure
 
-* **Save answers and conversations** for each Agent—review them anytime.
-* **Edit or delete profiles, sources, and chats** with a tap.
-* **All changes are instant**—no reload or restart needed.
+```
+mph/
+├── main.py                          # Main application code (Streamlit)
+├── requirements.txt                 # Python dependencies
+├── assets/                          # App images, icons, etc.
+├── data/                            # All persistent app data
+│   ├── parent_helpers_profiles.json
+│   ├── parent_helpers_responses.json
+│   ├── parent_helpers_sources.json
+│   ├── parent_helpers_shortcuts.json
+│   └── parent_helpers_memory.json
+├── docs/                            # Manuals, technical docs, release notes
+│   ├── mphUserManual draft.docx
+│   ├── My Parent Helpers - Prompt Injection and Message Structures.docx
+│   └── README.md
+└── .gitignore
+```
 
----
+**Key Files:**
 
-### 🧩 Full Customization & Extensibility
-
-* **Edit the lists of Books, Experts, Styles, and Domain Areas** for any Agent type—add your favorites or custom entries.
-* **Add or modify shortcuts for any Agent**, at any time—tailor every chat to your real needs.
-* **Instantly apply changes across the app**—new shortcuts and sources are available immediately for Agent creation and chat.
-
----
-
-### 👨‍👩‍👧‍👦🧑‍🏫🌟 Multi-Role & Multi-Domain Support
-
-* **Parent Agents:** Age-appropriate, style-aligned advice for any family scenario
-* **Teacher Agents:** Lesson planning, Q\&A, explanations, and classroom support
-* **Other/Expert Agents:** Build assistants for technology, healthcare, science, business, or any custom field
-
-MPH is truly universal—**one app, endless possibilities**.
-
----
-
-### 📱 Mobile-First, Friendly Interface
-
-* **Works beautifully on phones, tablets, and computers**
-* **Simple card-based navigation** for Agents, chats, and saved answers
-* **Tooltips and in-app help everywhere**
-
----
-
-## 🛡️ Private & Local
-
-* Everything you create is saved **locally** on your device—your profiles, chats, and changes are yours alone.
-* **No account required, no cloud storage** (unless you choose to sync).
+| File                            | Purpose                                         |
+| ------------------------------- | ----------------------------------------------- |
+| `main.py` or `app.py`           | Streamlit app, modular logic                    |
+| `requirements.txt`              | Python deps (Streamlit, OpenAI, pydantic, etc.) |
+| `parent_helpers_profiles.json`  | Saved agent profiles                            |
+| `parent_helpers_responses.json` | Chat history                                    |
+| `parent_helpers_sources.json`   | Book/expert/style sources                       |
+| `parent_helpers_shortcuts.json` | Response shortcut templates                     |
+| `parent_helpers_memory.json`    | Persistent chat memory                          |
 
 ---
 
-## 🛠️ Getting Started
+## 🔌 Extensibility & Integration
 
-**What you need:**
+* **Plug-in ready:**
+
+  * Easily extend to support new domains, expert areas, or response types.
+  * Add RAG/document support (PDFs, images, etc.) per Agent.
+
+* **Seamless OpenAI API Integration:**
+
+  * Supports GPT-4o, RAG via vector store, web search, and other OpenAI tools via modular wrappers.
+
+* **Future-proof:**
+
+  * Architecture supports migration to PWA/mobile, cloud-based sync, and multi-user deployments.
+
+---
+
+## 🛠️ Installation & Setup
+
+**Requirements:**
 
 * Python 3.9+
-* An OpenAI API key (see below)
+* OpenAI API key
 
-**To install:**
+**Quick Start:**
 
 ```sh
 git clone https://github.com/yourusername/mph2025-app.git
 cd mph2025-app
 pip install -r requirements.txt
-streamlit run app.py
+streamlit run main.py
 ```
 
-**Set your OpenAI key:**
+**Configure OpenAI API:**
 
-* On Streamlit Cloud: Go to your app’s **Secrets** tab, and add
-  `openai_key = "sk-xxxxxxxxxxxx"`
-* Locally: Create a file `.streamlit/secrets.toml`
+* In `.streamlit/secrets.toml`:
 
   ```toml
   [general]
   openai_key = "sk-xxxxxxxxxxxx"
   ```
+* Or set via Streamlit Cloud Secrets.
 
 ---
 
-## 📂 Key Files
+## 📖 Documentation
 
-| File                            | Purpose                    |
-| ------------------------------- | -------------------------- |
-| `app.py`                        | Main application logic     |
-| `parent_helpers_profiles.json`  | Saved Agent profiles       |
-| `parent_helpers_responses.json` | Saved chat history         |
-| `parent_helpers_sources.json`   | List of sources for Agents |
-| `parent_helpers_shortcuts.json` | Saved shortcuts/actions    |
-| `requirements.txt`              | Python dependencies        |
+* **User Manual:** `/docs/mphUserManual draft.docx`
+* **Prompt Engineering & Injection Whitepaper:** `/docs/My Parent Helpers - Prompt Injection and Message Structures.docx`
+* **In-app Quick Start Guide:** Step-by-step onboarding
 
 ---
 
-## 📖 Documentation & Help
+## 🔒 Privacy & Data Control
 
-* **Quick Start Guide and User Manual**—built into the app for first-time users
-* **Dynamic tooltips and in-app help**—tap any “?” icon
-* **Editable persona and Agent details**
-* **All your changes are always saved**
-
-**More resources:** [www.myparenthelpers.com](https://www.myparenthelpers.com)
+* **All data is local by default:** You own your profiles, history, and customizations.
+* **No accounts, no forced sync.** (Cloud sync is planned, opt-in only.)
 
 ---
 
-## ✨ Why Choose MPH?
+## 🧪 For Developers & Power Users
 
-* **Customizable, multi-role Agents:** Parenting, teaching, or any expert support you need
-* **Personalized and always in your words and style**
-* **Local, private, and under your control**
-* **Extensible for any new domain, shortcut, or method**
-* **Perfect for families, educators, students, and professionals**
-
-**MPH isn’t just AI-assisted—it’s AI-shaped by you.**
+* **Fully modular codebase**—extend/replace data files, shortcut logic, or add new agent domains with minimal code changes.
+* **Customizable prompt/response scripts**—build your own context-aware prompt structures.
+* **Release notes and changelog**—see `/docs/` for feature history and upgrade notes.
 
 ---
 
-## 🤝 Questions or Suggestions?
+## 📢 Release Notes & Roadmap
 
-We love feedback!
-Visit [www.myparenthelpers.com](https://www.myparenthelpers.com) for support, feature requests, and contact info.
-
----
-
-## 🛡️ License
-
-MIT License
+Release notes and roadmap are included in `/docs/RELEASE_NOTES.md` (to be updated with each release).
 
 ---
 
-**MPH: Your own team of digital helpers, always ready to support your parenting, teaching, and expert needs—your way.**
+## 🤝 Community & Support
+
+* [www.myparenthelpers.com](https://www.myparenthelpers.com) for contact, bug reports, or feature suggestions
+* Open source contributions welcome (MIT license)
+
+---
+
+**MPH: Modular, context-driven AI helpers—private, extensible, and shaped by you.**
+
+---
+
+Let me know if you’d like a separate section for **release notes**, **API docs**, or a “for maintainers” guide!

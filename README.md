@@ -3,7 +3,7 @@ Technical concepts, Context engineering, Modularity, Extensibility, and how the 
 
 ---
 
-# 🌿 Aigent Helpers (AiH) – Technical Overview
+# 🌿 Agent Ai Builder (AAB) – Technical Overview
 
 **Live Demo:** [mph-2025.streamlit.app](https://mph-2025.streamlit.app/)
 
@@ -11,9 +11,9 @@ Technical concepts, Context engineering, Modularity, Extensibility, and how the 
 
 ## ⚡ About the App
 
-**Aigent Helpers (AiH)** is a modular, extensible AI-powered context agent platform. Designed for parents, teachers, and professionals, MPH enables the creation and management of multi-role digital assistants (“Agents”) driven by context-rich, user-controlled prompt engineering.
+**Agent Ai Builder (AAB)** is a modular, extensible AI-powered context agent platform. Designed for parents, teachers, and professionals, MPH enables the creation and management of multi-role digital assistants (“Agents”) driven by context-rich, user-controlled prompt engineering.
 
-Built in Python with Streamlit and OpenAI APIs, MPH supports custom persona creation, multi-domain context engineering, structured response formatting, and granular prompt injection—enabling highly adaptive, role- and scenario-specific answers for any user-defined need.
+Built in Python with Streamlit and OpenAI APIs, AAB supports custom persona creation, multi-domain context engineering, structured response formatting, and granular prompt injection—enabling highly adaptive, role- and scenario-specific answers for any user-defined need.
 
 ---
 
@@ -89,7 +89,7 @@ Built in Python with Streamlit and OpenAI APIs, MPH supports custom persona crea
 ## ⚙️ File & Directory Structure
 
 ```
-mph/
+AAB/
 ├── main.py                          # Main application code (Streamlit)
 ├── requirements.txt                 # Python dependencies
 ├── assets/                          # App images, icons, etc.
@@ -201,7 +201,7 @@ Release notes and roadmap are included in `/docs/RELEASE_NOTES.md` (to be update
 
 ---
 
-**MPH: Modular, context-driven AI helpers—private, extensible, and shaped by you.**
+**AAB: Modular, context-driven AI helpers—private, extensible, and shaped by you.**
 
 ---
 

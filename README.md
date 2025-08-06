@@ -1,8 +1,9 @@
-**technically driven README** for *My Parent Helpers (MPH)*, including technical concepts, context engineering, modularity, extensibility, and how the architecture supports advanced use-cases and maintainability. “context injection”, modular domain/shortcut logic, and local data persistence.  Build your own agents.
+**README** 
+Technical concepts, Context engineering, Modularity, Extensibility, and how the architecture supports advanced use-cases and maintainability. context injection”, modular domain/shortcut logic, and local data persistence.  Build your own agents.
 
 ---
 
-# 🌿 My Parent Helpers (MPH) – Technical Overview
+# 🌿 Aigent Helpers (AiH) – Technical Overview
 
 **Live Demo:** [mph-2025.streamlit.app](https://mph-2025.streamlit.app/)
 
@@ -10,7 +11,7 @@
 
 ## ⚡ About the App
 
-**My Parent Helpers (MPH)** is a modular, extensible AI-powered context agent platform. Designed for parents, teachers, and professionals, MPH enables the creation and management of multi-role digital assistants (“Agents”) driven by context-rich, user-controlled prompt engineering.
+**Aigent Helpers (AiH)** is a modular, extensible AI-powered context agent platform. Designed for parents, teachers, and professionals, MPH enables the creation and management of multi-role digital assistants (“Agents”) driven by context-rich, user-controlled prompt engineering.
 
 Built in Python with Streamlit and OpenAI APIs, MPH supports custom persona creation, multi-domain context engineering, structured response formatting, and granular prompt injection—enabling highly adaptive, role- and scenario-specific answers for any user-defined need.
 

@@ -37,7 +37,7 @@ def mph_splash():
         <div class="mph-btn-anchor">
             <a href="#mph_start_real" class="mph-anchor-link">🚀 Start</a>
         </div>
-        <h1>🌿 Welcome to My Parent Helpers!</h1>
+        <h1>🌿 Welcome to Aigent Helpers</h1>
         <h3>Your digital team of AI-powered helpers—for parenting, teaching, and any expert support you need.</h3>
         <ul>
             <li><span class="mph-role">👨‍👩‍👧‍👦 Parent Agents:</span> Age-appropriate advice for your family.</li>
@@ -76,7 +76,7 @@ if "splash_done" not in st.session_state:
     st.session_state.splash_done = False
 
 if not st.session_state.splash_done:
-    st.set_page_config(page_title="My Parent Helpers", page_icon="🌿", layout="centered")
+    st.set_page_config(page_title="Aigent Helpers", page_icon="🌿", layout="centered")
     if mph_splash():
         st.session_state.splash_done = True
         st.rerun()
@@ -199,7 +199,7 @@ DOMAIN_SHORTCUTS = {
 # ---------------------------------------------------------------------------
 # AGENT TYPES & SOURCES (corrected: domains preloaded dynamically)
 # ---------------------------------------------------------------------------
-AGENT_TYPES = ["Parent", "Teacher", "Other"]
+AGENT_TYPES = ["Parent", "Teacher", "Agent"]
 PARENT_SOURCES = {
     "Book":   ["The Whole‑Brain Child", "Peaceful Parent, Happy Kids"],
     "Expert": ["Dr. Laura Markham", "Dr. Daniel Siegel"],
@@ -210,12 +210,12 @@ TEACHER_SOURCES = {
     "Expert": ["Carol Dweck", "Doug Lemov"],
     "Style":  ["Project-Based Learning", "SEL"]
 }
-# --- Automatically sync domain names with OTHER_SOURCES["Expert"]
-other_expert_domains = list(DOMAIN_SHORTCUTS.keys())
+# --- Automatically sync domain names with AGENT_SOURCES["Expert"]
+agent_expert_domains = list(DOMAIN_SHORTCUTS.keys())
 custom_option = "Custom Expert (enter manually)"
-OTHER_SOURCES = {
+AGENT_SOURCES = {
     "Book":   ["Custom Book (enter manually)"],
-    "Expert": other_expert_domains + [custom_option],
+    "Expert": agent_expert_domains + [custom_option],
     "Style":  ["Custom Style (enter manually)"]
 }
 
@@ -257,7 +257,7 @@ if "sources" not in st.session_state:
     st.session_state["sources"] = {
         "Parent":  PARENT_SOURCES,
         "Teacher": TEACHER_SOURCES,
-        "Other":   OTHER_SOURCES
+        "Agent":   AGENT_SOURCES
     }
 loaded = load_json(SHORTCUTS_FILE)
 if isinstance(loaded, dict) and loaded:
@@ -749,11 +749,11 @@ def render_step0():
 #  STEP 1: SELECT AGENT TYPE
 # ---------------------------------------------------------------------------
 def render_step1():
-    st.markdown('<div class="biglabel-G">Step 1: Select Agent Type - Choose what kind of agent you want to create (e.g., Parent, Teacher, or Other).</div>', unsafe_allow_html=True)
+    st.markdown('<div class="biglabel-G">Step 1: Select Agent Type - Choose what kind of agent you want to create (e.g., Parent, Teacher, or Agent).</div>', unsafe_allow_html=True)
     cols = st.columns(3)
     for label, key, atype in [("👪 Parent","btn_parent","Parent"),
                               ("🧑‍🏫 Teacher","btn_teacher","Teacher"),
-                              ("✨ Other","btn_other","Other")]:
+                              ("✨ Agent","btn_agent","Agent")]:
         with cols.pop(0):
             if st.button(label, key=key):
                 st.session_state.agent_type = atype
@@ -784,7 +784,7 @@ def render_step3():
     st.markdown(f'<div class="biglabel-G">Step 3: Select Source Name - Select a specific {st.session_state.source_type} name for your agent’s persona.</div>', unsafe_allow_html=True)
     agent_type = st.session_state.agent_type
     opts = st.session_state["sources"][agent_type].get(st.session_state.source_type, [])
-    if "Other..." not in opts: opts.append("Other...")
+    if "Agent..." not in opts: opts.append("Agent...")
     choice = st.selectbox("Select or enter your own:", opts)
     custom = st.text_input("Enter custom name") if choice == "Other..." else ""
     c1, c2 = st.columns(2)
@@ -891,7 +891,7 @@ def render_step5():
     # --- Per-profile shortcut logic ---
     # On first load, pre-fill from domain or default if new profile
     if "profile_shortcuts" not in st.session_state:
-        if agent_type == "Other" and source_type == "Expert" and source_name in DOMAIN_SHORTCUTS:
+        if agent_type == "Agent" and source_type == "Expert" and source_name in DOMAIN_SHORTCUTS:
             st.session_state["profile_shortcuts"] = get_shortcuts_for_domain(source_name)
         else:
             st.session_state["profile_shortcuts"] = DEFAULT_EXTRAS_MAP.copy()
@@ -1352,7 +1352,7 @@ def render_step10():
 
     if not st.session_state['sources']:
         st.session_state['sources'] = load_sources() or {
-            "Parent":PARENT_SOURCES, "Teacher":TEACHER_SOURCES, "Other":OTHER_SOURCES
+            "Parent":PARENT_SOURCES, "Teacher":TEACHER_SOURCES, "Agent":AGENT_SOURCES
         }
     srcs = st.session_state['sources']
 

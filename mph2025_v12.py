@@ -37,7 +37,7 @@ def mph_splash():
         <div class="mph-btn-anchor">
             <a href="#mph_start_real" class="mph-anchor-link">🚀 Start</a>
         </div>
-        <h1>🌿 Welcome to Aigent Helpers</h1>
+        <h1>🌿 Welcome to Agent AI Builder</h1>
         <h3>Your digital team of AI-powered helpers—for parenting, teaching, and any expert support you need.</h3>
         <ul>
             <li><span class="mph-role">👨‍👩‍👧‍👦 Parent Agents:</span> Age-appropriate advice for your family.</li>
@@ -76,7 +76,7 @@ if "splash_done" not in st.session_state:
     st.session_state.splash_done = False
 
 if not st.session_state.splash_done:
-    st.set_page_config(page_title="Aigent Helpers", page_icon="🌿", layout="centered")
+    st.set_page_config(page_title="Agent AI Builder", page_icon="🌿", layout="centered")
     if mph_splash():
         st.session_state.splash_done = True
         st.rerun()

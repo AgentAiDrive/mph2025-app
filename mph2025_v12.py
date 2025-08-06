@@ -37,7 +37,7 @@ def mph_splash():
         <div class="mph-btn-anchor">
             <a href="#mph_start_real" class="mph-anchor-link">🚀 Start</a>
         </div>
-        <h1>🌿 Welcome to Agent AI Builder</h1>
+        <h1>🌿 Agent AI Builder 🌿</h1>
         <h3>Your digital team of AI-powered helpers—for parenting, teaching, and any expert support you need.</h3>
         <ul>
             <li><span class="mph-role">👨‍👩‍👧‍👦 Parent Agents:</span> Age-appropriate advice for your family.</li>
@@ -53,7 +53,7 @@ def mph_splash():
             <b>Get Started:</b> 1. Create Agent &nbsp;2. Add Source &nbsp;3. Chat &nbsp;4. Save
         </div>
         <div style="text-align:center; margin-top:8px; font-size:1em;">
-            <b>MPH isn’t just AI advice—it’s a toolkit for shaping support, learning, and growth your way.</b>
+            <bAgent Ai Builder toolkit is for shaping agents your way.</b>
         </div>
         <div class="mph-btn-bottom" id="mph_start_real">
             <!-- Streamlit button goes here -->

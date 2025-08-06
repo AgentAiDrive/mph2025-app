@@ -89,6 +89,14 @@ RESPONSES_FILE  = "parent_helpers_responses.json"
 SOURCES_FILE    = "parent_helpers_sources.json"
 MEMORY_FILE     = "parent_helpers_memory.json"
 SHORTCUTS_FILE  = "parent_helpers_shortcuts.json"
+DEFAULT_EXTRAS_MAP = {
+    " DEFAULT":  "General purpose answer.",
+    " CONNECT": " Help explain with examples.",
+    " GROW":    " Offer advanced strategies.",
+    " EXPLORE": " Age-appropriate Q&A.",
+    " RESOLVE": " Step-by-step resolution.",
+    "❤ SUPPORT": " Empathetic support."
+}
 DOMAIN_SHORTCUTS = {
     "Cardiologist": {
         " 📝 SUMMARY": "Concise findings summary.",

@@ -1,4 +1,4 @@
-**technically driven README** for *My Parent Helpers (MPH)*, including technical concepts, context engineering, modularity, extensibility, and how the architecture supports advanced use-cases and maintainability. This version maintains clarity for power users, developers, or technical reviewers, and references “context injection”, modular domain/shortcut logic, and local data persistence.
+**technically driven README** for *My Parent Helpers (MPH)*, including technical concepts, context engineering, modularity, extensibility, and how the architecture supports advanced use-cases and maintainability. “context injection”, modular domain/shortcut logic, and local data persistence.  Build your own agents.
 
 ---
 

@@ -1,3 +1,45 @@
+***************************************************************************************************
+***** Release v1.2.1 – “Profile-Aware Memory, Smarter History & Instant Updates” (2025-08-06) *****
+***************************************************************************************************
+
+What’s New
+
+## Summary
+This release brings profile-scoped persistent memory, seamless fallback to session memory, and instant global updates for all shortcuts, sources, and agent settings. Memory, context, and chat history management are now robust and unified—supporting flawless agent switching, reliable chat replays, and an always-up-to-date UI.
+
+### [Added]
+
+Profile-Aware Memory & History
+- Per-Profile Persistent Memory: Every agent’s chat history is stored and loaded based on profile, ensuring the right conversation context is always injected.
+- Session-Only Memory Fallback: When persistent memory is disabled, session memory is handled in-memory, enabling true stateless chats.
+- Snapshot Saving: Saving a chat with persistent memory includes a full context snapshot—perfect for reloading or exporting threads.
+- Unified History View: All chat histories are now directly viewable and replayable from saved chats and dashboards, with clear expanders.
+
+Live Editing & Global Updates
+- Instant Propagation: Any change to shortcuts, sources, or profiles is reflected everywhere in real time—including chat, profile editors, and saved responses.
+- Atomic Save/Load: All changes are saved to disk immediately for robust, consistent local data persistence.
+
+Context Injection & Chat Workflow
+- Unified Context Injection: Every agent reply includes up-to-date persona, shortcut, and context instructions, plus full conversation history if persistent memory is enabled.
+- On-the-Fly Shortcut Switching: Change shortcuts mid-conversation; edits reflect instantly in the chat and across all UIs.
+
+UI & User Experience
+- Improved History Display: Persistent and session chat histories are shown in clear expanders, with user/agent roles labeled.
+- Mobile & Card UX: More tweaks for a mobile-first, card-centric experience.
+- Feedback & Error Handling: Enhanced error feedback for memory, file, and API issues.
+
+#### [Fixed]
+- History Consistency: Fixed bugs where toggling persistent memory or switching profiles left chat history in a stale or out-of-sync state.
+- Shortcut/Source Drift: Global edits always update all references—no more mismatches or missing buttons.
+- Atomic Persistence: Prevented rare issues with silent data loss or failed saves.
+
+##### [Coming Soon]
+- Agent export/import and sharing features
+- Custom agent function-calling and plugin support
+- Context schema editor and visual memory tools
+- Multimodal RAG: PDF/image search, advanced document tools
+- Team and enterprise agent options
+
 *****************************************************************************************
 ***** Release v1.2.0 – “Shortcuts, Hybrid Tools & Enhanced Management” (2025-08-05) *****
 *****************************************************************************************
@@ -45,6 +87,7 @@ Coming Soon:
 =========================================================================================
 ***** Release v1.1.0 – “Memory & UX Polishes” (2025-08-01) *****
 =========================================================================================
+
 - **Persistent Memory:** Toggle on chat to re-inject full chat history on every turn (`parent_helpers_memory.json`)
 - **Live Chat Feed:** Conversation updates live above input box
 - **Profile Hover:** ℹ️ reveals profile metadata on hover
@@ -56,6 +99,7 @@ Coming Soon:
 =========================================================================================
 ***** Release v1.0.0 – “Foundations” (2025-07-30) *****
 =========================================================================================
+
 - **Agent Creation:** Select profile type and source, generate persona
 - **AI Chat with Shortcuts:** Six response types (Default, Connect, Grow, etc.)
 - **Stateless Chat:** One-turn JSON responses, save any chat

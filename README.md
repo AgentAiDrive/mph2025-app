@@ -1,208 +1,186 @@
-**README** 
-Technical concepts, Context engineering, Modularity, Extensibility, and how the architecture supports advanced use-cases and maintainability. context injection”, modular domain/shortcut logic, and local data persistence.  Build your own agents.
+🌿 Agent Ai Builder (AAB) – Technical Overview
+Live Demo: mph-2025.streamlit.app
 
----
+⚡ About the App
+Agent Ai Builder (AAB) is a modular, extensible, and privacy-first AI agent builder platform. AAB empowers users (parents, teachers, domain experts) to design and deploy highly customized, context-driven AI helpers (“Agents”) with persona-specific, scenario-aware responses, all in a no-code Streamlit UI.
+Core pillars: context engineering, layered prompt injection, domain/shortcut modularity, and local data control.
 
-# 🌿 Agent Ai Builder (AAB) – Technical Overview
+🚀 Technical Features & Architecture
+🔧 Context Engineering & Prompt Injection
+Dynamic Persona Profiles:
+Persona synthesis is user-driven. Agent profiles are created using:
 
-**Live Demo:** [mph-2025.streamlit.app](https://mph-2025.streamlit.app/)
+Source type/name (Book, Expert, Style, Domain)
 
----
+Parent/child/teacher details, age/grade, and role
 
-## ⚡ About the App
+Automated persona synthesis using multi-stage OpenAI prompt flow
 
-**Agent Ai Builder (AAB)** is a modular, extensible AI-powered context agent platform. Designed for parents, teachers, and professionals, MPH enables the creation and management of multi-role digital assistants (“Agents”) driven by context-rich, user-controlled prompt engineering.
+Every parameter is available for prompt injection in all queries, enabling stateful and scenario-appropriate answers
 
-Built in Python with Streamlit and OpenAI APIs, AAB supports custom persona creation, multi-domain context engineering, structured response formatting, and granular prompt injection—enabling highly adaptive, role- and scenario-specific answers for any user-defined need.
+Layered Prompt Injection:
 
----
+System prompts are dynamically composed with:
 
-## 🚀 Technical Features & Architecture
+Persona description (domain, principles, philosophy)
 
-### 🔧 Context Engineering & Persona Injection
+User/child names, age/grade (for age/role targeting)
 
-* **Dynamic Persona Profiles:**
+Current query
 
-  * Agent context is synthesized from user-defined parameters (source type/name, parent/child name, age/grade, domain).
-  * Persona synthesis uses multi-step knowledge assimilation (source → synthesis → summary), injected directly into the prompt system message.
-  * Persona parameters are always available for injection in subsequent queries, ensuring *stateful*, contextually aware conversations.
+Optional: Shortcut-specific instructions (e.g., “Explain with examples”)
 
-* **Layered Prompt Injection:**
+All prompt injection is modular and runtime-extensible—new domains or instructions can be added via UI without code changes
 
-  * Prompts dynamically integrate:
+Structured Response Shortcuts:
 
-    * Persona description (domain, philosophy, and actionable principles)
-    * User/child names
-    * Age/grade (for adaptive language)
-    * User’s current query
-    * Optional: Shortcut-specific response instructions (see below)
-  * Injection is modular—custom domains, shortcut types, and formats can be added or changed in real time.
+Shortcuts define response formats (e.g., summary, plan, counsel, checklist)
 
-* **Structured Response Shortcuts:**
+User-editable, domain-aware, and persistent across sessions
 
-  * Each shortcut (Connect, Grow, Explore, Resolve, Support, etc.) defines a response template: expected structure, language level, and purpose.
-  * All shortcuts are user-editable, domain-extensible, and persistently stored.
+💡 Modularity & Extensibility
+Domain-Specific & Custom Shortcuts:
 
-### 💡 Modular, Extensible Domain & Shortcut Logic
+Parent, Teacher, AV, and any custom domain can be loaded or created with their own shortcut templates
 
-* **Domain-Aware Shortcuts:**
+Shortcuts and sources are editable and persisted in local JSON—extend or re-theme the app by editing these lists, not the code
 
-  * Domains (Parent, Teacher, Other/Custom) support their own pre-configured or custom shortcut sets.
-  * New domains or expert areas can be added at runtime via editable source/shortcut JSON.
+Plug-in Ready:
 
-* **Fully Editable Sources & Shortcuts:**
+Per-agent tool enablement: document upload (RAG), web search, etc.
 
-  * Books, experts, styles, and shortcuts are fully user-editable.
-  * All logic (lists, edits, persistence) is decoupled from code—empowering users to extend functionality via simple UI.
+Future integration for multi-modal input, third-party APIs, or custom toolchains
 
-* **Profile-Specific Tooling:**
+Profile-specific Tooling:
 
-  * Enable per-profile RAG (document upload/vector search), web search, and other tools using simple checkboxes.
-  * OpenAI tool calls are dynamically composed, based on profile/tool flags.
+Each agent profile has flags for RAG/document search, web search, and can be extended with more OpenAI tools or custom functions
 
-### 📦 Local-First Persistence
+📦 Local-first Data Persistence
+User Data is Local & Portable:
 
-* **No Cloud Dependency (by default):**
+All profiles, chats, memory, sources, and shortcuts are stored as JSON files in /data/
 
-  * All user data—profiles, chats, sources, shortcuts, and history—are stored locally as JSON, supporting privacy and offline access.
-  * Data structure is robust, human-readable, and portable (future upgrade: optional cloud sync or export).
+No cloud or external sync required; files are portable and human-readable
 
-* **Atomic Save/Load:**
+Atomic save/load: every change is instantly written to disk; no silent data loss
 
-  * Every change is instantly written to disk.
-  * Profiles, chats, shortcuts, and sources are updated independently for integrity and modularity.
+Future Cloud Support:
 
-### 🧩 Modular UI & Navigation
+Planned: Optional encrypted sync, multi-device, and import/export via /data/
 
-* **Step-based, Card-centric UI:**
+🧩 Modular UI & Navigation
+Step-based UI:
 
-  * Modular navigation logic (per-page/step) with strong separation between creation, editing, chat, history, and settings.
-  * Codebase is clean, with well-separated UI, persistence, and agent logic (ideal for extension or mobile packaging).
+Each major operation (create agent, edit, chat, history, sources/settings) is its own function/component, allowing easy extension or refactoring
 
-* **Mobile-first design:**
+Mobile-first design:
 
-  * Responsive CSS for card navigation, shortcut selection, and chat interfaces.
-  * Tooltips and dynamic help are present throughout.
+Card-based navigation, responsive layout, and touch-optimized controls
 
----
+Decoupled UI/Data/Logic:
 
-## ⚙️ File & Directory Structure
+Clean separation of data persistence, UI flow, and context/agent logic
 
-```
+⚙️ File & Directory Structure
+pgsql
+Copy
+Edit
 AAB/
-├── main.py                          # Main application code (Streamlit)
-├── requirements.txt                 # Python dependencies
-├── assets/                          # App images, icons, etc.
-├── data/                            # All persistent app data
+├── main.py                        # Streamlit app & all logic
+├── requirements.txt               # Python dependencies
+├── assets/                        # Images, icons, UI assets
+├── data/
 │   ├── parent_helpers_profiles.json
 │   ├── parent_helpers_responses.json
 │   ├── parent_helpers_sources.json
 │   ├── parent_helpers_shortcuts.json
 │   └── parent_helpers_memory.json
-├── docs/                            # Manuals, technical docs, release notes
+├── docs/
 │   ├── mphUserManual draft.docx
 │   ├── My Parent Helpers - Prompt Injection and Message Structures.docx
 │   └── README.md
 └── .gitignore
-```
+File	Purpose
+main.py / app.py	Streamlit app, modular UI/logic
+requirements.txt	Python deps (Streamlit, OpenAI, pydantic, etc.)
+parent_helpers_profiles.json	Saved agent profiles
+parent_helpers_responses.json	Chat history
+parent_helpers_sources.json	Book/expert/style/domain sources
+parent_helpers_shortcuts.json	Response shortcut templates
+parent_helpers_memory.json	Persistent chat memory per profile
 
-**Key Files:**
+🔌 Extensibility & Integration
+Domain & shortcut modularity: Add or edit domains/shortcuts live via UI or JSON file
 
-| File                            | Purpose                                         |
-| ------------------------------- | ----------------------------------------------- |
-| `main.py` or `app.py`           | Streamlit app, modular logic                    |
-| `requirements.txt`              | Python deps (Streamlit, OpenAI, pydantic, etc.) |
-| `parent_helpers_profiles.json`  | Saved agent profiles                            |
-| `parent_helpers_responses.json` | Chat history                                    |
-| `parent_helpers_sources.json`   | Book/expert/style sources                       |
-| `parent_helpers_shortcuts.json` | Response shortcut templates                     |
-| `parent_helpers_memory.json`    | Persistent chat memory                          |
+RAG & Tools: Enable document upload, vector search, and other tools per agent
 
----
+Seamless OpenAI Integration: Support for GPT-4o, OpenAI tools, file_search, and web_search—easily extend to more endpoints
 
-## 🔌 Extensibility & Integration
+Future-Proof: PWA/mobile ready, cloud sync planned, easy to extend to new agent types and tools
 
-* **Plug-in ready:**
+🛠️ Installation & Setup
+Requirements:
 
-  * Easily extend to support new domains, expert areas, or response types.
-  * Add RAG/document support (PDFs, images, etc.) per Agent.
+Python 3.9+
 
-* **Seamless OpenAI API Integration:**
+OpenAI API key
 
-  * Supports GPT-4o, RAG via vector store, web search, and other OpenAI tools via modular wrappers.
+Quick Start:
 
-* **Future-proof:**
-
-  * Architecture supports migration to PWA/mobile, cloud-based sync, and multi-user deployments.
-
----
-
-## 🛠️ Installation & Setup
-
-**Requirements:**
-
-* Python 3.9+
-* OpenAI API key
-
-**Quick Start:**
-
-```sh
+sh
+Copy
+Edit
 git clone https://github.com/yourusername/mph2025-app.git
 cd mph2025-app
 pip install -r requirements.txt
 streamlit run main.py
-```
+Configure OpenAI API:
 
-**Configure OpenAI API:**
+toml
+Copy
+Edit
+# .streamlit/secrets.toml
+[general]
+openai_key = "sk-xxxxxxxxxxxxxxxxx"
+Or use Streamlit Cloud secrets UI.
 
-* In `.streamlit/secrets.toml`:
+📖 Documentation
+User Manual: /docs/mphUserManual draft.docx
 
-  ```toml
-  [general]
-  openai_key = "sk-xxxxxxxxxxxx"
-  ```
-* Or set via Streamlit Cloud Secrets.
+Prompt Engineering Guide: /docs/My Parent Helpers - Prompt Injection and Message Structures.docx
 
----
+Quick Start Guide: In-app onboarding (first use)
 
-## 📖 Documentation
+🔒 Privacy & Data Control
+All data local by default: Profiles, chats, customizations are yours
 
-* **User Manual:** `/docs/mphUserManual draft.docx`
-* **Prompt Engineering & Injection Whitepaper:** `/docs/My Parent Helpers - Prompt Injection and Message Structures.docx`
-* **In-app Quick Start Guide:** Step-by-step onboarding
+No accounts, no forced sync: Cloud support is opt-in and planned only for future versions
 
----
+🧪 For Developers & Maintainers
+Extensible codebase:
 
-## 🔒 Privacy & Data Control
+Add new agent types, shortcuts, and UI pages with minimal code changes
 
-* **All data is local by default:** You own your profiles, history, and customizations.
-* **No accounts, no forced sync.** (Cloud sync is planned, opt-in only.)
+Data files are modular and replaceable—test new shortcut or domain sets by swapping JSON
 
----
+Prompt/response modularity:
 
-## 🧪 For Developers & Power Users
+Modify context injection or structured prompts at the function or data level
 
-* **Fully modular codebase**—extend/replace data files, shortcut logic, or add new agent domains with minimal code changes.
-* **Customizable prompt/response scripts**—build your own context-aware prompt structures.
-* **Release notes and changelog**—see `/docs/` for feature history and upgrade notes.
+Upgrade & Changelog:
 
----
+See /docs/ for feature history, roadmap, and upgrade notes
 
-## 📢 Release Notes & Roadmap
+🛣️ Roadmap & Release Notes
+Release notes & roadmap: /docs/RELEASE_NOTES.md
 
-Release notes and roadmap are included in `/docs/RELEASE_NOTES.md` (to be updated with each release).
+Upcoming: Multi-user support, encrypted sync, plugin/extension API, agent export/import, enterprise support
 
----
+🤝 Community & Support
+Web: myparenthelpers.com
 
-## 🤝 Community & Support
+Issues/Contributions: Open source, MIT License—PRs and feature ideas welcome!
 
-* [www.myparenthelpers.com](https://www.myparenthelpers.com) for contact, bug reports, or feature suggestions
-* Open source contributions welcome (MIT license)
+Agent Ai Builder: Create, own, and extend your own modular, context-driven AI helpers—secure, private, and truly yours.
 
----
-
-**AAB: Modular, context-driven AI helpers—private, extensible, and shaped by you.**
-
----
-
-Let me know if you’d like a separate section for **release notes**, **API docs**, or a “for maintainers” guide!
+Would you like to add API reference, a detailed "for maintainers" section, or architecture diagrams? If you want a super-short version for GitHub or an extended version for internal onboarding, let me know!

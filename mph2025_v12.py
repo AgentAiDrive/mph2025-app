@@ -1268,6 +1268,7 @@ def render_step9():
         shortcut_edits = []
         delete_keys = set()
 
+        # Show each shortcut with edit boxes and a delete checkbox
         for i, (label, description) in enumerate(list(shortcuts.items())):
             cols = st.columns([2, 4, 1])
             with cols[0]:
@@ -1291,24 +1292,25 @@ def render_step9():
             else:
                 shortcuts[new_sc_label] = new_sc_desc
                 st.success(f"Added shortcut '{new_sc_label}'.")
+                # Immediate update in UI (no rerun on Streamlit forms, so added to the next render)
 
         # --- Save Profile Edits ---
         saved = st.form_submit_button("SAVE CHANGES")
 
     # --- Apply Edits After Form Submission ---
     if saved:
-        # Remove checked shortcuts
-        for k in delete_keys:
-            shortcuts.pop(k, None)
-        # Apply edits (label/desc), renaming as needed
-        new_shortcuts = {}
+        # 1. Build a new shortcuts dict, skipping any marked for delete, and renaming/editing as appropriate
+        updated_shortcuts = {}
         for old_label, new_label, new_desc in shortcut_edits:
-            if not new_label: continue  # skip empty
-            if new_label in new_shortcuts and new_label != old_label:
+            if not new_label or old_label in delete_keys:
+                continue  # skip deleted or empty
+            if new_label in updated_shortcuts and new_label != old_label:
                 st.warning(f"Duplicate shortcut label: '{new_label}'")
                 continue
-            new_shortcuts[new_label] = new_desc
-        shortcuts = {**shortcuts, **new_shortcuts}
+            updated_shortcuts[new_label] = new_desc
+        # 2. Add any newly created shortcut from add_sc above, unless it's flagged for delete or already exists
+        if new_sc_label and new_sc_label not in delete_keys and new_sc_label not in updated_shortcuts:
+            updated_shortcuts[new_sc_label] = new_sc_desc
 
         prof.update(
             parent_name=p_name,
@@ -1321,7 +1323,7 @@ def render_step9():
             search_documents=docs,
             search_web=web,
             documents=prof.get("documents", []),
-            shortcuts=shortcuts,   # updated per-profile shortcuts
+            shortcuts=updated_shortcuts,
         )
         # If doc search disabled, forget old vector store
         if not docs:
@@ -1329,6 +1331,7 @@ def render_step9():
         st.session_state.profiles[idx] = prof
         save_json(PROFILES_FILE, st.session_state.profiles)
         st.success("Profile updated!")
+        st.rerun()
 
     # --- Danger Zone ---
     c1, c2 = st.columns(2)
@@ -1341,6 +1344,7 @@ def render_step9():
         if st.button("CLOSE", key="btn_close_profile"):
             st.session_state.step = 0; st.rerun()
     render_bottom_nav()
+
 
 # ---------------------------------------------------------------------------
 #  STEP 10: EDIT SOURCES AND SHORTCUTS

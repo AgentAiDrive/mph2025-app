@@ -274,9 +274,6 @@ else:
     st.session_state.setdefault("extras_map", DEFAULT_EXTRAS_MAP.copy())
 
 # ---------------------------------------------------------------------------
-#  GLOBAL CSS (unchanged)
-# ---------------------------------------------------------------------------
-# ---------------------------------------------------------------------------
 #  GLOBAL CSS
 # ---------------------------------------------------------------------------
 st.markdown(
@@ -435,7 +432,7 @@ body {
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------------------------
-# PERSONA PROFILE MODEL (corrected for Pydantic v2)
+# PERSONA PROFILE MODEL
 # ---------------------------------------------------------------------------
 class PersonaProfile(BaseModel):
     profile_name:        str
@@ -479,7 +476,7 @@ def get_shortcuts_for_domain(domain):
     return DEFAULT_EXTRAS_MAP.copy()
 
 # ---------------------------------------------------------------------------
-# FILE‑SEARCH TOOL for RAG (unchanged)
+# FILE‑SEARCH TOOL for RAG
 # ---------------------------------------------------------------------------
 def get_openai_tools(profile: dict) -> list:
     tools = []
@@ -503,7 +500,7 @@ def add_tool_params(params: dict, profile: dict) -> dict:
     return params
 
 # ---------------------------------------------------------------------------
-# OPENAI API CALL WRAPPER (unchanged)
+# OPENAI API CALL WRAPPER
 # ---------------------------------------------------------------------------
 def openai_chat_or_responses(params: dict, fallback_prompt: str):
     """
@@ -520,7 +517,7 @@ def openai_chat_or_responses(params: dict, fallback_prompt: str):
         )
 
 # ---------------------------------------------------------------------------
-# MESSAGE BUILDERS (unchanged except tool_line changes)
+# MESSAGE BUILDERS
 # ---------------------------------------------------------------------------
 def build_openai_agent_messages(profile, shortcut, shortcut_desc, query, history):
     tool_lines = []
@@ -1344,8 +1341,6 @@ def render_step9():
         if st.button("CLOSE", key="btn_close_profile"):
             st.session_state.step = 0; st.rerun()
     render_bottom_nav()
-
-
 # ---------------------------------------------------------------------------
 #  STEP 10: EDIT SOURCES AND SHORTCUTS
 # ---------------------------------------------------------------------------

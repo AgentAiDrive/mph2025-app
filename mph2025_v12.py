@@ -53,7 +53,7 @@ def mph_splash():
             <b>Get Started:</b> 1. Create Agent &nbsp; 2. Add Source &nbsp; 3. Chat &nbsp; 4. Save
         </div>
         <div style="text-align:center; margin-top:8px; font-size:1em;">
-            <bAgent Ai Builder toolkit is for shaping agents your way.  <a href="#mph_start_real" class="mph-anchor-link">Quick Start Guide</a></b>
+            <bAgent Ai Builder toolkit is for shaping agents your way.  <a href="https://github.com/AgentAiDrive/mph2025-app/blob/main/AAB_README.md" class="mph-anchor-link">Quick Start Guide</a></b>
         </div>
         <div class="mph-btn-bottom" id="mph_start_real">
             <!-- Streamlit button goes here -->

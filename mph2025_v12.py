@@ -50,10 +50,10 @@ def mph_splash():
             <li><span class="mph-shortcut">📱 Mobile-First:</span> Works on any device. No account needed.</li>
         </ul>
         <div class="mph-getstarted">
-            <b>Get Started:</b> 1. Create Agent &nbsp;2. Add Source &nbsp;3. Chat &nbsp;4. Save
+            <b>Get Started:</b> 1. Create Agent &nbsp; 2. Add Source &nbsp; 3. Chat &nbsp; 4. Save
         </div>
         <div style="text-align:center; margin-top:8px; font-size:1em;">
-            <bAgent Ai Builder toolkit is for shaping agents your way.</b>
+            <bAgent Ai Builder toolkit is for shaping agents your way.  <a href="#mph_start_real" class="mph-anchor-link">Quick Start Guide</a></b>
         </div>
         <div class="mph-btn-bottom" id="mph_start_real">
             <!-- Streamlit button goes here -->

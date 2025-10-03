@@ -79,13 +79,13 @@ AAB/
 │  └─ README.md
 └─ .gitignore
 File	Purpose
-main.py / app.py	Streamlit app, modular UI/logic
-requirements.txt	Python deps (Streamlit, OpenAI, pydantic, …)
+main.py / app.py	            Streamlit app, modular UI/logic
+requirements.txt	            Python deps (Streamlit, OpenAI, pydantic, …)
 parent_helpers_profiles.json	Saved agent profiles
 parent_helpers_responses.json	Chat history
-parent_helpers_sources.json	Book/expert/style/domain sources
+parent_helpers_sources.json	  Book/expert/style/domain sources
 parent_helpers_shortcuts.json	Response shortcut templates
-parent_helpers_memory.json	Persistent chat memory per profile
+parent_helpers_memory.json	  Persistent chat memory per profile
 ________________________________________
 🛠️ Installation & Setup
 Requirements
@@ -137,5 +137,5 @@ ________________________________________
 🪪 License
 MIT License — see LICENSE (or repository header).
 ________________________________________
-Agent Ai Builder: Create, own, and extend modular, context-driven AI helpers—secure, private, and truly yours.
+Agent Ai Builder
 

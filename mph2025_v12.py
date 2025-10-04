@@ -711,21 +711,55 @@ def render_shortcut_editor():
         save_json(SHORTCUTS_FILE, updated_map)
         st.success("Shortcut labels and descriptions updated!")
         st.rerun()
-
+# ---------------------------------------------------------------------------
+#  STEP 0: HOME PAGE - DASHBOARD
+# ---------------------------------------------------------------------------
 def render_step0():
-    """Home / Dashboard top card + the main four dashboard cards."""
+    """
+    Home / Dashboard top card + the main four dashboard cards.
+    - Adds a Home 'Current Agent' selectbox that updates st.session_state.chat_profile.
+    - Adds clickable agent buttons inside the Saved Agents expander to select agent from Home.
+    """
+
     profiles = st.session_state.get("profiles", [])
     selected_agent = None
 
-    # Choose selected agent: explicit chat_profile index if valid, else last profile
+    # If a chat_profile is set and valid, prefer that; else fall back to last profile
     if profiles:
         chat_idx = st.session_state.get("chat_profile")
         if isinstance(chat_idx, int) and 0 <= chat_idx < len(profiles):
             selected_agent = profiles[chat_idx]
         else:
+            # default to last created profile
             selected_agent = profiles[-1]
+            # set chat_profile to last if not set
+            st.session_state.setdefault("chat_profile", len(profiles) - 1)
+    else:
+        st.session_state.pop("chat_profile", None)
 
-    # Build details HTML
+    # --- Current Agent selector (visible only when profiles exist) ---
+    if profiles:
+        names = [p["profile_name"] for p in profiles]
+        # Use current chat_profile as default selection index
+        default_index = st.session_state.get("chat_profile", len(profiles) - 1)
+        # selectbox returns an index because options are range(len(names))
+        sel_index = st.selectbox(
+            "Current agent (select to change)",
+            range(len(names)),
+            index=default_index if 0 <= default_index < len(names) else len(names) - 1,
+            format_func=lambda i: names[i],
+            key="home_select_agent"
+        )
+        # keep chat_profile in sync whenever the home selector changes
+        if st.session_state.get("chat_profile") != sel_index:
+            st.session_state["chat_profile"] = sel_index
+            # update selected_agent to mirror immediately in UI
+            selected_agent = profiles[sel_index]
+    else:
+        # No profiles; small helpful message
+        st.info("No agents yet — create one with the Create button below.")
+
+    # Build details HTML for the agent-info card
     if selected_agent:
         details_html = (
             f"<strong>Name:</strong> {selected_agent.get('profile_name','')}"
@@ -743,7 +777,7 @@ def render_step0():
         else "A"
     )
 
-    # Card HTML: light background for readability and accessible contrast
+    # Agent info card HTML (light background for readability)
     card_html = f"""
     <div class="agent-info-card" role="region" aria-label="Current Agent"
          style="background: linear-gradient(90deg, #ffffff, #f6fff7); color: #044a37;">
@@ -763,11 +797,12 @@ def render_step0():
 
     st.markdown(card_html, unsafe_allow_html=True)
 
-    # Action buttons next to the card (compact)
+    # Action buttons (Edit / Create / Chat)
     btn_cols = st.columns([1,1,1], gap="small")
     with btn_cols[0]:
         if st.button("✏️ Edit", key="home_edit_agent"):
             if profiles:
+                # if chat_profile exists, open that profile
                 st.session_state.step = 9
                 st.rerun()
             else:
@@ -778,17 +813,34 @@ def render_step0():
             st.rerun()
     with btn_cols[2]:
         if st.button("💬 Chat", key="home_start_chat"):
-            # go to chat if there are profiles; otherwise guide to create
             st.session_state.step = 7 if st.session_state.get("profiles") else 1
             if not st.session_state.get("profiles"):
                 st.info("No profiles yet — create one first.")
             st.rerun()
 
-    # --- Dashboard cards (keeps previous behavior) ---
+    # --- Dashboard cards (preserve previous behavior) ---
     r1c1, r1c2 = st.columns(2)
     r2c1, r2c2 = st.columns(2)
 
+    # AGENTS card with Saved Agents expander — now clickable buttons to select agent
     with r1c1:
+        def saved_agents_expander():
+            if not st.session_state.profiles:
+                st.markdown("<p class='home-small'>No profiles yet.</p>", unsafe_allow_html=True)
+                return
+            for i, p in enumerate(st.session_state.profiles):
+                # Render each profile name as a small button that selects it
+                col1, col2 = st.columns([3,1], gap="small")
+                with col1:
+                    st.markdown(f"<div style='padding:6px 8px; border-radius:10px; background:#fff; color:#000; font-weight:700; margin-bottom:6px;'>{p['profile_name']}</div>", unsafe_allow_html=True)
+                with col2:
+                    if st.button("Select", key=f"select_profile_home_{i}"):
+                        st.session_state["chat_profile"] = i
+                        # also sync the home_select_agent selectbox stored value
+                        st.session_state["home_select_agent"] = i
+                        st.success(f"Selected profile: {p['profile_name']}")
+                        st.rerun()
+
         render_home_card(
             title="AGENTS",
             buttons=[
@@ -800,12 +852,10 @@ def render_step0():
                  lambda: (st.session_state.update(step=1), st.rerun())),
             ],
             expander_label="Saved Agents 🖫",
-            expander_body=lambda: [
-                st.markdown(f"<p class='home-small'>{p['profile_name']}</p>", unsafe_allow_html=True)
-                for p in st.session_state.profiles
-            ] or st.markdown("<p class='home-small'>No profiles yet.</p>", unsafe_allow_html=True)
+            expander_body=saved_agents_expander
         )
 
+    # CHATS card
     with r1c2:
         render_home_card(
             title="CHATS",
@@ -829,6 +879,7 @@ def render_step0():
             ] or st.markdown("<p class='home-small'>No saved chats.</p>", unsafe_allow_html=True)
         )
 
+    # SOURCES card
     with r2c1:
         render_home_card(
             title="SOURCES",
@@ -838,6 +889,7 @@ def render_step0():
             expander_body=list_current_sources_and_shortcuts
         )
 
+    # DATA card
     with r2c2:
         render_home_card(
             title="DATA",
@@ -856,6 +908,7 @@ def render_step0():
                             unsafe_allow_html=True)
             ]
         )
+
 
 # ---------------------------------------------------------------------------
 #  STEP 1: SELECT AGENT TYPE

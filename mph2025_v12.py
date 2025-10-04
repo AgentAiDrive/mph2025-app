@@ -732,26 +732,26 @@ def render_step0():
             f"<br><strong>Source:</strong> {selected_agent.get('source_type','')} – "
             f"{selected_agent.get('source_name','')}"
         )
-  else:
-        details_html = "No agent selected. Create or select an agent to get started."
+        else:
+            details_html = "No agent selected. Create or select an agent to get started."
 
     # Render Agent Info Card (fixed: proper triple-quoted f-string + Streamlit Edit button)
-    avatar_initial = (selected_agent.get('profile_name','')[0:1] if selected_agent else "A")
-    card_html = f"""
-    <div class="agent-info-card" role="region" aria-label="Current Agent">
-      <div style="display:flex; align-items:center; gap:12px;">
-        <div style="width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center;
-                    background:linear-gradient(180deg, rgba(16,118,110,0.12), rgba(16,118,110,0.06));
-                    font-weight:800; color:#07523f; font-size:1.1em;">
-            {avatar_initial}
+        avatar_initial = (selected_agent.get('profile_name','')[0:1] if selected_agent else "A")
+        card_html = f"""
+        <div class="agent-info-card" role="region" aria-label="Current Agent">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+                        background:linear-gradient(180deg, rgba(16,118,110,0.12), rgba(16,118,110,0.06));
+                        font-weight:800; color:#07523f; font-size:1.1em;">
+                {avatar_initial}
+            </div>
+            <div style="flex:1; min-width:0;">
+              <div class="agent-info-header">Current Agent</div>
+              <div class="agent-info-body" style="margin-top:4px; color:inherit;">{details_html}</div>
+            </div>
+          </div>
         </div>
-        <div style="flex:1; min-width:0;">
-          <div class="agent-info-header">Current Agent</div>
-          <div class="agent-info-body" style="margin-top:4px; color:inherit;">{details_html}</div>
-        </div>
-      </div>
-    </div>
-    """
+        """
 
     st.markdown(card_html, unsafe_allow_html=True)
 

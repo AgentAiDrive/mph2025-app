@@ -732,34 +732,33 @@ def render_step0():
             f"<br><strong>Source:</strong> {selected_agent.get('source_type','')} – "
             f"{selected_agent.get('source_name','')}"
         )
-    else:
+  else:
         details_html = "No agent selected. Create or select an agent to get started."
 
-        st.markdown(
-        f"
-        <div class="agent-info-card" role="region" aria-label="Current Agent">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <div style="width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center;
-                        background:linear-gradient(180deg, rgba(16,118,110,0.12), rgba(16,118,110,0.06));
-                        font-weight:800; color:#07523f;">
-                { (selected_agent.get('profile_name','')[0:1] if selected_agent else "A") }
-            </div>
-            <div style="flex:1;">
-              <div class="agent-info-header">Current Agent</div>
-              <div class="agent-info-body" style="margin-top:2px;">{details_html}</div>
-            </div>
-            <div style="display:flex; align-items:center;">
-              <button onclick="document.querySelectorAll('button[title=\\'edit_agent\\']')[0]?.click?.()" 
-                      style="background:#0f766e;color:#fff;border:none;border-radius:10px;padding:8px 10px;font-weight:700;cursor:pointer;">
-                Edit
-              </button>
-            </div>
-          </div>
+    # Render Agent Info Card (fixed: proper triple-quoted f-string + Streamlit Edit button)
+    avatar_initial = (selected_agent.get('profile_name','')[0:1] if selected_agent else "A")
+    card_html = f"""
+    <div class="agent-info-card" role="region" aria-label="Current Agent">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+                    background:linear-gradient(180deg, rgba(16,118,110,0.12), rgba(16,118,110,0.06));
+                    font-weight:800; color:#07523f; font-size:1.1em;">
+            {avatar_initial}
         </div>
-        unsafe_allow_html=True
-    )
+        <div style="flex:1; min-width:0;">
+          <div class="agent-info-header">Current Agent</div>
+          <div class="agent-info-body" style="margin-top:4px; color:inherit;">{details_html}</div>
+        </div>
+      </div>
+    </div>
+    """
 
+    st.markdown(card_html, unsafe_allow_html=True)
 
+    # Use a normal Streamlit button for the Edit action (safer than inline JS)
+    if st.button("Edit", key="edit_agent"):
+        st.session_state.step = 9
+        st.rerun()
     # Existing dashboard cards (unchanged)
     r1c1, r1c2 = st.columns(2)
     r2c1, r2c2 = st.columns(2)

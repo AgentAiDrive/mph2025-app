@@ -10,7 +10,7 @@ def mph_splash():
     st.markdown("""
     <style>
         .mph-splash { background: linear-gradient(135deg,#2fe273 0%,#09742a 100%)!important; border-radius:24px; padding:24px 18px 18px 18px; margin:22px auto 12px auto; box-shadow:0 4px 24px rgba(44,99,80,.10); max-width:420px; }
-        .mph-splash h1 { text-align:center; font-size:2.1em; margin-bottom:0.22em; color:#18542e; font-weight:900;}
+        .mph-splash h1 { text-align:center; font-size:1.8em; margin-bottom:0.22em; color:#18542e; font-weight:900;}
         .mph-splash h3 { text-align:center; font-size:1.09em; color:#23683c;}
         .mph-splash ul { padding-left:1.1em; margin-bottom:12px;}
         .mph-splash li { margin-bottom:4px; font-size:1em;}

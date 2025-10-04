@@ -737,15 +737,31 @@ def render_step0():
     else:
         details_html = "No agent selected. Create or select an agent to get started."
 
-    st.markdown(
+        st.markdown(
         f"""
-        <div class="agent-info-card">
-          <div class="agent-info-header">Current Agent</div>
-          <div class="agent-info-body">{details_html}</div>
+        <div class="agent-info-card" role="region" aria-label="Current Agent">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+                        background:linear-gradient(180deg, rgba(16,118,110,0.12), rgba(16,118,110,0.06));
+                        font-weight:800; color:#07523f;">
+                { (selected_agent.get('profile_name','')[0:1] if selected_agent else "A") }
+            </div>
+            <div style="flex:1;">
+              <div class="agent-info-header">Current Agent</div>
+              <div class="agent-info-body" style="margin-top:2px;">{details_html}</div>
+            </div>
+            <div style="display:flex; align-items:center;">
+              <button onclick="document.querySelectorAll('button[title=\\'edit_agent\\']')[0]?.click?.()" 
+                      style="background:#0f766e;color:#fff;border:none;border-radius:10px;padding:8px 10px;font-weight:700;cursor:pointer;">
+                Edit
+              </button>
+            </div>
+          </div>
         </div>
         """,
         unsafe_allow_html=True
     )
+
 
     # Existing dashboard cards (unchanged)
     r1c1, r1c2 = st.columns(2)

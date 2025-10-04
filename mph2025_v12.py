@@ -37,7 +37,7 @@ def mph_splash():
         <div class="mph-btn-anchor">
             <a href="#mph_start_real" class="mph-anchor-link">🚀 Start</a>
         </div>
-        <h1>🌿 Subject Matter Agent Builder 🌿</h1>
+        <h2>🌿 Subject Matter Agent Builder 🌿</h2>
         <h3>Your digital team of AI-powered helpers—for parenting, teaching, and any expert support you need.</h3>
         <ul>
             <li><span class="mph-role">👨‍👩‍👧‍👦 Parent Agents:</span> Age-appropriate advice for your family.</li>
@@ -53,7 +53,7 @@ def mph_splash():
             <b>Get Started:</b>
         <div style="text-align:center; margin-top:8px; font-size:1em;">
           <strong>
-            Agent Ai Builder toolkit is for shaping agents your way.
+           SMA - Subject Matter Agent Ai Builder toolkit is for shaping agents your way.
             <a href="https://github.com/AgentAiDrive/mph2025-app/blob/main/AAB_README.md"
                target="_blank" rel="noopener noreferrer">
            <h1>🌟 Quick Start Guide </h1> </a>

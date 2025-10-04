@@ -56,8 +56,7 @@ def mph_splash():
             Agent Ai Builder toolkit is for shaping agents your way.
             <a href="https://github.com/AgentAiDrive/mph2025-app/blob/main/AAB_README.md"
                target="_blank" rel="noopener noreferrer">
-              Quick Start Guide
-            </a>
+           <h1>🌿 Quick Start Guide 🌿</h1> </a>
           </strong>
         </div>
         <div class="mph-btn-bottom" id="mph_start_real">

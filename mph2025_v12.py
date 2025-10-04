@@ -712,8 +712,6 @@ def render_shortcut_editor():
         st.success("Shortcut labels and descriptions updated!")
         st.rerun()
 
-
-
 # === FULL REPLACEMENT for render_step0() ===
 def render_step0():
     # Top "Current Agent" card
@@ -738,7 +736,7 @@ def render_step0():
         details_html = "No agent selected. Create or select an agent to get started."
 
         st.markdown(
-        f"""
+        f"
         <div class="agent-info-card" role="region" aria-label="Current Agent">
           <div style="display:flex; align-items:center; gap:10px;">
             <div style="width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center;
@@ -758,7 +756,6 @@ def render_step0():
             </div>
           </div>
         </div>
-        """,
         unsafe_allow_html=True
     )
 

@@ -712,19 +712,20 @@ def render_shortcut_editor():
         st.success("Shortcut labels and descriptions updated!")
         st.rerun()
 
-# === FULL REPLACEMENT for render_step0() ===
 def render_step0():
-    # Top "Current Agent" card
+    """Home / Dashboard top card + the main four dashboard cards."""
     profiles = st.session_state.get("profiles", [])
     selected_agent = None
+
+    # Choose selected agent: explicit chat_profile index if valid, else last profile
     if profiles:
-        # If a chat profile index exists use it; otherwise fall back to newest profile
         chat_idx = st.session_state.get("chat_profile")
         if isinstance(chat_idx, int) and 0 <= chat_idx < len(profiles):
             selected_agent = profiles[chat_idx]
         else:
             selected_agent = profiles[-1]
 
+    # Build details HTML
     if selected_agent:
         details_html = (
             f"<strong>Name:</strong> {selected_agent.get('profile_name','')}"
@@ -732,34 +733,58 @@ def render_step0():
             f"<br><strong>Source:</strong> {selected_agent.get('source_type','')} – "
             f"{selected_agent.get('source_name','')}"
         )
-        else:
-            details_html = "No agent selected. Create or select an agent to get started."
+    else:
+        details_html = "No agent selected. Create or select an agent to get started."
 
-    # Render Agent Info Card (fixed: proper triple-quoted f-string + Streamlit Edit button)
-        avatar_initial = (selected_agent.get('profile_name','')[0:1] if selected_agent else "A")
-        card_html = f"""
-        <div class="agent-info-card" role="region" aria-label="Current Agent">
-          <div style="display:flex; align-items:center; gap:12px;">
-            <div style="width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center;
-                        background:linear-gradient(180deg, rgba(16,118,110,0.12), rgba(16,118,110,0.06));
-                        font-weight:800; color:#07523f; font-size:1.1em;">
-                {avatar_initial}
-            </div>
-            <div style="flex:1; min-width:0;">
-              <div class="agent-info-header">Current Agent</div>
-              <div class="agent-info-body" style="margin-top:4px; color:inherit;">{details_html}</div>
-            </div>
-          </div>
+    # Avatar initial (safe)
+    avatar_initial = (
+        (selected_agent.get('profile_name','')[0:1].upper())
+        if selected_agent and selected_agent.get('profile_name')
+        else "A"
+    )
+
+    # Card HTML: light background for readability and accessible contrast
+    card_html = f"""
+    <div class="agent-info-card" role="region" aria-label="Current Agent"
+         style="background: linear-gradient(90deg, #ffffff, #f6fff7); color: #044a37;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="
+            width:52px; height:52px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+            background: linear-gradient(180deg,#0f766e,#07523f); color:#fff; font-weight:800; font-size:1.05em;">
+          {avatar_initial}
         </div>
-        """
+        <div style="flex:1; min-width:0;">
+          <div class="agent-info-header" style="color:#044a37;">Current Agent</div>
+          <div class="agent-info-body" style="margin-top:4px; color: #0b3b2f;">{details_html}</div>
+        </div>
+      </div>
+    </div>
+    """
 
     st.markdown(card_html, unsafe_allow_html=True)
 
-    # Use a normal Streamlit button for the Edit action (safer than inline JS)
-    if st.button("Edit", key="edit_agent"):
-        st.session_state.step = 9
-        st.rerun()
-    # Existing dashboard cards (unchanged)
+    # Action buttons next to the card (compact)
+    btn_cols = st.columns([1,1,1], gap="small")
+    with btn_cols[0]:
+        if st.button("✏️ Edit", key="home_edit_agent"):
+            if profiles:
+                st.session_state.step = 9
+                st.rerun()
+            else:
+                st.warning("No profiles to edit. Create an agent first.")
+    with btn_cols[1]:
+        if st.button("➕ Create", key="home_create_agent"):
+            st.session_state.step = 1
+            st.rerun()
+    with btn_cols[2]:
+        if st.button("💬 Chat", key="home_start_chat"):
+            # go to chat if there are profiles; otherwise guide to create
+            st.session_state.step = 7 if st.session_state.get("profiles") else 1
+            if not st.session_state.get("profiles"):
+                st.info("No profiles yet — create one first.")
+            st.rerun()
+
+    # --- Dashboard cards (keeps previous behavior) ---
     r1c1, r1c2 = st.columns(2)
     r2c1, r2c2 = st.columns(2)
 
@@ -767,10 +792,12 @@ def render_step0():
         render_home_card(
             title="AGENTS",
             buttons=[
-                ("EDIT AGENTS","home_profiles", lambda: st.session_state.profiles,
-                    lambda: (st.session_state.update(step=9), st.rerun())),
-                ("CREATE AGENT","home_create", None,
-                    lambda: (st.session_state.update(step=1), st.rerun())),
+                ("EDIT AGENTS", "home_profiles",
+                 lambda: st.session_state.profiles,
+                 lambda: (st.session_state.update(step=9), st.rerun())),
+                ("CREATE AGENT", "home_create",
+                 None,
+                 lambda: (st.session_state.update(step=1), st.rerun())),
             ],
             expander_label="Saved Agents 🖫",
             expander_body=lambda: [
@@ -783,28 +810,30 @@ def render_step0():
         render_home_card(
             title="CHATS",
             buttons=[
-                ("SAVED CHATS","home_saved", lambda: st.session_state.saved_responses,
-                    lambda: (st.session_state.update(step=8), st.rerun())),
-                ("START CHAT","home_chat", None,
-                    lambda: (
-                        st.session_state.update(step=7 if st.session_state.profiles else 1),
-                        st.warning("No profiles – create one first.") if not st.session_state.profiles else None,
-                        st.rerun()
-                    )),
+                ("SAVED CHATS", "home_saved",
+                 lambda: st.session_state.saved_responses,
+                 lambda: (st.session_state.update(step=8), st.rerun())),
+                ("START CHAT", "home_chat",
+                 None,
+                 lambda: (
+                     st.session_state.update(step=7 if st.session_state.profiles else 1),
+                     st.warning("No profiles – create one first.") if not st.session_state.profiles else None,
+                     st.rerun()
+                 )),
             ],
             expander_label="Chat History 🖫",
             expander_body=lambda: [
                 st.markdown(f"<p class='home-small'>{i+1}. {r['profile']} – {r['shortcut']}</p>",
                             unsafe_allow_html=True)
-                for i,r in enumerate(st.session_state.saved_responses)
+                for i, r in enumerate(st.session_state.saved_responses)
             ] or st.markdown("<p class='home-small'>No saved chats.</p>", unsafe_allow_html=True)
         )
 
     with r2c1:
         render_home_card(
             title="SOURCES",
-            buttons=[("EDIT SOURCES","home_sources",None,
-                      lambda:(st.session_state.update(step=10), st.rerun()))],
+            buttons=[("EDIT SOURCES", "home_sources", None,
+                      lambda: (st.session_state.update(step=10), st.rerun()))],
             expander_label="Sources & Shortcuts",
             expander_body=list_current_sources_and_shortcuts
         )
@@ -812,7 +841,7 @@ def render_step0():
     with r2c2:
         render_home_card(
             title="DATA",
-            buttons=[("CLEAR DATA","home_clear",None,
+            buttons=[("CLEAR DATA", "home_clear", None,
                       lambda: (
                           st.session_state.update(profiles=[], saved_responses=[]),
                           save_json(PROFILES_FILE, []),
@@ -827,6 +856,7 @@ def render_step0():
                             unsafe_allow_html=True)
             ]
         )
+
 # ---------------------------------------------------------------------------
 #  STEP 1: SELECT AGENT TYPE
 # ---------------------------------------------------------------------------

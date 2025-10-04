@@ -432,6 +432,27 @@ body {
     background: rgba(0,0,0,0.1) !important;
   }
 }
+# === Add after your existing global CSS block ===
+/* Agent Info Card (top of Home) */
+.agent-info-card {
+  background: rgba(255,255,255,0.20);
+  border-radius: 20px;
+  padding: 16px;
+  margin-top: 8px;
+  margin-bottom: 24px; /* pushes dashboard down a bit */
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+  width: 100%;
+}
+.agent-info-header {
+  font-size: 1.2em;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+.agent-info-body {
+  font-size: 0.9em;
+  line-height: 1.4;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -681,11 +702,42 @@ def render_shortcut_editor():
         st.success("Shortcut labels and descriptions updated!")
         st.rerun()
 
-# ---------------------------------------------------------------------------
-#  STEP 0: DASHBOARD
-# ---------------------------------------------------------------------------
 
+
+# === FULL REPLACEMENT for render_step0() ===
 def render_step0():
+    # Top "Current Agent" card
+    profiles = st.session_state.get("profiles", [])
+    selected_agent = None
+    if profiles:
+        # If a chat profile index exists use it; otherwise fall back to newest profile
+        chat_idx = st.session_state.get("chat_profile")
+        if isinstance(chat_idx, int) and 0 <= chat_idx < len(profiles):
+            selected_agent = profiles[chat_idx]
+        else:
+            selected_agent = profiles[-1]
+
+    if selected_agent:
+        details_html = (
+            f"<strong>Name:</strong> {selected_agent.get('profile_name','')}"
+            f"<br><strong>Type:</strong> {selected_agent.get('agent_type','')}"
+            f"<br><strong>Source:</strong> {selected_agent.get('source_type','')} – "
+            f"{selected_agent.get('source_name','')}"
+        )
+    else:
+        details_html = "No agent selected. Create or select an agent to get started."
+
+    st.markdown(
+        f"""
+        <div class="agent-info-card">
+          <div class="agent-info-header">Current Agent</div>
+          <div class="agent-info-body">{details_html}</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # Existing dashboard cards (unchanged)
     r1c1, r1c2 = st.columns(2)
     r2c1, r2c2 = st.columns(2)
 
@@ -753,7 +805,6 @@ def render_step0():
                             unsafe_allow_html=True)
             ]
         )
-
 # ---------------------------------------------------------------------------
 #  STEP 1: SELECT AGENT TYPE
 # ---------------------------------------------------------------------------

@@ -716,50 +716,32 @@ def render_shortcut_editor():
 # ---------------------------------------------------------------------------
 def render_step0():
     """
-    Home / Dashboard top card + the main four dashboard cards.
-    - Adds a Home 'Current Agent' selectbox that updates st.session_state.chat_profile.
-    - Adds clickable agent buttons inside the Saved Agents expander to select agent from Home.
+    Home / Dashboard top card (compact) + the main four dashboard cards.
+    - NO separate dropdown at the top.
+    - The Saved Agents expander lists agents as clickable items; clicking an agent
+      sets st.session_state['chat_profile'] to that agent index and updates the
+      Current Agent card above.
+    - The small Edit / Create / Chat buttons above the cards behave as before.
     """
 
     profiles = st.session_state.get("profiles", [])
     selected_agent = None
 
-    # If a chat_profile is set and valid, prefer that; else fall back to last profile
+    # Determine current agent index (chat_profile). If not set, default to last profile (if any).
     if profiles:
         chat_idx = st.session_state.get("chat_profile")
         if isinstance(chat_idx, int) and 0 <= chat_idx < len(profiles):
             selected_agent = profiles[chat_idx]
         else:
             # default to last created profile
-            selected_agent = profiles[-1]
-            # set chat_profile to last if not set
-            st.session_state.setdefault("chat_profile", len(profiles) - 1)
+            last_idx = len(profiles) - 1
+            st.session_state["chat_profile"] = last_idx
+            selected_agent = profiles[last_idx]
     else:
+        # make sure chat_profile isn't left around when no profiles exist
         st.session_state.pop("chat_profile", None)
 
-    # --- Current Agent selector (visible only when profiles exist) ---
-    if profiles:
-        names = [p["profile_name"] for p in profiles]
-        # Use current chat_profile as default selection index
-        default_index = st.session_state.get("chat_profile", len(profiles) - 1)
-        # selectbox returns an index because options are range(len(names))
-        sel_index = st.selectbox(
-            "Current agent (select to change)",
-            range(len(names)),
-            index=default_index if 0 <= default_index < len(names) else len(names) - 1,
-            format_func=lambda i: names[i],
-            key="home_select_agent"
-        )
-        # keep chat_profile in sync whenever the home selector changes
-        if st.session_state.get("chat_profile") != sel_index:
-            st.session_state["chat_profile"] = sel_index
-            # update selected_agent to mirror immediately in UI
-            selected_agent = profiles[sel_index]
-    else:
-        # No profiles; small helpful message
-        st.info("No agents yet — create one with the Create button below.")
-
-    # Build details HTML for the agent-info card
+    # Build details HTML for the compact agent-info card
     if selected_agent:
         details_html = (
             f"<strong>Name:</strong> {selected_agent.get('profile_name','')}"
@@ -767,51 +749,44 @@ def render_step0():
             f"<br><strong>Source:</strong> {selected_agent.get('source_type','')} – "
             f"{selected_agent.get('source_name','')}"
         )
+        avatar_initial = (selected_agent.get('profile_name','')[0:1].upper() if selected_agent.get('profile_name') else "A")
     else:
         details_html = "No agent selected. Create or select an agent to get started."
+        avatar_initial = "A"
 
-    # Avatar initial (safe)
-    avatar_initial = (
-        (selected_agent.get('profile_name','')[0:1].upper())
-        if selected_agent and selected_agent.get('profile_name')
-        else "A"
-    )
-
-    # Agent info card HTML (light background for readability)
+    # Compact Agent Info Card (merged, no extra dropdown above)
     card_html = f"""
-    <div class="agent-info-card" role="region" aria-label="Current Agent"
-         style="background: linear-gradient(90deg, #ffffff, #f6fff7); color: #044a37;">
+    <div class="agent-info-card" role="region" aria-label="Current Agent" style="background: rgba(255,255,255,0.14);">
       <div style="display:flex; align-items:center; gap:12px;">
         <div style="
-            width:52px; height:52px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+            width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center;
             background: linear-gradient(180deg,#0f766e,#07523f); color:#fff; font-weight:800; font-size:1.05em;">
           {avatar_initial}
         </div>
         <div style="flex:1; min-width:0;">
-          <div class="agent-info-header" style="color:#044a37;">Current Agent</div>
-          <div class="agent-info-body" style="margin-top:4px; color: #0b3b2f;">{details_html}</div>
+          <div class="agent-info-header" style="color:#fff;">Current Agent</div>
+          <div class="agent-info-body" style="margin-top:4px; color:#f0fff5;">{details_html}</div>
         </div>
       </div>
     </div>
     """
-
     st.markdown(card_html, unsafe_allow_html=True)
 
-    # Action buttons (Edit / Create / Chat)
-    btn_cols = st.columns([1,1,1], gap="small")
-    with btn_cols[0]:
+    # Small action buttons right under the agent card
+    btn_col1, btn_col2, btn_col3 = st.columns([1,1,1], gap="small")
+    with btn_col1:
         if st.button("✏️ Edit", key="home_edit_agent"):
             if profiles:
-                # if chat_profile exists, open that profile
+                # open edit page for currently selected agent
                 st.session_state.step = 9
                 st.rerun()
             else:
                 st.warning("No profiles to edit. Create an agent first.")
-    with btn_cols[1]:
+    with btn_col2:
         if st.button("➕ Create", key="home_create_agent"):
             st.session_state.step = 1
             st.rerun()
-    with btn_cols[2]:
+    with btn_col3:
         if st.button("💬 Chat", key="home_start_chat"):
             st.session_state.step = 7 if st.session_state.get("profiles") else 1
             if not st.session_state.get("profiles"):
@@ -822,34 +797,35 @@ def render_step0():
     r1c1, r1c2 = st.columns(2)
     r2c1, r2c2 = st.columns(2)
 
-    # AGENTS card with Saved Agents expander — now clickable buttons to select agent
+    # AGENTS card with Saved Agents expander — now clickable names to select agent
     with r1c1:
         def saved_agents_expander():
             if not st.session_state.profiles:
                 st.markdown("<p class='home-small'>No profiles yet.</p>", unsafe_allow_html=True)
                 return
+
+            # Render a vertical selectable list of profiles.
+            # Clicking the profile name sets it as the current agent (chat_profile).
             for i, p in enumerate(st.session_state.profiles):
-                # Render each profile name as a small button that selects it
-                col1, col2 = st.columns([3,1], gap="small")
-                with col1:
-                    st.markdown(f"<div style='padding:6px 8px; border-radius:10px; background:#fff; color:#000; font-weight:700; margin-bottom:6px;'>{p['profile_name']}</div>", unsafe_allow_html=True)
-                with col2:
-                    if st.button("Select", key=f"select_profile_home_{i}"):
+                # Use a horizontal layout: name on left (as a button), small badge with type on right (not actionable).
+                cols = st.columns([5,1], gap="small")
+                with cols[0]:
+                    # Render the profile name as a button; clicking selects it as current agent.
+                    if st.button(p.get("profile_name", f"Profile {i+1}"), key=f"select_profile_home_{i}"):
                         st.session_state["chat_profile"] = i
-                        # also sync the home_select_agent selectbox stored value
-                        st.session_state["home_select_agent"] = i
-                        st.success(f"Selected profile: {p['profile_name']}")
+                        # give a small confirmation (non-disruptive)
+                        st.success(f"Selected profile: {p.get('profile_name','')}")
+                        # rerun to update the top card immediately
                         st.rerun()
+                with cols[1]:
+                    # show a small read-only label for agent type to the right
+                    st.markdown(f"<div style='text-align:center; font-size:0.8em; padding:6px 4px; background:rgba(255,255,255,0.12); border-radius:8px; color:#fff;'>{p.get('agent_type','')}</div>", unsafe_allow_html=True)
 
         render_home_card(
             title="AGENTS",
             buttons=[
-                ("EDIT AGENTS", "home_profiles",
-                 lambda: st.session_state.profiles,
-                 lambda: (st.session_state.update(step=9), st.rerun())),
-                ("CREATE AGENT", "home_create",
-                 None,
-                 lambda: (st.session_state.update(step=1), st.rerun())),
+                ("EDIT AGENTS", "home_profiles", lambda: st.session_state.profiles, lambda: (st.session_state.update(step=9), st.rerun())),
+                ("CREATE AGENT", "home_create", None, lambda: (st.session_state.update(step=1), st.rerun())),
             ],
             expander_label="Saved Agents 🖫",
             expander_body=saved_agents_expander
@@ -860,21 +836,16 @@ def render_step0():
         render_home_card(
             title="CHATS",
             buttons=[
-                ("SAVED CHATS", "home_saved",
-                 lambda: st.session_state.saved_responses,
-                 lambda: (st.session_state.update(step=8), st.rerun())),
-                ("START CHAT", "home_chat",
-                 None,
-                 lambda: (
-                     st.session_state.update(step=7 if st.session_state.profiles else 1),
-                     st.warning("No profiles – create one first.") if not st.session_state.profiles else None,
-                     st.rerun()
-                 )),
+                ("SAVED CHATS", "home_saved", lambda: st.session_state.saved_responses, lambda: (st.session_state.update(step=8), st.rerun())),
+                ("START CHAT", "home_chat", None, lambda: (
+                    st.session_state.update(step=7 if st.session_state.profiles else 1),
+                    st.warning("No profiles – create one first.") if not st.session_state.profiles else None,
+                    st.rerun()
+                )),
             ],
             expander_label="Chat History 🖫",
             expander_body=lambda: [
-                st.markdown(f"<p class='home-small'>{i+1}. {r['profile']} – {r['shortcut']}</p>",
-                            unsafe_allow_html=True)
+                st.markdown(f"<p class='home-small'>{i+1}. {r['profile']} – {r['shortcut']}</p>", unsafe_allow_html=True)
                 for i, r in enumerate(st.session_state.saved_responses)
             ] or st.markdown("<p class='home-small'>No saved chats.</p>", unsafe_allow_html=True)
         )
@@ -883,8 +854,7 @@ def render_step0():
     with r2c1:
         render_home_card(
             title="SOURCES",
-            buttons=[("EDIT SOURCES", "home_sources", None,
-                      lambda: (st.session_state.update(step=10), st.rerun()))],
+            buttons=[("EDIT SOURCES","home_sources",None, lambda:(st.session_state.update(step=10), st.rerun()))],
             expander_label="Sources & Shortcuts",
             expander_body=list_current_sources_and_shortcuts
         )
@@ -893,22 +863,18 @@ def render_step0():
     with r2c2:
         render_home_card(
             title="DATA",
-            buttons=[("CLEAR DATA", "home_clear", None,
-                      lambda: (
-                          st.session_state.update(profiles=[], saved_responses=[]),
-                          save_json(PROFILES_FILE, []),
-                          save_json(RESPONSES_FILE, []),
-                          st.success("All data cleared.")
-                      ))],
+            buttons=[("CLEAR DATA","home_clear",None, lambda: (
+                st.session_state.update(profiles=[], saved_responses=[]),
+                save_json(PROFILES_FILE, []),
+                save_json(RESPONSES_FILE, []),
+                st.success("All data cleared.")
+            ))],
             expander_label="Types & Counts",
             expander_body=lambda: [
-                st.markdown(f"<p class='home-small'>Profiles: {len(st.session_state.profiles)}</p>",
-                            unsafe_allow_html=True),
-                st.markdown(f"<p class='home-small'>Chats: {len(st.session_state.saved_responses)}</p>",
-                            unsafe_allow_html=True)
+                st.markdown(f"<p class='home-small'>Profiles: {len(st.session_state.profiles)}</p>", unsafe_allow_html=True),
+                st.markdown(f"<p class='home-small'>Chats: {len(st.session_state.saved_responses)}</p>", unsafe_allow_html=True)
             ]
         )
-
 
 # ---------------------------------------------------------------------------
 #  STEP 1: SELECT AGENT TYPE

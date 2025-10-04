@@ -37,7 +37,7 @@ def mph_splash():
         <div class="mph-btn-anchor">
             <a href="#mph_start_real" class="mph-anchor-link">🚀 Start</a>
         </div>
-        <h2>🌿 Subject Matter Agent Builder 🌿</h2>
+        <h2> Subject Matter Agents</h2>
         <h3>Your digital team of AI-powered helpers—for parenting, teaching, and any expert support you need.</h3>
         <ul>
             <li><span class="mph-role">👨‍👩‍👧‍👦 Parent Agents:</span> Age-appropriate advice for your family.</li>

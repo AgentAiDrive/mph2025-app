@@ -101,6 +101,7 @@ DEFAULT_EXTRAS_MAP = {
     " RESOLVE": " Step-by-step resolution.",
     "❤ SUPPORT": " Empathetic support."
 }
+
 DOMAIN_SHORTCUTS = {
     "Cardiologist": {
         " 📝 SUMMARY": "Concise findings summary.",
@@ -207,6 +208,15 @@ DOMAIN_SHORTCUTS = {
         ),
     },
 }
+# --- Add this immediately after the DOMAIN_SHORTCUTS definition ---
+DOMAIN_SHORTCUTS.update({
+    "HR Talent Team Expert": {
+        " 🧩 FIT ASSESSMENT": (
+            "Assess candidate–role fit across competencies, culture add, and growth potential. "
+            "Return 3–5 bullet findings and a brief lean (hire/hold/decline) with 1–2 concrete next steps."
+        )
+    }
+})
 
 # ---------------------------------------------------------------------------
 # AGENT TYPES & SOURCES (corrected: domains preloaded dynamically)
@@ -836,32 +846,77 @@ def render_step2():
                 st.session_state.step        = 3
                 st.rerun() 
     render_top_nav()
+# ---------------------------------------------------------------------------
+#  STEP 3: CHOOSE SPECIFIC SOURCE  (DROP-IN REPLACEMENT)
+# ---------------------------------------------------------------------------
+def render_step3():
+    st.markdown(
+        f'<div class="biglabel-G">Step 3: Select Source Name - Select a specific '
+        f'{st.session_state.source_type} name for your agent’s persona.</div>',
+        unsafe_allow_html=True
+    )
 
-# ---------------------------------------------------------------------------
-#  STEP 3: CHOOSE SPECIFIC SOURCE
-# ---------------------------------------------------------------------------
-def render_step3(): 
-    st.markdown(f'<div class="biglabel-G">Step 3: Select Source Name - Select a specific {st.session_state.source_type} name for your agent’s persona.</div>', unsafe_allow_html=True)
     agent_type = st.session_state.agent_type
-    opts = st.session_state["sources"][agent_type].get(st.session_state.source_type, [])
-    if "Agent..." not in opts: opts.append("Agent...")
-    choice = st.selectbox("Select or enter your own:", opts)
-    custom = st.text_input("Enter custom name") if choice == "Other..." else ""
+    source_type = st.session_state.source_type
+    opts = list(st.session_state["sources"][agent_type].get(source_type, []))  # copy
+
+    # Recognize any existing "manual entry" options from your sources
+    # (covers Agent->Expert built-in "Custom Expert (enter manually)" and others)
+    manual_candidates = {
+        "Custom Expert (enter manually)",
+        "Custom Book (enter manually)",
+        "Custom Style (enter manually)",
+        "Other...",
+        "Agent..."
+    }
+
+    # If no manual-entry option is present, add a sensible default
+    if not any(x in opts for x in manual_candidates):
+        # Prefer a clear label that matches the selected source type
+        if source_type == "Expert":
+            opts.append("Custom Expert (enter manually)")
+        elif source_type == "Book":
+            opts.append("Custom Book (enter manually)")
+        elif source_type == "Style":
+            opts.append("Custom Style (enter manually)")
+        else:
+            opts.append("Other...")
+
+    choice = st.selectbox("Select or enter your own:", opts, key="step3_choice")
+
+    # Show text input when user picks a manual option
+    is_manual = choice in manual_candidates or "enter manually" in choice.lower()
+    custom_name = ""
+    if is_manual:
+        custom_name = st.text_input(
+            f"Enter {source_type} name",
+            key="step3_custom_name",
+            placeholder=f"Type your {source_type.lower()} name here…"
+        )
+
     c1, c2 = st.columns(2)
     with c1:
         if st.button("← Back", key="btn_back3"):
-            st.session_state.step = 2; st.rerun()
+            st.session_state.step = 2
+            st.rerun()
+
     with c2:
         if st.button("CREATE PERSONA →", key="btn_next3"):
-            src = custom if choice=="Other..." else choice
-            if not src:
-                st.warning("Please provide a name.")
+            # Use the custom name if a manual option is chosen
+            if is_manual:
+                if not custom_name.strip():
+                    st.warning(f"Please provide a {source_type.lower()} name.")
+                    st.stop()
+                src = custom_name.strip()
             else:
-                st.session_state.source_name = src
-                st.session_state.pop("persona_description", None)
-                st.session_state.step = 4; st.rerun()
- 
-    render_bottom_nav();
+                src = choice
+
+            st.session_state.source_name = src
+            st.session_state.pop("persona_description", None)
+            st.session_state.step = 4
+            st.rerun()
+
+    render_bottom_nav()
     render_top_nav()
 # ---------------------------------------------------------------------------
 # RENDER FUNCTION (Step 4)

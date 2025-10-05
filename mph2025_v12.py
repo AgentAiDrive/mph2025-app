@@ -822,7 +822,7 @@ def render_step0():
                 if sel_name in names:
                     st.session_state["chat_profile"] = names.index(sel_name)
                 # Re-run so the top card updates immediately
-                st.experimental_rerun()
+                st.rerun()
 
             # Show the selectbox of agents (selecting directly makes it current)
             st.selectbox(

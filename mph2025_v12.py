@@ -869,7 +869,7 @@ def render_step0():
                     idx = titles.index(sel_title)
                     st.session_state["saved_select"] = idx
                     st.session_state.step = 8
-                st.experimental_rerun()
+                st.rerun()
 
             st.selectbox(
                 "Choose a saved chat",

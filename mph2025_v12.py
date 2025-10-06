@@ -42,7 +42,7 @@ def mph_splash():
         <ul>
             <li><span class="mph-role">👨‍👩‍👧‍👦 Parent Agents:</span> Age-appropriate advice for your family.</li>
             <li><span class="mph-role">🧑‍🏫 Teacher Agents:</span> Lesson outlines, Q&A, and class support.</li>
-            <li><span class="mph-role">🌟 SMAs Subject Matter Agents:</span> Custom domain agents for any subject - Business, Personal, Experimental</li>
+            <li><span class="mph-role">🌟💡 SMAs Subject Matter Agents:</span> Custom agents for business or personal</li>
         </ul>
         <ul>
             <li><span class="mph-shortcut">💬 Shortcuts:</span> Control your SMA - Inject prompts, instructions and templated workflows to execute tasks or deterministic (structured) outcomes - with the power of dynamically inserted multi-step Instructions executed by the SMA.</li>

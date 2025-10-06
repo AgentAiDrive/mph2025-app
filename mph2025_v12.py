@@ -1038,7 +1038,7 @@ def render_step2():
 def render_step3():
     st.markdown(
         f'<div class="biglabel-G">Step 3: Select Source Name - Select a specific '
-        f'{st.session_state.source_type} name for your agent's persona.</div>',
+        f'{st.session_state.source_type} name for your agents persona.</div>',
         unsafe_allow_html=True
     )
 

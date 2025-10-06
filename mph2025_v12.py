@@ -5,7 +5,7 @@ from typing import List, Tuple, Callable
 from typing import Dict, Optional
 from pydantic import BaseModel, Field, ConfigDict
 
-# ===================== MPH SPLASH SECTION (SHOWS ON APP LOAD) =================
+# ===================== MPH SPLASH SECTION (SHOWS ON APP LOAD) =====================
 def mph_splash():
     st.markdown("""
     <style>
@@ -35,19 +35,19 @@ def mph_splash():
     </style>
     <div class="mph-splash">
         <div class="mph-btn-anchor">
-            <a href="#mph_start_real" class="mph-anchor-link">🚀 Start</a>
+            <a href="#mph_start_real" class="mph-anchor-link">Start Here</a> 
         </div>
-        <h2> Subject Matter Agents</h2>
-        <h3>Your digital team of AI-powered helpers—for parenting, teaching, and any expert support you need.</h3>
+        <h2> SMA - Subject Matter Agents</h2> 
+        <h3>AI-powered helpers—for parenting, teaching, and any expert support you need.</h3> 
         <ul>
             <li><span class="mph-role">👨‍👩‍👧‍👦 Parent Agents:</span> Age-appropriate advice for your family.</li>
             <li><span class="mph-role">🧑‍🏫 Teacher Agents:</span> Lesson outlines, Q&A, and class support.</li>
-            <li><span class="mph-role">🌟 Expert Agents:</span> Custom helpers for any field—AV, science, more.</li>
+            <li><span class="mph-role">🌟 SMAs Subject Matter Agents:</span> Custom domain agents for any subject - Business, Personal, Experimental</li>
         </ul>
         <ul>
-            <li><span class="mph-shortcut">💬 Shortcuts:</span> Choose how you want answers: explain, resolve, chat.</li>
-            <li><span class="mph-shortcut">🧩 Fully Customizable:</span> Add your own sources, edit shortcuts.</li>
-            <li><span class="mph-shortcut">📱 Mobile-First:</span> Works on any device. No account needed.</li>
+            <li><span class="mph-shortcut">💬 Shortcuts:</span> Control your SMA - Inject prompts, instructions and templated workflows to execute tasks or deterministic (structured) outcomes - with the power of dynamically inserted multi-step Instructions executed by the SMA.</li>
+            <li><span class="mph-shortcut">🧩 Fully Customizable:</span> Add your own data sources for agents, and add or edit shortcuts.</li>
+            <li><span class="mph-shortcut">📱 Mobile-First Edition:</span> Works on any device. No account needed.</li>
         </ul>
         <div class="mph-getstarted">
             <b>Get Started:</b>
@@ -64,7 +64,7 @@ def mph_splash():
     """, unsafe_allow_html=True)
 
     # Only the bottom button is a real Streamlit control
-    start = st.button("🚀 Start", use_container_width=True, key="mph_splash_start_real")
+    start = st.button("Start Here", use_container_width=True, key="mph_splash_start_real")
 
     st.markdown("""
         </div> <!-- End mph-btn-bottom -->
@@ -72,7 +72,6 @@ def mph_splash():
     """, unsafe_allow_html=True)
 
     return start
-
 
 # -------------------- SPLASH LOGIC --------------------
 

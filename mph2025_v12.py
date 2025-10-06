@@ -288,7 +288,7 @@ else:
     st.session_state.setdefault("extras_map", DEFAULT_EXTRAS_MAP.copy())
 
 # ---------------------------------------------------------------------------
-#  GLOBAL CSS
+#  GLOBAL CSS - ENHANCED VERSION
 # ---------------------------------------------------------------------------
 st.markdown(
     """
@@ -312,6 +312,22 @@ body {
   align-items: center;
   padding: 10px;
   overflow-y: auto;
+}
+
+/* ---- STEP TRANSITION ANIMATION ---- */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stApp > div[data-testid="stVerticalBlock"] {
+  animation: fadeInUp 0.4s ease-out;
 }
 
 /* ---- LABELS ---- */
@@ -339,14 +355,14 @@ body {
   color: #fff;
 }
 
-/* ---- BUTTONS ---- */
+/* ---- ENHANCED BUTTONS ---- */
 .stButton>button, .st-btn-blue > button, .st-btn-green > button, .st-btn-red > button {
   font-weight: 700 !important;
   border-radius: 26px !important;
   padding: 0.4em !important;
   margin: 5% !important;
   box-shadow: 0 2px 12px rgba(44,99,180,0.12);
-  transition: background 0.2s, filter 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .stButton>button        { background: #1ec97b !important; color: #fff !important; font-size: 0.7em !important; width: 90% !important; border-radius: 20px !important;}
 .st-btn-blue > button   { background: #2966d8 !important; color: #fff !important; font-size: 0.9em !important; width: 100% !important; border: none !important;}
@@ -358,6 +374,8 @@ body {
 .st-btn-green>button:hover,
 .st-btn-red>button:hover {
   filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(44,99,180,0.2);
 }
 
 /* ---- TOP NAVIGATION BAR ---- */
@@ -372,7 +390,7 @@ body {
   background: rgba(0,0,0,0.1) !important;
 }
 
-/* ---- ANSWER BUBBLE ---- */
+/* ---- ENHANCED ANSWER BUBBLE ---- */
 .answer-box {
   background: #23683c;
   border-radius: 12px;
@@ -380,21 +398,29 @@ body {
   color: #fff;
   white-space: pre-wrap;
   margin-top: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255,255,255,0.15);
 }
 
-/* ---- HOME CARDS & LISTS ---- */
+/* ---- ENHANCED HOME CARDS ---- */
 .home-card {
   background: rgba(255,255,255,0.25) !important;
   border-radius: 20px !important;
   padding: 16px !important;
   margin: 6px;
   color: #fff;
-  transition: transform 0.2s, box-shadow 0.2s !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.1) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: 1px solid rgba(255,255,255,0.2);
 }
 .home-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.2) !important;
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15) !important;
+  background: rgba(255,255,255,0.32) !important;
+  border-color: rgba(255,255,255,0.35);
 }
+
 .home-card-title {
   font-size: 1.3em !important;
   color: #fff !important;
@@ -419,6 +445,29 @@ body {
   border: 3px solid #000;
 }
 
+/* ---- ENHANCED AGENT INFO CARD ---- */
+.agent-info-card {
+  background: rgba(255,255,255,0.20);
+  border-radius: 20px;
+  padding: 16px;
+  margin-top: 8px;
+  margin-bottom: 24px;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255,255,255,0.15);
+  width: 100%;
+}
+.agent-info-header {
+  font-size: 1.2em;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+.agent-info-body {
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
 /* ---- DASHBOARD GRID ---- */
 .stApp > div[data-testid="stVerticalBlock"] > div:nth-child(1) {
   display: grid;
@@ -426,6 +475,56 @@ body {
   gap: 16px;
   width: 100%;
   padding: 0 8px;
+}
+
+/* ---- ENHANCED INPUT FIELDS ---- */
+.stTextInput > div > div > input,
+.stTextArea > div > div > textarea,
+.stSelectbox > div > div > div {
+  background: rgba(255,255,255,0.95) !important;
+  border: 2px solid rgba(41,102,216,0.2) !important;
+  border-radius: 14px !important;
+  padding: 12px 16px !important;
+  font-size: 0.95em !important;
+  transition: all 0.25s ease !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
+}
+
+.stTextInput > div > div > input:focus,
+.stTextArea > div > div > textarea:focus {
+  border-color: #2966d8 !important;
+  box-shadow: 0 0 0 3px rgba(41,102,216,0.15), 0 4px 12px rgba(0,0,0,0.1) !important;
+  background: #fff !important;
+  outline: none !important;
+}
+
+/* ---- ENHANCED INPUT LABELS ---- */
+.stTextInput > label, .stTextArea > label, .stSelectbox > label {
+  font-weight: 700 !important;
+  color: #fff !important;
+  font-size: 0.9em !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
+  margin-bottom: 6px !important;
+}
+
+/* ---- ENHANCED SPINNER ---- */
+.stSpinner > div {
+  border-color: rgba(255,255,255,0.2) !important;
+  border-top-color: #1ec97b !important;
+  width: 50px !important;
+  height: 50px !important;
+}
+
+/* ---- PULSING LOADING INDICATOR ---- */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.stAlert {
+  animation: pulse 1.5s ease-in-out infinite;
+  border-radius: 16px !important;
+  border-left: 4px solid #1ec97b !important;
 }
 
 /* ---- RESPONSIVE HEIGHT ---- */
@@ -441,27 +540,6 @@ body {
     width: 100% !important;
     background: rgba(0,0,0,0.1) !important;
   }
-}
-# === Add after your existing global CSS block ===
-/* Agent Info Card (top of Home) */
-.agent-info-card {
-  background: rgba(255,255,255,0.20);
-  border-radius: 20px;
-  padding: 16px;
-  margin-top: 8px;
-  margin-bottom: 24px; /* pushes dashboard down a bit */
-  color: #fff;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
-  width: 100%;
-}
-.agent-info-header {
-  font-size: 1.2em;
-  font-weight: 800;
-  margin-bottom: 6px;
-}
-.agent-info-body {
-  font-size: 0.9em;
-  line-height: 1.4;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -483,8 +561,8 @@ class PersonaProfile(BaseModel):
     search_web:        bool = False
     search_documents:  bool = False
     vector_store_id:   Optional[str] = Field(default=None)
-    documents:         List[str] = Field(default_factory=list)      # FIXED
-    shortcuts:         Dict[str, str] = Field(default_factory=dict) # FIXED
+    documents:         List[str] = Field(default_factory=list)
+    shortcuts:         Dict[str, str] = Field(default_factory=dict)
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
 # ---------------------------------------------------------------------------
@@ -506,8 +584,6 @@ def get_shortcuts_for_domain(domain):
     for key in DOMAIN_SHORTCUTS.keys():
         if domain_key.lower() in key.lower():
             return DOMAIN_SHORTCUTS[key].copy()
-    # Not found: return default
-    # st.warning(f"Domain '{domain}' not found in DOMAIN_SHORTCUTS. Using default shortcuts.")
     return DEFAULT_EXTRAS_MAP.copy()
 
 # ---------------------------------------------------------------------------
@@ -559,12 +635,12 @@ def build_openai_agent_messages(profile, shortcut, shortcut_desc, query, history
     if profile.get("search_web"):
         tool_lines.append("You can search the web for up‑to‑date information.")
     if profile.get("vector_store_id"):
-        tool_lines.append("You can use file_search to reference uploaded documents.")  # for auditing
+        tool_lines.append("You can use file_search to reference uploaded documents.")
     system = (
-        f"You are a {profile['agent_type']} agent based on {profile['source_type']} “{profile['source_name']}”.\n"
+        f"You are a {profile['agent_type']} agent based on {profile['source_type']} "{profile['source_name']}".\n"
         f"Persona: {profile['persona_description']}\n"
         f"Personalization: Parent {profile.get('parent_name','')}, Child {profile.get('child_name','')} (Age {profile.get('child_age','')}).\n"
-        f"Shortcut “{shortcut}”: {shortcut_desc}\n"
+        f"Shortcut "{shortcut}": {shortcut_desc}\n"
         + ("\n".join(tool_lines) if tool_lines else "")
         + "\nAlways respond with a JSON object: {\"answer\": \"…\"}."
     )
@@ -945,7 +1021,7 @@ def render_step1():
 #  STEP 2: SELECT SOURCE TYPE
 # ---------------------------------------------------------------------------
 def render_step2():
-    st.markdown('<div class="biglabel-G">Step 2: Select Source Type - Pick the type of source you’d like your {st.session_state.agent_type} to be based on (Book, Style, or Expert).</div>', unsafe_allow_html=True)
+    st.markdown('<div class="biglabel-G">Step 2: Select Source Type - Pick the type of source you'd like your {st.session_state.agent_type} to be based on (Book, Style, or Expert).</div>', unsafe_allow_html=True)
     cols = st.columns(3)
     for label, key, stype in [("📚 Book","btn_book","Book"),
                               ("🧠 Expert","btn_expert","Expert"),
@@ -957,21 +1033,20 @@ def render_step2():
                 st.rerun() 
     render_top_nav()
 # ---------------------------------------------------------------------------
-#  STEP 3: CHOOSE SPECIFIC SOURCE  (DROP-IN REPLACEMENT)
+#  STEP 3: CHOOSE SPECIFIC SOURCE
 # ---------------------------------------------------------------------------
 def render_step3():
     st.markdown(
         f'<div class="biglabel-G">Step 3: Select Source Name - Select a specific '
-        f'{st.session_state.source_type} name for your agent’s persona.</div>',
+        f'{st.session_state.source_type} name for your agent's persona.</div>',
         unsafe_allow_html=True
     )
 
     agent_type = st.session_state.agent_type
     source_type = st.session_state.source_type
-    opts = list(st.session_state["sources"][agent_type].get(source_type, []))  # copy
+    opts = list(st.session_state["sources"][agent_type].get(source_type, []))
 
     # Recognize any existing "manual entry" options from your sources
-    # (covers Agent->Expert built-in "Custom Expert (enter manually)" and others)
     manual_candidates = {
         "Custom Expert (enter manually)",
         "Custom Book (enter manually)",
@@ -982,7 +1057,6 @@ def render_step3():
 
     # If no manual-entry option is present, add a sensible default
     if not any(x in opts for x in manual_candidates):
-        # Prefer a clear label that matches the selected source type
         if source_type == "Expert":
             opts.append("Custom Expert (enter manually)")
         elif source_type == "Book":
@@ -1012,7 +1086,6 @@ def render_step3():
 
     with c2:
         if st.button("CREATE PERSONA →", key="btn_next3"):
-            # Use the custom name if a manual option is chosen
             if is_manual:
                 if not custom_name.strip():
                     st.warning(f"Please provide a {source_type.lower()} name.")
@@ -1028,20 +1101,42 @@ def render_step3():
 
     render_bottom_nav()
     render_top_nav()
-# ---------------------------------------------------------------------------
-# RENDER FUNCTION (Step 4)
-# ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# STEP 4: GENERATE PERSONA - ENHANCED WITH BETTER LOADING INDICATORS
+# ---------------------------------------------------------------------------
 def render_step4():
     st.markdown('<div class="biglabel-B">GENERATING YOUR AGENT PERSONA</div>', unsafe_allow_html=True)
     placeholder = st.empty()
-    for msg in ["Assimilating Knowledge…","Synthesizing Information…","Assessing Results…","Generating Persona…"]:
-        placeholder.info(msg); time.sleep(0.5)
+    
+    # Enhanced loading messages with emojis and better styling
+    messages = [
+        "🔍 Assimilating Knowledge…",
+        "⚡ Synthesizing Information…",
+        "🧠 Assessing Results…",
+        "✨ Generating Persona…"
+    ]
+    
+    for msg in messages:
+        with placeholder.container():
+            st.markdown(f"""
+            <div style='
+                background: rgba(255,255,255,0.2);
+                padding: 20px;
+                border-radius: 16px;
+                text-align: center;
+                color: #fff;
+                font-weight: 700;
+                font-size: 1.1em;
+                box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+                animation: pulse 1.5s ease-in-out infinite;
+            '>{msg}</div>
+            """, unsafe_allow_html=True)
+        time.sleep(0.6)
 
     if "persona_description" not in st.session_state:
         with st.spinner("Thinking…"):
             try:
-                # Build system and user messages with all context
                 profile_stub = {
                     "agent_type": st.session_state.agent_type,
                     "parent_name": "",
@@ -1064,7 +1159,6 @@ def render_step4():
                 params = build_openai_params(
                     profile_stub, shortcut_label, shortcut_desc, query, history=None
                 )
-                # Conditional: use chat.completions.create if available, else responses.create
                 openai_method = None
                 if hasattr(client, "chat") and hasattr(client.chat, "completions"):
                     openai_method = client.chat.completions.create
@@ -1097,15 +1191,17 @@ def render_step4():
     c1, c2 = st.columns(2)
     with c1:
         if st.button("Retry →", key="btn_retry4"):
-            st.session_state.pop("persona_description", None); st.rerun()
+            st.session_state.pop("persona_description", None)
+            st.rerun()
     with c2:
         if st.button("Save Persona", key="btn_save4"):
-            st.session_state.step = 5; st.rerun()
+            st.session_state.step = 5
+            st.rerun()
 
     render_top_nav()
 
 # ---------------------------------------------------------------------------
-# RENDER FUNCTION (Step 5)
+# STEP 5: PERSONALIZE AGENT
 # ---------------------------------------------------------------------------
 def render_step5():
     st.markdown('<div class="biglabel-G">Great! Now personalize your agent and add tools if desired</div>', unsafe_allow_html=True)
@@ -1114,7 +1210,6 @@ def render_step5():
     source_name  = st.session_state.source_name
 
     # --- Per-profile shortcut logic ---
-    # On first load, pre-fill from domain or default if new profile
     if "profile_shortcuts" not in st.session_state:
         if agent_type == "Agent" and source_type == "Expert" and source_name in DOMAIN_SHORTCUTS:
             st.session_state["profile_shortcuts"] = get_shortcuts_for_domain(source_name)
@@ -1123,7 +1218,7 @@ def render_step5():
     shortcut_map = st.session_state["profile_shortcuts"]
 
     # Editable list
-    st.markdown("**Customize This Agent’s Shortcuts**")
+    st.markdown("**Customize This Agent's Shortcuts**")
     shortcut_items = list(shortcut_map.items())
     to_delete = set()
     new_shortcuts = {}
@@ -1137,11 +1232,9 @@ def render_step5():
         with cols[2]:
             if st.button("❌", key=f"delete_shortcut_{i}"):
                 to_delete.add(label)
-        # Only add non-deleted
         if new_label.strip() and label not in to_delete:
             new_shortcuts[new_label.strip()] = new_desc.strip()
 
-    # Add new shortcut
     st.markdown("---")
     st.markdown("**Add New Shortcut**")
     new_slabel = st.text_input("New Shortcut Label", key="add_shortcut_label_pf")
@@ -1155,7 +1248,6 @@ def render_step5():
         else:
             st.warning("Shortcut label required and must be unique.")
 
-    # Save in session for profile creation
     st.session_state["profile_shortcuts"] = new_shortcuts
 
     # --- Profile form ---
@@ -1222,12 +1314,14 @@ def render_step5():
             st.session_state.profiles.append(profile.dict())
             save_json(PROFILES_FILE, st.session_state.profiles)
             st.success("Profile saved!")
-            st.session_state.pop("profile_shortcuts", None)  # Reset for next profile
-            st.session_state.step = 6; st.rerun()
+            st.session_state.pop("profile_shortcuts", None)
+            st.session_state.step = 6
+            st.rerun()
 
     if st.button("← Back", key="btn_back5"):
-        st.session_state.pop("profile_shortcuts", None)  # Clean up
-        st.session_state.step = 4; st.rerun()
+        st.session_state.pop("profile_shortcuts", None)
+        st.session_state.step = 4
+        st.rerun()
 
     render_top_nav()
 
@@ -1253,7 +1347,6 @@ def render_step6():
 # ---------------------------------------------------------------------------
 #  STEP 7: CHAT
 # ---------------------------------------------------------------------------
-
 def render_step7():
     render_top_nav()
 
@@ -1299,7 +1392,7 @@ def render_step7():
                              help=shortcuts_map[sc]):
                     st.session_state["shortcut"] = sc
 
-    # ── Per-chat tool toggles ───────────────────────────────────────────────
+    # Per-chat tool toggles
     use_web  = st.checkbox(
         "ENABLE WEB SEARCH for this chat",
         value=sel.get("search_web", False),
@@ -1310,7 +1403,6 @@ def render_step7():
         value=sel.get("search_documents", False),
         key="chat_use_docs"
     )
-    # ────────────────────────────────────────────────────────────────────────
 
     # 3. Persistent memory toggle
     use_mem = st.checkbox("ENABLE PERSISTENT MEMORY - CHAT HISTORY", key="persistent_memory")
@@ -1363,7 +1455,6 @@ def render_step7():
             history = (st.session_state.conversation.get(sel["profile_name"], [])
                        if use_mem else None)
 
-            # make a one-off copy of the profile to override its tool flags
             oneoff = sel.copy()
             oneoff["search_web"]       = use_web
             oneoff["search_documents"] = use_docs
@@ -1387,7 +1478,6 @@ def render_step7():
                 answer = parsed.get("answer", raw)
                 st.session_state.last_answer = answer
 
-                # Update memory
                 if use_mem:
                     new_hist = (history or []) + [
                         {"role": "user", "content": query},
@@ -1410,6 +1500,7 @@ def render_step7():
                 st.error(f"OpenAI API error (chat): {e}")
 
     render_bottom_nav()
+
 # ---------------------------------------------------------------------------
 #  STEP 8: VIEW SAVED CHATS
 # ---------------------------------------------------------------------------
@@ -1417,7 +1508,9 @@ def render_step8():
     render_top_nav()
     st.markdown('<div class="biglabel-B">SAVED CHATS</div>', unsafe_allow_html=True)
     if not st.session_state.saved_responses:
-        st.info("No saved responses."); st.session_state.step=0; st.rerun()
+        st.info("No saved responses.")
+        st.session_state.step=0
+        st.rerun()
     titles = [f"{i+1}. {r['profile']} – {r['shortcut']}" for i,r in enumerate(st.session_state.saved_responses)]
     sel_idx = st.selectbox("Saved Chats:", range(len(titles)), format_func=lambda i: titles[i], key="saved_select")
     item = st.session_state.saved_responses[sel_idx]
@@ -1425,7 +1518,6 @@ def render_step8():
     st.markdown(f"<p style='color:#fff;'><strong>Profile:</strong> {item['profile']}</p>", unsafe_allow_html=True)
     st.markdown(f"<p style='color:#fff;'><strong>Shortcut:</strong> {item['shortcut']}</p>", unsafe_allow_html=True)
 
-    # Lookup and show shortcut description for this profile
     sel_profile = next((p for p in st.session_state.profiles if p['profile_name'] == item['profile']), None)
     sc_desc = ""
     if sel_profile and "shortcuts" in sel_profile:
@@ -1451,7 +1543,9 @@ def render_step8():
             st.rerun()
     with c2:
         if st.button("CLOSE", key="btn_close_saved"):
-            st.session_state.step = 0; st.rerun()
+            st.session_state.step = 0
+            st.rerun()
+
 # ---------------------------------------------------------------------------
 #  STEP 9: EDIT PROFILES + SHORTCUTS
 # ---------------------------------------------------------------------------
@@ -1459,14 +1553,14 @@ def render_step9():
     render_top_nav()
     st.markdown('<div class="biglabel-B">AGENT PROFILES</div>', unsafe_allow_html=True)
 
-    # No profiles? Go home
     if not st.session_state.profiles:
-        st.info("No profiles stored."); st.session_state.step=0; st.rerun()
+        st.info("No profiles stored.")
+        st.session_state.step=0
+        st.rerun()
     titles = [f"{i+1}. {p['profile_name']}" for i,p in enumerate(st.session_state.profiles)]
     idx = st.selectbox("Select a profile:", range(len(titles)), format_func=lambda i: titles[i], key="profile_select")
     prof = st.session_state.profiles[idx]
 
-    # --- Begin Profile Edit Form ---
     with st.form("edit_profile"):
         p_name = st.text_input("Parent/Agent Name", value=prof.get("parent_name", ""))
         c_age  = st.number_input("Child Age (or Class Grade)", 1, 99, value=max(1, prof.get("child_age", 1)))
@@ -1479,13 +1573,11 @@ def render_step9():
         web = st.checkbox("Enable web search", value=prof.get("search_web", False))
         uploads = st.file_uploader("Upload documents", accept_multiple_files=True) if rag else []
 
-        # --- Shortcuts Editor for this profile ---
         st.markdown("#### Shortcuts for this Agent")
         shortcuts = dict(prof.get("shortcuts", {}))
         shortcut_edits = []
         delete_keys = set()
 
-        # Show each shortcut with edit boxes and a delete checkbox
         for i, (label, description) in enumerate(list(shortcuts.items())):
             cols = st.columns([2, 4, 1])
             with cols[0]:
@@ -1509,23 +1601,18 @@ def render_step9():
             else:
                 shortcuts[new_sc_label] = new_sc_desc
                 st.success(f"Added shortcut '{new_sc_label}'.")
-                # Immediate update in UI (no rerun on Streamlit forms, so added to the next render)
 
-        # --- Save Profile Edits ---
         saved = st.form_submit_button("SAVE CHANGES")
 
-    # --- Apply Edits After Form Submission ---
     if saved:
-        # 1. Build a new shortcuts dict, skipping any marked for delete, and renaming/editing as appropriate
         updated_shortcuts = {}
         for old_label, new_label, new_desc in shortcut_edits:
             if not new_label or old_label in delete_keys:
-                continue  # skip deleted or empty
+                continue
             if new_label in updated_shortcuts and new_label != old_label:
                 st.warning(f"Duplicate shortcut label: '{new_label}'")
                 continue
             updated_shortcuts[new_label] = new_desc
-        # 2. Add any newly created shortcut from add_sc above, unless it's flagged for delete or already exists
         if new_sc_label and new_sc_label not in delete_keys and new_sc_label not in updated_shortcuts:
             updated_shortcuts[new_sc_label] = new_sc_desc
 
@@ -1542,7 +1629,6 @@ def render_step9():
             documents=prof.get("documents", []),
             shortcuts=updated_shortcuts,
         )
-        # If doc search disabled, forget old vector store
         if not docs:
             prof["vector_store_id"] = None
         st.session_state.profiles[idx] = prof
@@ -1550,7 +1636,6 @@ def render_step9():
         st.success("Profile updated!")
         st.rerun()
 
-    # --- Danger Zone ---
     c1, c2 = st.columns(2)
     with c1:
         if st.button("DELETE PROFILE", key="btn_delete_profile"):
@@ -1559,8 +1644,10 @@ def render_step9():
             st.rerun()
     with c2:
         if st.button("CLOSE", key="btn_close_profile"):
-            st.session_state.step = 0; st.rerun()
+            st.session_state.step = 0
+            st.rerun()
     render_bottom_nav()
+
 # ---------------------------------------------------------------------------
 #  STEP 10: EDIT SOURCES AND SHORTCUTS
 # ---------------------------------------------------------------------------
@@ -1595,23 +1682,27 @@ def render_step10():
         if st.button("Remove Selected"):
             srcs[agent_type][source_type] = [i for i in items if i not in to_remove]
             st.session_state['sources'] = srcs
-            save_sources(srcs); st.success("Removed!"); st.rerun()
+            save_sources(srcs)
+            st.success("Removed!")
+            st.rerun()
     with c2:
         if st.button("Add"):
             if new_item and new_item not in items:
                 srcs[agent_type][source_type].append(new_item)
                 st.session_state['sources'] = srcs
-                save_sources(srcs); st.success(f"Added '{new_item}'!"); st.rerun()
+                save_sources(srcs)
+                st.success(f"Added '{new_item}'!")
+                st.rerun()
             elif new_item:
                 st.warning("Already in list.")
     with c3:
         if st.button("Back to Home"):
-            st.session_state.step = 0; st.rerun()
+            st.session_state.step = 0
+            st.rerun()
 
     st.write(srcs[agent_type][source_type])
     render_bottom_nav()
 
-    # --- DYNAMIC SHORTCUT EDITOR ---
     render_shortcut_editor()
 
 # ---------------------------------------------------------------------------

@@ -38,7 +38,7 @@ def mph_splash():
             <a href="#mph_start_real" class="mph-anchor-link">Start Here</a> 
         </div>
         <h1> SMA - Subject Matter Agents</h1> 
-        <h3>AI-powered helpers—for parenting, teaching, and any expert support you need.</h3> 
+        <h3>Custom Agents for parenting, teaching, and any subject matter expert you need.</h3> 
         <ul>
             <li><span class="mph-role">👨‍👩‍👧‍👦 Parent Agents:</span> Age-appropriate advice for your family.</li>
             <li><span class="mph-role">🧑‍🏫 Teacher Agents:</span> Lesson outlines, Q&A, and class support.</li>

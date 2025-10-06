@@ -1021,7 +1021,7 @@ def render_step1():
 #  STEP 2: SELECT SOURCE TYPE
 # ---------------------------------------------------------------------------
 def render_step2():
-    st.markdown('<div class="biglabel-G">Step 2: Select Source Type - Pick the type of source you'd like your {st.session_state.agent_type} to be based on (Book, Style, or Expert).</div>', unsafe_allow_html=True)
+    st.markdown('<div class="biglabel-G">Step 2: Select Source Type - Pick the type of source you would like your {st.session_state.agent_type} to be based on (Book, Style, or Expert).</div>', unsafe_allow_html=True)
     cols = st.columns(3)
     for label, key, stype in [("📚 Book","btn_book","Book"),
                               ("🧠 Expert","btn_expert","Expert"),

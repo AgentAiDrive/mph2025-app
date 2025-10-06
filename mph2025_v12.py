@@ -5,7 +5,7 @@ from typing import List, Tuple, Callable
 from typing import Dict, Optional
 from pydantic import BaseModel, Field, ConfigDict
 
-# ===================== MPH SPLASH SECTION (SHOWS ON APP LOAD) =====================
+# ===================== MPH SPLASH SECTION (SHOWS ON APP LOAD) =================
 def mph_splash():
     st.markdown("""
     <style>
@@ -85,8 +85,9 @@ if not st.session_state.splash_done:
         st.session_state.splash_done = True
         st.rerun()
     st.stop()
+
 # ---------------------------------------------------------------------------
-# CONSTANTS & FILE PATHS (unchanged)
+# CONSTANTS & FILE PATHS
 # ---------------------------------------------------------------------------
 PROFILES_FILE   = "parent_helpers_profiles.json"
 RESPONSES_FILE  = "parent_helpers_responses.json"
@@ -219,11 +220,11 @@ DOMAIN_SHORTCUTS.update({
 })
 
 # ---------------------------------------------------------------------------
-# AGENT TYPES & SOURCES (corrected: domains preloaded dynamically)
+# AGENT TYPES & SOURCES
 # ---------------------------------------------------------------------------
 AGENT_TYPES = ["Parent", "Teacher", "Agent"]
 PARENT_SOURCES = {
-    "Book":   ["The Whole‑Brain Child", "Peaceful Parent, Happy Kids"],
+    "Book":   ["The Whole-Brain Child", "Peaceful Parent, Happy Kids"],
     "Expert": ["Dr. Laura Markham", "Dr. Daniel Siegel"],
     "Style":  ["Authoritative", "Gentle Parenting"]
 }
@@ -242,7 +243,7 @@ AGENT_SOURCES = {
 }
 
 # ---------------------------------------------------------------------------
-# JSON LOAD / SAVE UTILITIES (unchanged)
+# JSON LOAD / SAVE UTILITIES
 # ---------------------------------------------------------------------------
 def load_json(path: str):
     if not os.path.exists(path): return []
@@ -266,7 +267,7 @@ def save_json(path: str, data):
 client = OpenAI(api_key=st.secrets.get("openai_key", "YOUR_OPENAI_API_KEY"))
 
 # ---------------------------------------------------------------------------
-# SESSION‑STATE INIT (unchanged)
+# SESSION-STATE INIT
 # ---------------------------------------------------------------------------
 st.session_state.setdefault("profiles",        load_json(PROFILES_FILE))
 st.session_state.setdefault("saved_responses", load_json(RESPONSES_FILE))
@@ -369,6 +370,7 @@ body {
 .st-btn-green > button  { background: #1ec97b !important; color: #fff !important; font-size: 0.9em !important; width: 40% !important; border: none !important;}
 .st-btn-red > button    { background: #d8293c !important; color: #fff !important; font-size: 0.9em !important; width: 100% !important; border: none !important; margin: 6px 0 !important; padding: 0.4em 0 !important;}
 
+/* hover */
 .stButton>button:hover,
 .st-btn-blue>button:hover,
 .st-btn-green>button:hover,
@@ -587,7 +589,7 @@ def get_shortcuts_for_domain(domain):
     return DEFAULT_EXTRAS_MAP.copy()
 
 # ---------------------------------------------------------------------------
-# FILE‑SEARCH TOOL for RAG
+# FILE-SEARCH TOOL for RAG
 # ---------------------------------------------------------------------------
 def get_openai_tools(profile: dict) -> list:
     tools = []
@@ -631,21 +633,30 @@ def openai_chat_or_responses(params: dict, fallback_prompt: str):
 # MESSAGE BUILDERS
 # ---------------------------------------------------------------------------
 def build_openai_agent_messages(profile, shortcut, shortcut_desc, query, history):
+    """
+    Build system + history messages for OpenAI calls.
+    Uses safe quoting and doubles braces where literal JSON braces are required.
+    """
     tool_lines = []
     if profile.get("search_web"):
-        tool_lines.append("You can search the web for up‑to‑date information.")
+        tool_lines.append("You can search the web for up-to-date information.")
     if profile.get("vector_store_id"):
         tool_lines.append("You can use file_search to reference uploaded documents.")
+    tool_section = "\n".join(tool_lines) if tool_lines else ""
+
+    # Use a triple-quoted f-string and double braces for literal JSON braces.
     system = (
-        f"You are a {profile['agent_type']} agent based on {profile['source_type']} "{profile['source_name']}".\n"
-        f"Persona: {profile['persona_description']}\n"
-        f"Personalization: Parent {profile.get('parent_name','')}, Child {profile.get('child_name','')} (Age {profile.get('child_age','')}).\n"
-        f"Shortcut "{shortcut}": {shortcut_desc}\n"
-        + ("\n".join(tool_lines) if tool_lines else "")
-        + "\nAlways respond with a JSON object: {\"answer\": \"…\"}."
+        f"""You are a {profile.get('agent_type','agent')} agent based on {profile.get('source_type','source')} \"{profile.get('source_name','')}\"
+Persona: {profile.get('persona_description','')}
+Personalization: Parent {profile.get('parent_name','')}, Child {profile.get('child_name','')} (Age {profile.get('child_age','')})
+Shortcut \"{shortcut}\": {shortcut_desc}
+{tool_section}
+Always respond with a JSON object: {{\"answer\": \"…\"}}."""
     )
+
     messages = [{"role": "system", "content": system}]
     if history:
+        # Expect history as list[{"role": "...", "content": "..."}]
         messages += [{"role": m["role"], "content": m["content"]} for m in history]
     messages.append({"role": "user", "content": query})
     return messages
@@ -674,8 +685,18 @@ def render_home_card(
         cols = st.columns(len(buttons), gap="small")
         for col, (label, key, cond, act) in zip(cols, buttons):
             with col:
-                if st.button(label, key=key) and (cond is None or cond()):
-                    act()
+                # cond may be None or a callable that returns bool
+                enabled = True
+                try:
+                    if cond is not None:
+                        enabled = cond()
+                except Exception:
+                    enabled = False
+                if st.button(label, key=key) and enabled:
+                    try:
+                        act()
+                    except Exception as e:
+                        st.error(f"Action error: {e}")
     if expander_label and expander_body:
         with st.expander(expander_label):
             expander_body()
@@ -696,6 +717,7 @@ def list_current_sources_and_shortcuts() -> None:
     for key, desc in st.session_state["extras_map"].items():
         label = key.strip() or "(DEFAULT)"
         st.markdown(f"<p class='home-small'>&nbsp;&nbsp;{label}: {desc}</p>", unsafe_allow_html=True)
+
 # ---------------------------------------------------------------------------
 #  TOP NAVIGATION
 # ---------------------------------------------------------------------------
@@ -706,6 +728,7 @@ def render_top_nav() -> None:
         if st.button("🏠 Home", key="nav_home"):
             st.session_state.step = 0
             st.rerun()
+
 # ---------------------------------------------------------------------------
 #  BOTTOM NAVIGATION
 # ---------------------------------------------------------------------------
@@ -723,10 +746,10 @@ def render_bottom_nav():
             else:
                 st.warning("No saved responses yet.")
             st.rerun()
+
 # ---------------------------------------------------------------------------
 #  SHORTCUT EDITOR
 # ---------------------------------------------------------------------------
-
 def render_shortcut_editor():
     st.markdown("### Edit Shortcut Buttons (Label and Description)")
 
@@ -787,6 +810,7 @@ def render_shortcut_editor():
         save_json(SHORTCUTS_FILE, updated_map)
         st.success("Shortcut labels and descriptions updated!")
         st.rerun()
+
 # ---------------------------------------------------------------------------
 #  STEP 0: HOME PAGE - DASHBOARD
 # ---------------------------------------------------------------------------
@@ -915,8 +939,8 @@ def render_step0():
         render_home_card(
             title="AGENTS",
             buttons=[
-                ("EDIT AGENTS", "home_profiles", lambda: st.session_state.profiles, lambda: (st.session_state.update(step=9), st.rerun())),
-                ("CREATE AGENT", "home_create", None, lambda: (st.session_state.update(step=1), st.rerun())),
+                ("EDIT AGENTS", "home_profiles", lambda: bool(st.session_state.get("profiles")), lambda: (st.session_state.__setitem__('step', 9), st.rerun())),
+                ("CREATE AGENT", "home_create", None, lambda: (st.session_state.__setitem__('step', 1), st.rerun())),
             ],
             expander_label="Saved Agents 🖫",
             expander_body=saved_agents_expander
@@ -960,12 +984,8 @@ def render_step0():
         render_home_card(
             title="CHATS",
             buttons=[
-                ("SAVED CHATS", "home_saved", lambda: st.session_state.saved_responses, lambda: (st.session_state.update(step=8), st.rerun())),
-                ("START CHAT", "home_chat", None, lambda: (
-                    st.session_state.update(step=7 if st.session_state.profiles else 1),
-                    st.warning("No profiles – create one first.") if not st.session_state.profiles else None,
-                    st.rerun()
-                )),
+                ("SAVED CHATS", "home_saved", lambda: bool(st.session_state.get("saved_responses")), lambda: (st.session_state.__setitem__('step', 8), st.rerun())),
+                ("START CHAT", "home_chat", None, lambda: (st.session_state.__setitem__('step', 7 if st.session_state.get("profiles") else 1), st.rerun())),
             ],
             expander_label="Saved Chats 🖫",
             expander_body=saved_chats_expander
@@ -977,7 +997,7 @@ def render_step0():
     with r2c1:
         render_home_card(
             title="SOURCES",
-            buttons=[("EDIT SOURCES", "home_sources", None, lambda: (st.session_state.update(step=10), st.rerun()))],
+            buttons=[("EDIT SOURCES", "home_sources", None, lambda: (st.session_state.__setitem__('step', 10), st.rerun()))],
             expander_label="Sources & Shortcuts",
             expander_body=list_current_sources_and_shortcuts
         )
@@ -989,7 +1009,8 @@ def render_step0():
         render_home_card(
             title="DATA",
             buttons=[("CLEAR DATA", "home_clear", None, lambda: (
-                st.session_state.update(profiles=[], saved_responses=[]),
+                st.session_state.__setitem__('profiles', []),
+                st.session_state.__setitem__('saved_responses', []),
                 save_json(PROFILES_FILE, []),
                 save_json(RESPONSES_FILE, []),
                 st.success("All data cleared.")
@@ -1021,7 +1042,11 @@ def render_step1():
 #  STEP 2: SELECT SOURCE TYPE
 # ---------------------------------------------------------------------------
 def render_step2():
-    st.markdown('<div class="biglabel-G">Step 2: Select Source Type - Pick the type of source you would like your {st.session_state.agent_type} to be based on (Book, Style, or Expert).</div>', unsafe_allow_html=True)
+    agent_label = st.session_state.get("agent_type", "agent")
+    st.markdown(
+        f"<div class='biglabel-G'>Step 2: Select Source Type - Pick the type of source you'd like your {agent_label} to be based on (Book, Style, or Expert).</div>",
+        unsafe_allow_html=True,
+    )
     cols = st.columns(3)
     for label, key, stype in [("📚 Book","btn_book","Book"),
                               ("🧠 Expert","btn_expert","Expert"),
@@ -1030,8 +1055,9 @@ def render_step2():
             if st.button(label, key=key):
                 st.session_state.source_type = stype
                 st.session_state.step        = 3
-                st.rerun() 
+                st.rerun()
     render_top_nav()
+
 # ---------------------------------------------------------------------------
 #  STEP 3: CHOOSE SPECIFIC SOURCE
 # ---------------------------------------------------------------------------
@@ -1108,7 +1134,7 @@ def render_step3():
 def render_step4():
     st.markdown('<div class="biglabel-B">GENERATING YOUR AGENT PERSONA</div>', unsafe_allow_html=True)
     placeholder = st.empty()
-    
+
     # Enhanced loading messages with emojis and better styling
     messages = [
         "🔍 Assimilating Knowledge…",
@@ -1116,7 +1142,7 @@ def render_step4():
         "🧠 Assessing Results…",
         "✨ Generating Persona…"
     ]
-    
+
     for msg in messages:
         with placeholder.container():
             st.markdown(f"""
@@ -1452,7 +1478,7 @@ def render_step7():
 
     with c2:
         if st.button("SEND →", key="send_btn"):
-            history = (st.session_state.conversation.get(sel["profile_name"], [])
+            history = (st.session_state.conversation.get(sel["profile_name"], [] )
                        if use_mem else None)
 
             oneoff = sel.copy()

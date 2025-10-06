@@ -79,7 +79,7 @@ if "splash_done" not in st.session_state:
     st.session_state.splash_done = False
 
 if not st.session_state.splash_done:
-    st.set_page_config(page_title="Agent AI Builder", page_icon="🌿", layout="centered")
+    st.set_page_config(page_title="SMA - 📚 Subject Matter Agents 🧠", page_icon="🧠", layout="centered")
     if mph_splash():
         st.session_state.splash_done = True
         st.rerun()

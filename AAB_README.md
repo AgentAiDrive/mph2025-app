@@ -1,6 +1,6 @@
-# 🌿 Agent Ai Builder (AAB)
+# 🌿 Subject Matter Agents (SMA)
 
-_Modular, extensible, and privacy-first AI agent builder._  
+_Modular, extensible, and privacy-first AI subject matter agent builder._  
 Design and deploy context-driven “Agents” with persona-specific, scenario-aware responses in a no-code Streamlit UI.
 
 **Live Demo:** https://mph-2025.streamlit.app
@@ -29,7 +29,7 @@ Tech pillars: **Context engineering** • **Layered prompt injection** • **Dom
 ---
 
 ## ⚡ About the App
-Agent Ai Builder (AAB) enables parents, teachers, and domain experts to create highly customized AI helpers (“Agents”) with persona-specific, scenario-aware responses. Everything runs in a clean, mobile-friendly Streamlit UI. No code required.
+Subject Matter Agent Ai Builder (SMA) enables parents, teachers, and domain experts to create highly customized subject matter expert AI helpers (“SMA's”) with persona-specific, scenario-aware responses. Everything runs in a clean, mobile-friendly Streamlit UI. No code required.
 
 - **Audience:** Parents, teachers, and domain experts  
 - **Core capabilities:** Persona synthesis, layered prompt injection, structured response shortcuts, optional tools (RAG, web search), and local JSON persistence  
